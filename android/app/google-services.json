@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "975647460038",
+    "project_id": "nighthub-77c81",
+    "storage_bucket": "nighthub-77c81.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975647460038:android:84dea757b5b844d051e5c7",
+        "android_client_info": {
+          "package_name": "com.dhbw.nighthub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "975647460038-cl1t37orvnse32p5g1eq1uqo73992cd0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBldNi7VUVl1X3aNXDDD1LvyMuepRuEbeg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "975647460038-cl1t37orvnse32p5g1eq1uqo73992cd0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
