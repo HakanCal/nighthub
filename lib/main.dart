@@ -1,78 +1,34 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:provider/provider.dart';
+
+import 'package:nighthub/src/auth/loginScreen.dart';
+import 'package:nighthub/src/auth/authState.dart';
+import 'package:nighthub/src/auth/forgotPasswordScreen.dart';
+import 'package:nighthub/src/homepage.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthState(),
+      child: const NightHub(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class NightHub extends StatelessWidget {
+  const NightHub({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        title: 'Navigation bar Test',
-        home: Menu()
+    return MaterialApp(
+        title: 'Welcome Screen',
+        initialRoute: '/',
+        routes: <String, WidgetBuilder>{
+          '/': (BuildContext context) => const LoginScreen(),
+          '/home': (BuildContext context) => const HomePage(),
+          '/forgotPassword': (context) => const ForgotPasswordScreen(),
+        },
     );
   }
 }
 
-
-class Menu extends StatefulWidget {
-  const Menu({Key? key}) : super(key: key);
-
-  @override
-  State<Menu> createState() => _Menu();
-}
-
-class _Menu extends State<Menu> {
-
-  static const List <Widget> _menuSelects = <Widget>[
-    //Swiper
-    //Near me
-    //Setting
-    Text('Select 0'),
-    Text('Select 1'),
-    Text('Select 2')
-  ];
-  int _selectedIndex = 0;
-  void onItemTap(int index){
-    setState(()=>{_selectedIndex = index});
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text('Navigation bar for nighthub')),
-        body: Center(
-            child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginWidget()));
-                },
-                child: _menuSelects[_selectedIndex])),
-        bottomNavigationBar:
-        BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.local_bar_rounded, color: Colors.red),
-                  label: 'Discover',
-                  tooltip: 'Discover local Bars!'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.pin_drop_rounded, color: Colors.red),
-                  label: 'Near me',
-                  tooltip: 'Local Bars near me'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings, color: Colors.orange),
-                  label: 'Settings',
-                  tooltip: 'Settings')
-            ],
-            backgroundColor: Colors.black,
-            iconSize: 24,
-            currentIndex: _selectedIndex,
-            onTap: onItemTap,
-        )
-    );
-  }
-}
