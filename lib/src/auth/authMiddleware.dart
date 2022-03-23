@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 
+import '../homepage.dart';
 import '../widgets.dart';
 import './forms/index.dart';
 
 enum AuthenticationState {
   loggedOut,
-  emailAddress,
+  emailNotRegistered,
   forgotPassword,
-  register,
+  registerUser,
   loggedIn,
 }
 
-class AuthMiddleware extends StatelessWidget {
+class AuthMiddleware extends StatefulWidget {
   const AuthMiddleware({
     required this.authState,
     required this.email,
     required this.forgotPassword,
+    required this.setAuthStateToRegisterUser,
+    //required this.setAuthStateToRegisterBusiness,
     required this.sendNewPassword,
-    required this.loginWithNewPassword,
-    //required this.startLogin,
-    //required this.verifyEmail,
+    required this.setAuthStateToLoggedOut,
     required this.signIn,
     required this.cancelRegistration,
     required this.registerAccount,
@@ -28,17 +29,14 @@ class AuthMiddleware extends StatelessWidget {
 
   final AuthenticationState authState;
   final String? email;
-  //final void Function() startLogin;
-  /*final void Function(
-      String email,
-      void Function(Exception e) error,
-      ) verifyEmail;*/
   final void Function() forgotPassword;
+  final void Function() setAuthStateToRegisterUser;
+  //final void Function() setAuthStateToRegisterBusiness;
   final void Function(
       String email,
       void Function(Exception e) error,
       ) sendNewPassword;
-  final void Function() loginWithNewPassword;
+  final void Function() setAuthStateToLoggedOut;
   final void Function(
       String email,
       String password,
@@ -54,46 +52,39 @@ class AuthMiddleware extends StatelessWidget {
   final void Function() logOut;
 
   @override
+  _AuthMiddleware createState() => _AuthMiddleware();
+}
+
+class _AuthMiddleware extends State<AuthMiddleware> {
+  @override
   Widget build(BuildContext context) {
-    switch (authState) {
-      /*case AuthenticationState.loggedOut: //TODO: add screen for the different cases?
-        return Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 8),
-              child: StyledButton(
-                onPressed: () {
-                  signIn();
-                },
-                child: const Text('SIGN IN'),
-              ),
-            ),
-          ],
-        );*/
-      case AuthenticationState.forgotPassword:
+    switch (widget.authState) {
+     case AuthenticationState.forgotPassword:
         return ForgotPasswordForm(
-          email: email,
-          sendNewPassword: (email) => sendNewPassword(
+          email: widget.email,
+          sendNewPassword: (email) => widget.sendNewPassword(
             email, (e) => _showErrorDialog(context, 'Email could not be sent', e)
           ),
-          loginWithNewPassword: () => loginWithNewPassword(),
+          setAuthStateToLoggedOut: () => widget.setAuthStateToLoggedOut(),
         );
       case AuthenticationState.loggedOut:
         return LoginForm(
-          email: email,
+          email: widget.email,
           login: (email, password) {
-            signIn(email, password, (e) => _showErrorDialog(context, 'Failed to sign in', e));
+            widget.signIn(email, password, (e) => _showErrorDialog(context, 'Failed to sign in', e));
           },
-          forgotPassword: () => forgotPassword(),
+          forgotPassword: () => widget.forgotPassword(),
+          setAuthStateToRegisterUser: () => widget.setAuthStateToRegisterUser(),
+          //setAuthStateToRegisterBusiness: () => widget.setAuthStateToRegisterBusiness(),
         );
-      case AuthenticationState.register:
-        return RegisterForm(
-          email: email!,
+      case AuthenticationState.registerUser:
+        return UserRegisterForm(
+          email: widget.email,
           cancel: () {
-            cancelRegistration();
+            widget.cancelRegistration();
           },
           registerAccount: (email, username, password) {
-            registerAccount(
+            widget.registerAccount(
                 email,
                 username,
                 password,
@@ -101,8 +92,8 @@ class AuthMiddleware extends StatelessWidget {
           },
         );
       case AuthenticationState.loggedIn:
-        return Row(
-          children: [
+        return const HomePage();
+          /*children: [
             Padding(
               padding: const EdgeInsets.only(left: 24, bottom: 8),
               child: StyledButton(
@@ -113,7 +104,7 @@ class AuthMiddleware extends StatelessWidget {
               ),
             ),
           ],
-        );
+        );*/
       default:
         return Row(
           children: const [
@@ -124,37 +115,52 @@ class AuthMiddleware extends StatelessWidget {
   }
 
   void _showErrorDialog(BuildContext context, String title, Exception e) {
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            title,
-            style: const TextStyle(fontSize: 24),
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  '${(e as dynamic).message}',
-                  style: const TextStyle(fontSize: 18),
+    showGeneralDialog(
+      transitionBuilder: (context, a1, a2, widget) {
+        return Transform.scale(
+          scale: a1.value,
+          child: Opacity(
+            opacity: a1.value,
+            child: AlertDialog(
+              actionsPadding: const EdgeInsets.only(top: 0, right: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius:
+                  BorderRadius.circular(20)
+              ),
+              title: Text(
+                title,
+                style: const TextStyle(fontSize: 24),
+              ),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text(
+                      '${(e as dynamic).message}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                StyledButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ),
               ],
             ),
           ),
-          actions: <Widget>[
-            StyledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'OK',
-                style: TextStyle(color: Colors.deepPurple),
-              ),
-            ),
-          ],
         );
       },
+      transitionDuration: const Duration(milliseconds: 200),
+      barrierDismissible: true,
+      barrierLabel: '',
+      context: context,
+      pageBuilder: (context, animation1, animation2) {throw Exception;}
     );
   }
 }

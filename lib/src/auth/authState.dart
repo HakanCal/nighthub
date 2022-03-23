@@ -52,35 +52,8 @@ class AuthState extends ChangeNotifier {
   List<ReviewMessage> _reviewMessages = [];
   List<ReviewMessage> get reviewMessages => _reviewMessages;*/
 
-  /// The log-in flow starts
-  /*void startLogin() {
-    _authState = AuthenticationState.emailAddress;
-    notifyListeners();
-  }*/
-
   String? _email;
   String? get email => _email;
-
-  /// Verify in Firebase the record of the email
-  /*Future<void> verifyEmail(
-      String email,
-      void Function(FirebaseAuthException e) errorCallback
-    ) async {
-      try {
-        var methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-
-        if (methods.contains('password')) {
-          _authState = AuthenticationState.password;
-        } else {
-          _authState = AuthenticationState.register;
-        }
-
-        _email = email;
-        notifyListeners();
-      } on FirebaseAuthException catch (e) {
-        errorCallback(e);
-      }
-    }*/
 
   /// Auth state changes and navigates to ForgotPassword page
   void forgotPassword() {
@@ -102,26 +75,54 @@ class AuthState extends ChangeNotifier {
   }
 
   /// Navigates back to login page
-  void loginWithNewPassword() {
+  void setAuthStateToLoggedOut() {
     _authState = AuthenticationState.loggedOut;
     notifyListeners();
   }
 
-  /// Sign in with by entering email and password
+  /// Check whether email is already registered in Firebase
+  Future<void> verifyEmail(
+      String email,
+      String password,
+      void Function(FirebaseAuthException e) errorCallback,
+      ) async {
+    try {
+      var methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (methods.contains('password')) {
+        await signIn(email, password, errorCallback);
+        _authState = AuthenticationState.loggedIn;
+      } else {
+        _authState = AuthenticationState.emailNotRegistered;
+      }
+      _email = email;
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      errorCallback(e);
+    }
+  }
+
+  /// Sign in by entering email and password
   Future<void> signIn(
       String email,
       String password,
       void Function(FirebaseAuthException e) errorCallback,
     ) async {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+          _authState = AuthenticationState.loggedIn;
       } on FirebaseAuthException catch (e) {
         errorCallback(e);
       }
     }
+
+  /// Navigates back to login page
+  void setAuthStateToRegisterUser() {
+    _authState = AuthenticationState.registerUser;
+    notifyListeners();
+  }
 
   ///  Registration process was interrupted
   void cancelRegistration() {
@@ -131,13 +132,14 @@ class AuthState extends ChangeNotifier {
 
   /// Registration is finished and account created
   Future<void> registerAccount(
-      String email,
       String username,
+      String email,
       String password,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
-      var credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password);
       await credential.user!.updateDisplayName(username);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
