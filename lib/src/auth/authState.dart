@@ -1,6 +1,7 @@
 import 'dart:async';
 
 //import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -80,31 +81,11 @@ class AuthState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Check whether email is already registered in Firebase
-  Future<void> verifyEmail(
-      String email,
-      String password,
-      void Function(FirebaseAuthException e) errorCallback,
-      ) async {
-    try {
-      var methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-      if (methods.contains('password')) {
-        await signIn(email, password, errorCallback);
-        _authState = AuthenticationState.loggedIn;
-      } else {
-        _authState = AuthenticationState.emailNotRegistered;
-      }
-      _email = email;
-      notifyListeners();
-    } on FirebaseAuthException catch (e) {
-      errorCallback(e);
-    }
-  }
-
   /// Sign in by entering email and password
   Future<void> signIn(
       String email,
       String password,
+      void Function() navigator,
       void Function(FirebaseAuthException e) errorCallback,
     ) async {
       try {
@@ -113,6 +94,7 @@ class AuthState extends ChangeNotifier {
             password: password,
           );
           _authState = AuthenticationState.loggedIn;
+          navigator();
       } on FirebaseAuthException catch (e) {
         errorCallback(e);
       }
@@ -131,7 +113,7 @@ class AuthState extends ChangeNotifier {
   }
 
   /// Registration is finished and account created
-  Future<void> registerAccount(
+  Future<void> registerUserAccount(
       String username,
       String email,
       String password,
@@ -140,7 +122,18 @@ class AuthState extends ChangeNotifier {
       var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password);
-      await credential.user!.updateDisplayName(username);
+      await credential.user!.updateDisplayName(username)
+        .then((value) => FirebaseFirestore.instance
+          .collection('user_accounts')
+          .add(<String, dynamic>{
+            'username': FirebaseAuth.instance.currentUser!.displayName,
+            'email': FirebaseAuth.instance.currentUser!.email,
+            'userId': FirebaseAuth.instance.currentUser!.uid,
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+           })
+        );
+      _authState = AuthenticationState.loggedOut;
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
