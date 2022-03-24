@@ -1,3 +1,4 @@
 export './loginForm.dart';
-export './registrationForm.dart';
+export './userRegistrationForm.dart';
+export './businessRegistrationForm.dart';
 export './forgotPasswordForm.dart';

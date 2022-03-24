@@ -5,11 +5,14 @@ class Header extends StatelessWidget {
   final String heading;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.all(8.0),
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.only(top: 0, bottom: 15),
     child: Text(
       heading,
-      style: const TextStyle(fontSize: 24),
+      style: const TextStyle(
+        fontSize: 36,
+        color: Colors.white,
+      ),
     ),
   );
 }
@@ -55,9 +58,18 @@ class StyledButton extends StatelessWidget {
   final void Function() onPressed;
 
   @override
-  Widget build(BuildContext context) => OutlinedButton(
-    style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: Colors.deepPurple)
+  Widget build(BuildContext context) => TextButton(
+    style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.orange),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+                side: const BorderSide(
+                    color: Colors.orange,
+                    width: 2,
+                )
+            ),
+        ),
     ),
     onPressed: onPressed,
     child: child,

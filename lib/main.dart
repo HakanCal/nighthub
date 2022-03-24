@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nighthub/src/auth/loginScreen.dart';
+import 'package:nighthub/src/auth/authFlowScreens.dart';
 import 'package:nighthub/src/auth/authState.dart';
-import 'package:nighthub/src/auth/forgotPasswordScreen.dart';
 import 'package:nighthub/src/homepage.dart';
 
 void main() {
@@ -24,9 +23,8 @@ class NightHub extends StatelessWidget {
         title: 'Welcome Screen',
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (BuildContext context) => const LoginScreen(),
+          '/': (BuildContext context) => const AuthFlowScreens(),
           '/home': (BuildContext context) => const HomePage(),
-          '/forgotPassword': (context) => const ForgotPasswordScreen(),
         },
     );
   }
