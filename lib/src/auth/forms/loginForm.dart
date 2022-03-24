@@ -14,7 +14,7 @@ class LoginForm extends StatefulWidget {
   });
 
   final String? email;
-  final void Function(String email, String password) login;
+  final void Function(String email, String password, void Function() navigator) login;
   final void Function() forgotPassword;
   final void Function() setAuthStateToRegisterUser;
   //final void Function() setAuthStateToRegisterBusiness;
@@ -52,9 +52,7 @@ class _LoginFormState extends State<LoginForm> {
                 child: CustomTextField(
                   hint: "Email",
                   controller: _emailController,
-                  onSaved: (input) {
-                   print('saved');
-                  },
+                  onSaved: (input) {},
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Please email cannot be empty';
@@ -74,9 +72,7 @@ class _LoginFormState extends State<LoginForm> {
                   hint: "Password",
                   controller: _passwordController,
                   isHidden: _isPasswordHidden,
-                  onSaved: (input) {
-                    print('saved');
-                  },
+                  onSaved: (input) {},
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Please password cannot be empty';
@@ -100,33 +96,13 @@ class _LoginFormState extends State<LoginForm> {
                     text: 'Log In',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
-                    onPressed: () async {
+                    onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        var methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(_emailController.text);
-                        if (methods.contains('password')) {
-                          widget.login(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-                          Navigator.pushNamed(context, '/home');
-                        } else {
-                          showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) =>
-                            AlertDialog(
-                              title: const Text('Could not sign in!'),
-                              content: const Text("Either an account with this email doesn't exist or the password is wrong."),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
+                        widget.login(
+                          _emailController.text,
+                          _passwordController.text,
+                          () => Navigator.pushNamed(context, '/home'),
+                        );
                       }
                     },
                   ),

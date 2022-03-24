@@ -23,7 +23,7 @@ class AuthMiddleware extends StatefulWidget {
     required this.setAuthStateToLoggedOut,
     required this.signIn,
     required this.cancelRegistration,
-    required this.registerAccount,
+    required this.registerUserAccount,
     required this.logOut,
   });
 
@@ -40,15 +40,16 @@ class AuthMiddleware extends StatefulWidget {
   final void Function(
       String email,
       String password,
+      void Function() navigator,
       void Function(Exception e) error,
       ) signIn;
   final void Function() cancelRegistration;
   final void Function(
-      String email,
       String username,
+      String email,
       String password,
       void Function(Exception e) error,
-      ) registerAccount;
+      ) registerUserAccount;
   final void Function() logOut;
 
   @override
@@ -70,8 +71,8 @@ class _AuthMiddleware extends State<AuthMiddleware> {
       case AuthenticationState.loggedOut:
         return LoginForm(
           email: widget.email,
-          login: (email, password) {
-            widget.signIn(email, password, (e) => _showErrorDialog(context, 'Failed to sign in', e));
+          login: (email, password, navigator) {
+            widget.signIn(email, password, () => navigator(), (e) => _showErrorDialog(context, 'Failed to sign in', e));
           },
           forgotPassword: () => widget.forgotPassword(),
           setAuthStateToRegisterUser: () => widget.setAuthStateToRegisterUser(),
@@ -83,10 +84,10 @@ class _AuthMiddleware extends State<AuthMiddleware> {
           cancel: () {
             widget.cancelRegistration();
           },
-          registerAccount: (email, username, password) {
-            widget.registerAccount(
-                email,
+          registerUserAccount: (username, email, password) {
+            widget.registerUserAccount(
                 username,
+                email,
                 password,
                 (e) => _showErrorDialog(context, 'Failed to create account', e));
           },

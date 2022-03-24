@@ -5,17 +5,17 @@ import '../formFields/index.dart';
 
 class UserRegisterForm extends StatefulWidget {
   const UserRegisterForm({
-    required this.registerAccount,
+    required this.registerUserAccount,
     required this.cancel,
     required this.email,
   });
 
   final String? email;
   final void Function(
-      String email,
       String username,
+      String email,
       String password
-  ) registerAccount;
+  ) registerUserAccount;
   final void Function() cancel;
 
   @override
@@ -30,6 +30,9 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
   final _confirmPasswordController = TextEditingController();
 
   bool _isPasswordHidden = true;
+  String username = '';
+  String email = '';
+  String password = '';
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +43,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
           padding: const EdgeInsets.all(8.0),
           child: Form(
             key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -49,7 +53,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     hint: "Username",
                     controller: _usernameController,
                     onSaved: (input) {
-                      print('saved');
+                      username = input!;
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -70,7 +74,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     hint: "Email",
                     controller: _emailController,
                     onSaved: (input) {
-                      print('saved');
+                      email = input!;
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -91,9 +95,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     hint: "Password",
                     controller: _passwordController,
                     isHidden: _isPasswordHidden,
-                    onSaved: (input) {
-                      print('saved');
-                    },
+                    onSaved: (input) {},
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Please password cannot be empty';
@@ -118,10 +120,10 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     controller: _confirmPasswordController,
                     isHidden: true,
                     onSaved: (input) {
-                      print('saved');
+                      password = input!;
                     },
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      if (value!.isEmpty || value != _passwordController.text) {
                         return 'Passwords should match';
                       }
                       return null;
@@ -151,7 +153,8 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     fillColor: Colors.orange,
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        widget.registerAccount(
+                        _formKey.currentState!.save();
+                        widget.registerUserAccount(
                           _usernameController.text,
                           _emailController.text,
                           _passwordController.text,

@@ -30,7 +30,7 @@ class AuthFlowScreens extends StatelessWidget {
                 setAuthStateToLoggedOut: appState.setAuthStateToLoggedOut,
                 signIn: appState.signIn,
                 cancelRegistration: appState.cancelRegistration,
-                registerAccount: appState.registerAccount,
+                registerUserAccount: appState.registerUserAccount,
                 logOut: appState.logOut,
               ),
             ),

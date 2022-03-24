@@ -39,9 +39,7 @@ class _ForgotPasswordForm extends State<ForgotPasswordForm> {
                   child: CustomTextField(
                     hint: "Email",
                     controller: _emailController,
-                    onSaved: (input) {
-                      print('saved');
-                    },
+                    onSaved: (input) {},
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Please email cannot be empty';
@@ -77,32 +75,9 @@ class _ForgotPasswordForm extends State<ForgotPasswordForm> {
                     fillColor: Colors.orange,
                     onPressed: () {
                       widget.setAuthStateToLoggedOut();
-                      //Navigator.pop(context);
                     },
                   ),
                 ),
-                /*Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  margin: const EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      StyledButton(
-                        onPressed: () {
-                          widget.sendNewPassword(_emailController.text);
-                        },
-                        child: const Text('SEND EMAIL'),
-                      ),
-                      StyledButton(
-                        onPressed: () {
-                          widget.setAuthStateToLoggedOut();
-                          Navigator.pop(context);
-                        },
-                        child: const Text('SIGN IN'),
-                      ),
-                    ],
-                  ),
-                ),*/
               ],
             ),
           ),
