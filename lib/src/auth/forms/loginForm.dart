@@ -1,7 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nighthub/src/homepage.dart';
+import 'package:provider/provider.dart';
 
 import '../../widgets.dart';
+import '../authState.dart';
 import '../formFields/index.dart';
 
 class LoginForm extends StatefulWidget {
@@ -10,14 +13,14 @@ class LoginForm extends StatefulWidget {
     required this.login,
     required this.forgotPassword,
     required this.setAuthStateToRegisterUser,
-    //required this.setAuthStateToRegisterBusiness,
+    required this.setAuthStateToRegisterBusiness,
   });
 
   final String? email;
   final void Function(String email, String password, void Function() navigator) login;
   final void Function() forgotPassword;
   final void Function() setAuthStateToRegisterUser;
-  //final void Function() setAuthStateToRegisterBusiness;
+  final void Function() setAuthStateToRegisterBusiness;
 
   @override
   _LoginFormState createState() => _LoginFormState();
@@ -31,6 +34,19 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
+  }
+
+  /// Check whether it is a user or business account and pass the value
+  /// to the home page where different layouts should be displayed
+  Future<void> _navigateHome(String email) async {
+    bool isBusinessAccount = false;
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('entity_accounts').get();
+    for (var f in snapshot.docs) {
+      if (f['email'] == email) {
+        isBusinessAccount = true;
+      }
+    }
+    Navigator.pushNamed(context, '/home', arguments: {'isBusinessAccount': isBusinessAccount});
   }
 
   bool _isPasswordHidden = true;
@@ -101,7 +117,7 @@ class _LoginFormState extends State<LoginForm> {
                         widget.login(
                           _emailController.text,
                           _passwordController.text,
-                          () => Navigator.pushNamed(context, '/home'),
+                          () => _navigateHome(_emailController.text),
                         );
                       }
                     },
@@ -134,7 +150,7 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                       TextButton(
                         onPressed: () {
-                          //widget.setAuthStateToRegisterUser();
+                          widget.setAuthStateToRegisterBusiness();
                         },
                         child: const Text(
                           'Register Business Account ',
