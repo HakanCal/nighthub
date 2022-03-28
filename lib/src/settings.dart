@@ -100,9 +100,7 @@ class Settings extends StatefulWidget {
                 //NÄCHSTE SPALTE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               ],
             )
-        )
-    ),
+    );
   }
-
 
 }
