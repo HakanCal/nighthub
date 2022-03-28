@@ -1,12 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
-//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-//import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:provider/provider.dart';
 
 import './authMiddleware.dart';
 class AuthState extends ChangeNotifier {
@@ -21,9 +19,12 @@ class AuthState extends ChangeNotifier {
   /// init() function to check whether user is logged-in or -out
   Future<void> init() async {
     await Firebase.initializeApp();
-    FirebaseAuth.instance.userChanges().listen((user) {
+    FirebaseAuth.instance.userChanges().listen((user) async {
       if (user != null) {
-        _authState = AuthenticationState.loggedIn;
+        if (kDebugMode) {
+          print("User has signed in");
+        }
+        AuthenticationState.loggedIn;
         /*_reviewSubscription = FirebaseFirestore.instance
             .collection('reviews')
             .orderBy('timestamp', descending: true)
@@ -93,7 +94,6 @@ class AuthState extends ChangeNotifier {
             email: email,
             password: password,
           );
-          _authState = AuthenticationState.loggedIn;
           navigator();
       } on FirebaseAuthException catch (e) {
         errorCallback(e);
@@ -106,17 +106,25 @@ class AuthState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Navigates back to login page
+  void setAuthStateToRegisterBusiness() {
+    _authState = AuthenticationState.registerBusiness;
+    notifyListeners();
+  }
+
   ///  Registration process was interrupted
   void cancelRegistration() {
     _authState = AuthenticationState.loggedOut;
     notifyListeners();
   }
 
-  /// Registration is finished and account created
+  /// Registration is finished and user account created
   Future<void> registerUserAccount(
       String username,
       String email,
       String password,
+      File? profilePicture,
+      List<String> interests,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
       var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -124,14 +132,48 @@ class AuthState extends ChangeNotifier {
           password: password);
       await credential.user!.updateDisplayName(username)
         .then((value) => FirebaseFirestore.instance
-          .collection('user_accounts')
-          .add(<String, dynamic>{
-            'username': FirebaseAuth.instance.currentUser!.displayName,
-            'email': FirebaseAuth.instance.currentUser!.email,
-            'userId': FirebaseAuth.instance.currentUser!.uid,
-            'timestamp': DateTime.now().millisecondsSinceEpoch,
-           })
-        );
+        .collection('user_accounts')
+        .add(<String, dynamic>{
+          'username': FirebaseAuth.instance.currentUser!.displayName,
+          'email': FirebaseAuth.instance.currentUser!.email,
+          'userId': FirebaseAuth.instance.currentUser!.uid,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'profilePicture': profilePicture?.path,
+          'interests': interests,
+          'business': false
+         })
+      );
+      _authState = AuthenticationState.loggedOut;
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      errorCallback(e);
+    }
+  }
+  /// Registration is finished and business account created
+  Future<void> registerBusinessAccount(
+      String entityName,
+      String email,
+      String password,
+      File? profilePicture,
+      List<String> interests,
+      void Function(FirebaseAuthException e) errorCallback) async {
+    try {
+      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password);
+      await credential.user!.updateDisplayName(entityName)
+        .then((value) => FirebaseFirestore.instance
+        .collection('entity_accounts')
+        .add(<String, dynamic>{
+          'entityName': FirebaseAuth.instance.currentUser!.displayName,
+          'email': FirebaseAuth.instance.currentUser!.email,
+          'userId': FirebaseAuth.instance.currentUser!.uid,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'profilePicture': profilePicture?.path,
+          'interests': interests,
+          'business': true
+        })
+      );
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
