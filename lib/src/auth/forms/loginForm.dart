@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nighthub/src/homepage.dart';
-import 'package:provider/provider.dart';
 
 import '../../widgets.dart';
-import '../authState.dart';
 import '../formFields/index.dart';
 
 class LoginForm extends StatefulWidget {
@@ -80,6 +77,8 @@ class _LoginFormState extends State<LoginForm> {
                     color: Colors.blueGrey,
                     onPressed: () {},
                   ),
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                 ),
               ),
               Padding(
@@ -104,6 +103,8 @@ class _LoginFormState extends State<LoginForm> {
                         });
                       },
                     ),
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                   ),
                 ),
                 Padding(

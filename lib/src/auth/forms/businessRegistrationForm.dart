@@ -102,6 +102,8 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                       color: Colors.blueGrey,
                       onPressed: () {},
                     ),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                   ),
                 ),
                 Padding(
@@ -123,6 +125,8 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                       color: Colors.blueGrey,
                       onPressed: () {},
                     ),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                   ),
                 ),
                 Padding(
@@ -147,6 +151,8 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                         });
                       },
                     ),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                   ),
                 ),
                 Padding(
@@ -169,6 +175,8 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                       color: Colors.blueGrey,
                       onPressed: () {},
                     ),
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                   ),
                 ),
                 Padding(

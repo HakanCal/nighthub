@@ -8,6 +8,8 @@ class CustomTextField extends StatelessWidget {
     required this.validator,
     required this.onSaved,
     required this.iconWidget,
+    required this.textInputAction,
+    required this.onFieldSubmitted
   });
 
   final FormFieldSetter<String> onSaved;
@@ -16,6 +18,8 @@ class CustomTextField extends StatelessWidget {
   final bool isHidden;
   final FormFieldValidator<String> validator;
   final IconButton iconWidget;
+  final TextInputAction textInputAction;
+  final void Function(String) onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +28,8 @@ class CustomTextField extends StatelessWidget {
       validator: validator,
       obscureText: isHidden,
       controller: controller,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
       style: const TextStyle(
         fontSize: 16,
         color: Colors.grey,
