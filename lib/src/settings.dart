@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class Settings extends StatefulWidget {
 
@@ -60,6 +61,7 @@ class _Settings extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    debugPaintSizeEnabled = false;
     return FutureBuilder<dynamic>(
       future: _future,
       builder: (context, AsyncSnapshot<dynamic> snapshot){
@@ -78,7 +80,24 @@ class _Settings extends State<Settings> {
                 ),
                 margin: EdgeInsets.fromLTRB(marginCards, marginCards, marginCards, marginCards+15.00),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
+
+                    Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15.00)),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(username, style: const TextStyle(fontSize: 30, color: Colors.white)),
+                          Text(email, style: const TextStyle(fontSize: 25, color: Colors.white)),
+                          //INSERT BUBBLES
+                        ],
+                      ),
+                    )
+
+                    /*
                     Expanded(
                         flex: 40,
                         child: Container(
@@ -124,7 +143,10 @@ class _Settings extends State<Settings> {
                             ),
                           ],
                         )
-                    )
+                    )*/
+
+
+
                   ],
                 ),
               ),

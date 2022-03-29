@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nighthub/src/settings.dart';
 import 'package:provider/provider.dart';
 
 import 'auth/authState.dart';
@@ -18,7 +19,7 @@ class _HomePage extends State<HomePage> {
     //Setting
     const Text('LOG OUT'), //TODO: What we want in the screens
     const Text('Select 1'),
-    const Text('Select 2')
+    const Settings()
   ];
 
   @override
@@ -49,7 +50,7 @@ class _HomePage extends State<HomePage> {
               icon: Image.asset('assets/nighthub.png'),
             ),
           ),
-          body: arguments["isBusinessAccount"] ?  ///TODO: Here is where the different screens should be put: user account or business account
+          body: false ? //arguments["isBusinessAccount"] ?  ///TODO: Here is where the different screens should be put: user account or business account
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -67,7 +68,7 @@ class _HomePage extends State<HomePage> {
                 ),
               ),
             ) : Center(
-              child: ElevatedButton(
+              child: menuSelects[_selectedIndex]/*ElevatedButton(
                 onPressed: () {
                   Provider.of<AuthState>(context, listen: false).logOut();
                   Navigator.pushNamed(context, '/');
@@ -81,10 +82,9 @@ class _HomePage extends State<HomePage> {
                     fontWeight: FontWeight.bold
                   )
                 ),
-              ),
-          ),
+             */ ),
           bottomNavigationBar: NavBar(selectedIndex: _selectedIndex, onItemTap: _onItemTap),
         ),
-    );
+      );
   }
 }
