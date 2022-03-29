@@ -51,6 +51,8 @@ class _ForgotPasswordForm extends State<ForgotPasswordForm> {
                       color: Colors.blueGrey,
                       onPressed: () {},
                     ),
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                   ),
                 ),
                 Container(
