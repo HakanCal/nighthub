@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'customChipList.dart';
+
 class CustomDropdownField extends StatefulWidget {
   const CustomDropdownField({
     required this.values,
@@ -79,7 +81,7 @@ class _CustomDropdownField extends State<CustomDropdownField> {
         Row(
           children: [
             Expanded(
-              child: MyChipList(
+              child: CustomChipList(
                 values: widget.values,
                 chipBuilder: (String value) {
                   return Chip(
@@ -143,36 +145,6 @@ class _CustomCheckboxListTile extends State<CustomCheckboxListTile> {
           _checked = checked!;
         });
       },
-    );
-  }
-}
-
-class MyChipList extends StatelessWidget {
-  const MyChipList({
-    required this.values,
-    required this.chipBuilder,
-  });
-
-  final List<String> values;
-  final Chip Function(String) chipBuilder;
-
-  /// Adds the chips to the list
-  List _buildChipList() {
-    final List items = [];
-    for (String value in values) {
-      items.add(chipBuilder(value));
-    }
-    return items;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Wrap(
-        spacing: 20,
-        children: <Widget>[..._buildChipList()],
-      ),
     );
   }
 }
