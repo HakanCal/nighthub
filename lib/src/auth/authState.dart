@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import './authMiddleware.dart';
 class AuthState extends ChangeNotifier {
@@ -127,6 +128,10 @@ class AuthState extends ChangeNotifier {
       List<String> interests,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
+      String? imageName = profilePicture?.path.split('/').last;
+
+      uploadProfilePicture(profilePicture!, imageName!);
+
       var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password);
@@ -138,11 +143,12 @@ class AuthState extends ChangeNotifier {
           'email': FirebaseAuth.instance.currentUser!.email,
           'userId': FirebaseAuth.instance.currentUser!.uid,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'profilePicture': profilePicture?.path,
+          'profile_picture': imageName,
           'interests': interests,
           'business': false
          })
       );
+
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -158,6 +164,10 @@ class AuthState extends ChangeNotifier {
       List<String> interests,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
+      String? imageName = profilePicture?.path.split('/').last;
+
+      uploadProfilePicture(profilePicture!, imageName!);
+
       var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password);
@@ -169,7 +179,7 @@ class AuthState extends ChangeNotifier {
           'email': FirebaseAuth.instance.currentUser!.email,
           'userId': FirebaseAuth.instance.currentUser!.uid,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'profilePicture': profilePicture?.path,
+          'profilePicture': profilePicture.path,
           'interests': interests,
           'business': true
         })
@@ -186,18 +196,22 @@ class AuthState extends ChangeNotifier {
     FirebaseAuth.instance.signOut();
   }
 
-  /*Future<DocumentReference> submitReview(String message) {
-    if (_authState != AuthenticationState.loggedIn) {
-      throw Exception('Must be logged in');
-    }
+  /// Saves picture in Firebase Storage
+  void uploadProfilePicture(File profilePicture, String imageName) {
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('profile_pictures')
+        .child('/$imageName');
 
-    return FirebaseFirestore.instance
-        .collection('reviews')
-        .add(<String, dynamic>{
-      'text': message,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'name': FirebaseAuth.instance.currentUser!.displayName,
-      'userId': FirebaseAuth.instance.currentUser!.uid,
+    final metadata = firebase_storage.SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {'picked-file-path': profilePicture.path});
+
+    firebase_storage.UploadTask uploadTask = ref.putFile(File(profilePicture.path), metadata);
+    uploadTask.whenComplete(() {
+      if (kDebugMode) {
+        print('Photo was uploaded to storage');
+      }
     });
-  }*/
+  }
 }

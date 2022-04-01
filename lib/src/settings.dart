@@ -1,70 +1,35 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class Settings extends StatefulWidget {
+import 'auth/formFields/customChipList.dart';
 
-  const Settings({Key? key}) : super(key: key);
+class AppSettings extends StatefulWidget {
+  const AppSettings({required this.userData, Key? key}) : super(key: key);
+
+  final Map<String, dynamic> userData;
 
   @override
-  State<StatefulWidget> createState() => _Settings();
-
-
+  State<StatefulWidget> createState() => _AppSettings();
 
 }
 
-class _Settings extends State<Settings> {
+class _AppSettings extends State<AppSettings> {
 
-  var marginCards = 0.00;
+  double marginCards = 5.00;
   String username = "";
   String email = "";
   List<dynamic> interests = [];
 
-
-  Future<void> loadUserData() async {
-
-    String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-    FirebaseFirestore.instance
-        .collection('user_accounts')
-        .where('userId', isEqualTo: userId)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          if (querySnapshot.size > 0) {
-            for (final document in querySnapshot.docs) {
-
-              Map<String, dynamic>? fetchDoc = document.data() as Map<String, dynamic>?;
-
-              setState(() {
-
-                username = fetchDoc?['username'];
-                email = fetchDoc?['email'];
-                interests = fetchDoc?['interests'];
-
-              });
-            }
-          } else {
-            print("Fucks not working");
-          }
-        }
-      );
-  }
-
-  late Future<void> _future;
-
   @override
   void initState() {
-    _future = loadUserData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+
     debugPaintSizeEnabled = false;
-    return FutureBuilder<dynamic>(
-      future: _future,
-      builder: (context, AsyncSnapshot<dynamic> snapshot){
+
         return Container(
           color: const Color(0xFF262626),
           child: Column(
@@ -78,7 +43,8 @@ class _Settings extends State<Settings> {
                   color: Color(0x8c8c8c8c),
                   borderRadius: BorderRadius.all(Radius.circular(15.00)),
                 ),
-                margin: EdgeInsets.fromLTRB(marginCards, marginCards, marginCards, marginCards+15.00),
+                margin: EdgeInsets.fromLTRB(marginCards, marginCards+5.00, marginCards, marginCards+5.00),
+                padding: const EdgeInsets.symmetric(vertical: 25.00),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -90,63 +56,18 @@ class _Settings extends State<Settings> {
                       ),
                       child: Column(
                         children: [
-                          Text(username, style: const TextStyle(fontSize: 30, color: Colors.white)),
-                          Text(email, style: const TextStyle(fontSize: 25, color: Colors.white)),
-                          //INSERT BUBBLES
+                          const ProfilePic(width: 150.00, height: 150.00, imgPath: 'assets/dummy-profile-pic.png'),
+                          Text(widget.userData['username'], style: const TextStyle(fontSize: 30, color: Colors.white)),
+                          Text(widget.userData['email'], style: const TextStyle(fontSize: 20, color: Colors.white)),
+                          CustomChipList(
+                            values: getUserInterests(widget.userData['interests']),
+                            chipBuilder: (String value) {
+                              return Chip(label: Text(value));
+                            },
+                          ),
                         ],
                       ),
                     )
-
-                    /*
-                    Expanded(
-                        flex: 40,
-                        child: Container(
-                          margin: const EdgeInsets.fromLTRB(15.00, 0.00, 10.00, 0.00),
-                          width: 150,
-                          height: 150,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: AssetImage('assets/dummy-profile-pic.png')
-                              )
-                          ),
-                        )
-                    ),
-                    Expanded(
-                        flex: 65,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(margin: const EdgeInsets.symmetric(horizontal: 5.00, vertical: 5.00),
-                              child: Text(username, style: const TextStyle(fontSize: 25, color: Colors.white),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5.00, vertical: 5.00),
-                              child: Text(email, style: const TextStyle(fontSize: 16, color: Colors.white),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomChipList(
-                                    values: interests,
-                                    chipBuilder: (String value) {
-                                      return Chip(label: Text(value));
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
-                    )*/
-
-
-
                   ],
                 ),
               ),
@@ -157,8 +78,6 @@ class _Settings extends State<Settings> {
             ],
           )
       );
-      },
-    );
   }
 }
 
@@ -170,7 +89,7 @@ class _Settings extends State<Settings> {
     final Color itemColor = const Color(0x8c8c8c8c);
     final double iconSize = 30.00;
     final double fontSize = 20.00;
-    final double itemPadding = 12.00;
+    final double itemPadding = 10.00;
     final double borderRadius = 15.00;
 
     //Variable values
@@ -186,8 +105,10 @@ class _Settings extends State<Settings> {
   }
 
   class _AddItemState extends State<AddItem> {
+
     @override
     Widget build(BuildContext context) {
+
       return Container(
         margin: EdgeInsets.all(widget.margin),
         padding: EdgeInsets.symmetric(vertical: widget.itemPadding),
@@ -215,3 +136,39 @@ class _Settings extends State<Settings> {
     }
   }
 
+  class ProfilePic extends StatefulWidget {
+
+    final double width;
+    final double height;
+    final String imgPath;
+
+    const ProfilePic({Key? key, required this.width, required this.height, required this.imgPath}) : super(key: key);
+    @override
+    _ProfilePic createState() => _ProfilePic();
+  }
+
+  class _ProfilePic extends State<ProfilePic> {
+    @override
+    Widget build(BuildContext context) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(0.00, 0.00, 0.00, 10.00),
+        width: widget.width,
+        height: widget.height,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          image: DecorationImage(
+              fit: BoxFit.fill,
+              image: AssetImage('assets/dummy-profile-pic.png')
+          )
+        )
+      );
+    }
+  }
+
+List<String> getUserInterests(List<dynamic> userData) {
+  List<String> list = [];
+  for (var elem in userData) {
+    list.add(elem);
+  }
+  return list;
+}
