@@ -59,6 +59,9 @@ class AuthMiddleware extends StatefulWidget {
       String entityName,
       String email,
       String password,
+      String street,
+      String postcode,
+      String country,
       File? profilePicture,
       List<String> interests,
       void Function(Exception e) error,
@@ -113,11 +116,14 @@ class _AuthMiddleware extends State<AuthMiddleware> {
           cancel: () {
             widget.cancelRegistration();
           },
-          registerBusinessAccount: (entityName, email, password, profilePicture, interests) {
+          registerBusinessAccount: (entityName, email, password, street, postcode, country, profilePicture, interests) {
             widget.registerBusinessAccount(
               entityName,
               email,
               password,
+              street,
+              postcode,
+              country,
               profilePicture,
               interests,
               (e) => _showErrorDialog(context, 'Failed to create account', e));

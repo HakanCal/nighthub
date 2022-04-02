@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -17,6 +18,9 @@ class BusinessRegisterForm extends StatefulWidget {
     String entityName,
     String email,
     String password,
+      String street,
+      String postcode,
+      String country,
     File? profilePicture,
     List<String> interests,
   ) registerBusinessAccount;
@@ -32,6 +36,9 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _postCodeController = TextEditingController();
+  final _countryController = TextEditingController();
   final imagePicker = ImagePicker();
   final options = ["Club", "Bar", "Night Life", "Live Music", "Latin"];
 
@@ -44,6 +51,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
 
   @override
   void initState() {
+    _countryController.text = 'DE';
     super.initState();
   }
 
@@ -175,12 +183,120 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                       color: Colors.blueGrey,
                       onPressed: () {},
                     ),
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: CustomTextField(
+                    hint: "Street name, Nr.",
+                    controller: _streetController,
+                    onSaved: (input) {},
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Field cannot be empty';
+                      }
+                      return null;
+                    },
+                    iconWidget: IconButton(
+                      icon: const Icon(Icons.house_rounded ),
+                      color: Colors.blueGrey,
+                      onPressed: () {},
+                    ),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  width: MediaQuery.of(context).size.width,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: CustomTextField(
+                          hint: "Postcode",
+                          controller: _postCodeController,
+                          onSaved: (input) {},
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Empty field';
+                            }
+                            return null;
+                          },
+                          iconWidget: null,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                        ),
+                      ),
+                      Flexible(
+                        child: Padding (
+                          padding: const EdgeInsets.only(left: 40),
+                          child: CustomTextField(
+                            hint: "Country",
+                            controller: _countryController,
+                            onSaved: (input) {},
+                            readOnly: true,
+                            validator: (value) {
+                              if (_postCodeController.text == '') {
+                                return '';
+                              }
+                            },
+                            iconWidget: IconButton(
+                              icon: const Icon(Icons.arrow_drop_down ),
+                              color: Colors.blueGrey,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () {},
+                            ),
+                            onTap: () {
+                              showCountryPicker(
+                                context: context,
+                                showPhoneCode: false,
+                                showWorldWide: false,
+                                onSelect: (Country country) {
+                                  setState(() {
+                                    _countryController.text = country.countryCode;
+                                  });
+                                },
+                                countryListTheme: CountryListThemeData(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30),
+                                  ),
+                                  inputDecoration: InputDecoration(
+                                    hintText: 'Search country',
+                                    prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide: const BorderSide(
+                                        color: Colors.grey,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide: const BorderSide(
+                                        color: Colors.grey,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                          ),
+                        ),
+                      ),
+                    ]
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomDropdownField(
                     values: _interests,
                     hintText: 'Select interests',
@@ -214,6 +330,9 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                           _entityNameController.text,
                           _emailController.text,
                           _passwordController.text,
+                          _streetController.text,
+                          _postCodeController.text,
+                          _countryController.text,
                           _profilePicture,
                           _interests,
                         );
