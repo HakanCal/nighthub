@@ -160,6 +160,9 @@ class AuthState extends ChangeNotifier {
       String entityName,
       String email,
       String password,
+      String street,
+      String postcode,
+      String country,
       File? profilePicture,
       List<String> interests,
       void Function(FirebaseAuthException e) errorCallback) async {
@@ -167,6 +170,8 @@ class AuthState extends ChangeNotifier {
       String? imageName = profilePicture?.path.split('/').last;
 
       uploadProfilePicture(profilePicture!, imageName!);
+
+      String address = '$street , $postcode, $country';
 
       var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
@@ -181,7 +186,8 @@ class AuthState extends ChangeNotifier {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
           'profilePicture': profilePicture.path,
           'interests': interests,
-          'business': true
+          'business': true,
+          'address': address
         })
       );
       _authState = AuthenticationState.loggedOut;
