@@ -6,6 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geocode/geocode.dart';
+import 'package:dart_geohash/dart_geohash.dart';
 
 import './authMiddleware.dart';
 class AuthState extends ChangeNotifier {
@@ -140,8 +142,9 @@ class AuthState extends ChangeNotifier {
       toggleLoader();
       try {
         String? imageName = profilePicture?.path.split('/').last;
-
-        uploadProfilePicture(profilePicture!, imageName!);
+        if (imageName != null) {
+          uploadProfilePicture(profilePicture!, imageName);
+        }
 
         var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email,
@@ -184,14 +187,18 @@ class AuthState extends ChangeNotifier {
     toggleLoader();
     try {
         String? imageName = profilePicture?.path.split('/').last;
-
-        uploadProfilePicture(profilePicture!, imageName!);
+        if (imageName != null) {
+          uploadProfilePicture(profilePicture!, imageName);
+        }
 
         String address = '$street , $postcode, $country';
 
         var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email,
             password: password);
+
+        var point = await createGeoPoint(address);
+
         await credential.user!.updateDisplayName(entityName)
           .then((value) => FirebaseFirestore.instance
           .collection('entity_accounts')
@@ -200,10 +207,11 @@ class AuthState extends ChangeNotifier {
             'email': FirebaseAuth.instance.currentUser!.email,
             'userId': FirebaseAuth.instance.currentUser!.uid,
             'timestamp': DateTime.now().millisecondsSinceEpoch,
-            'profilePicture': profilePicture.path,
+            'profilePicture': profilePicture?.path,
             'interests': interests,
             'business': true,
-            'address': address
+            'address': address,
+            'point': point
           })
         );
         _authState = AuthenticationState.loggedOut;
@@ -237,5 +245,25 @@ class AuthState extends ChangeNotifier {
         print('Photo was uploaded to storage');
       }
     });
+  }
+
+  /// Creates geohash, longitude and latitude from address
+  Future<Object> createGeoPoint(String address) async {
+    var point = {};
+    GeoCode geoCode = GeoCode();
+
+    try {
+      Coordinates coordinates = await geoCode.forwardGeocoding(address: address);
+      GeoHash geoHash = GeoHash.fromDecimalDegrees(coordinates.longitude!, coordinates.latitude!);
+      point = {
+        'geohash': geoHash.geohash,
+        'geopoint': GeoPoint(coordinates.latitude!, coordinates.longitude!)
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return point;
   }
 }
