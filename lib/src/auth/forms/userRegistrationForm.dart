@@ -10,6 +10,8 @@ class UserRegisterForm extends StatefulWidget {
     required this.registerUserAccount,
     required this.cancel,
     required this.email,
+    required this.isLoading,
+    required this.toggleLoader
   });
 
   final String? email;
@@ -19,8 +21,11 @@ class UserRegisterForm extends StatefulWidget {
     String password,
     File? profilePicture,
     List<String> interests,
+    void Function() toggleLoader
   ) registerUserAccount;
   final void Function() cancel;
+  final bool isLoading;
+  final void Function() toggleLoader;
 
   @override
   _UserRegisterFormState createState() => _UserRegisterFormState();
@@ -208,6 +213,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                   text: 'Create',
                   textColor: Colors.black,
                   fillColor: Colors.orange,
+                  isLoading: widget.isLoading,
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
@@ -217,6 +223,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                           _passwordController.text,
                           _profilePicture,
                           _interests,
+                          () => widget.toggleLoader()
                       );
                     }
                   },
@@ -228,7 +235,8 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     text: 'Cancel',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
-                    onPressed: widget.cancel,
+                    isLoading: false,
+                    onPressed: widget.isLoading ? null : widget.cancel,
                   ),
                 ),
               ],

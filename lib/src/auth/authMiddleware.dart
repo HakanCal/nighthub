@@ -37,6 +37,7 @@ class AuthMiddleware extends StatefulWidget {
   final void Function() setAuthStateToRegisterBusiness;
   final void Function(
       String email,
+      void Function() toggleLoader,
       void Function(Exception e) error,
       ) sendNewPassword;
   final void Function() setAuthStateToLoggedOut;
@@ -44,6 +45,7 @@ class AuthMiddleware extends StatefulWidget {
       String email,
       String password,
       void Function() navigator,
+      void Function() toggleLoader,
       void Function(Exception e) error,
       ) signIn;
   final void Function() cancelRegistration;
@@ -53,6 +55,7 @@ class AuthMiddleware extends StatefulWidget {
       String password,
       File? profilePicture,
       List<String> interests,
+      void Function() toggleLoader,
       void Function(Exception e) error,
       ) registerUserAccount;
   final void Function(
@@ -64,6 +67,7 @@ class AuthMiddleware extends StatefulWidget {
       String country,
       File? profilePicture,
       List<String> interests,
+      void Function() toggleLoader,
       void Function(Exception e) error,
       ) registerBusinessAccount;
   final void Function() logOut;
@@ -73,26 +77,46 @@ class AuthMiddleware extends StatefulWidget {
 }
 
 class _AuthMiddleware extends State<AuthMiddleware> {
+  bool isLoading = false;
+
+  /// Show loading spinner when communicating with Firebase
+  void toggleLoader() async {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (widget.authState) {
      case AuthenticationState.forgotPassword:
         return ForgotPasswordForm(
           email: widget.email,
-          sendNewPassword: (email) => widget.sendNewPassword(
-            email, (e) => _showErrorDialog(context, 'Email could not be sent', e)
+          sendNewPassword: (email, toggleLoader) => widget.sendNewPassword(
+            email,
+            () => toggleLoader(),
+            (e) => _showErrorDialog(context, 'Email could not be sent', e)
           ),
           setAuthStateToLoggedOut: () => widget.setAuthStateToLoggedOut(),
+          isLoading: isLoading,
+          toggleLoader: () => toggleLoader()
         );
       case AuthenticationState.loggedOut:
         return LoginForm(
           email: widget.email,
-          login: (email, password, navigator) {
-            widget.signIn(email, password, () => navigator(), (e) => _showErrorDialog(context, 'Failed to sign in', e));
+          login: (email, password, navigator, toggleLoader) {
+            widget.signIn(
+              email,
+              password,
+              () => navigator(),
+              () => toggleLoader(),
+              (e) => _showErrorDialog(context, 'Failed to sign in', e));
           },
           forgotPassword: () => widget.forgotPassword(),
           setAuthStateToRegisterUser: () => widget.setAuthStateToRegisterUser(),
           setAuthStateToRegisterBusiness: () => widget.setAuthStateToRegisterBusiness(),
+          isLoading: isLoading,
+          toggleLoader: () => toggleLoader()
         );
       case AuthenticationState.registerUser:
         return UserRegisterForm(
@@ -100,15 +124,18 @@ class _AuthMiddleware extends State<AuthMiddleware> {
           cancel: () {
             widget.cancelRegistration();
           },
-          registerUserAccount: (username, email, password, profilePicture, interests) {
+          registerUserAccount: (username, email, password, profilePicture, interests, toggleLoader) {
             widget.registerUserAccount(
               username,
               email,
               password,
               profilePicture,
               interests,
+              () => toggleLoader(),
               (e) => _showErrorDialog(context, 'Failed to create account', e));
           },
+            isLoading: isLoading,
+            toggleLoader: () => toggleLoader()
         );
       case AuthenticationState.registerBusiness:
         return BusinessRegisterForm(
@@ -116,7 +143,17 @@ class _AuthMiddleware extends State<AuthMiddleware> {
           cancel: () {
             widget.cancelRegistration();
           },
-          registerBusinessAccount: (entityName, email, password, street, postcode, country, profilePicture, interests) {
+          registerBusinessAccount: (
+              entityName,
+              email,
+              password,
+              street,
+              postcode,
+              country,
+              profilePicture,
+              interests,
+              toggleLoader,
+              ) {
             widget.registerBusinessAccount(
               entityName,
               email,
@@ -126,8 +163,11 @@ class _AuthMiddleware extends State<AuthMiddleware> {
               country,
               profilePicture,
               interests,
+              () => toggleLoader(),
               (e) => _showErrorDialog(context, 'Failed to create account', e));
           },
+            isLoading: isLoading,
+            toggleLoader: () => toggleLoader()
         );
       case AuthenticationState.loggedIn:
         return const HomePage();

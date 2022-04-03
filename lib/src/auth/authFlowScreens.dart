@@ -18,7 +18,10 @@ class AuthFlowScreens extends StatelessWidget {
           addAutomaticKeepAlives: true,
           padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
           children: <Widget>[
-            Image.asset('assets/nighthub.png', width: 50, height: 200, fit: BoxFit.contain),
+            Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: Image.asset('assets/nighthub.png', width: 50, height: 200, fit: BoxFit.contain),
+            ),
             Consumer<AuthState>(
               builder: (context, appState, _) => AuthMiddleware(
                 email: appState.email,

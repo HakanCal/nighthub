@@ -11,13 +11,22 @@ class LoginForm extends StatefulWidget {
     required this.forgotPassword,
     required this.setAuthStateToRegisterUser,
     required this.setAuthStateToRegisterBusiness,
+    required this.isLoading,
+    required this.toggleLoader
   });
 
   final String? email;
-  final void Function(String email, String password, void Function() navigator) login;
+  final void Function(
+      String email,
+      String password,
+      void Function() navigator,
+      void Function() toggleLoader
+  ) login;
   final void Function() forgotPassword;
   final void Function() setAuthStateToRegisterUser;
   final void Function() setAuthStateToRegisterBusiness;
+  final bool isLoading;
+  final void Function() toggleLoader;
 
   @override
   _LoginFormState createState() => _LoginFormState();
@@ -43,7 +52,8 @@ class _LoginFormState extends State<LoginForm> {
         isBusinessAccount = true;
       }
     }
-    Navigator.pushNamed(context, '/home', arguments: {'isBusinessAccount': isBusinessAccount});
+    Navigator.pushNamed(context, '/home', arguments: {'isBusinessAccount': isBusinessAccount})
+        .then((value) => widget.toggleLoader());
   }
 
   bool _isPasswordHidden = true;
@@ -113,12 +123,14 @@ class _LoginFormState extends State<LoginForm> {
                     text: 'Log In',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
+                    isLoading: widget.isLoading,
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         widget.login(
                           _emailController.text,
                           _passwordController.text,
                           () => _navigateHome(_emailController.text),
+                          () => widget.toggleLoader()
                         );
                       }
                     },

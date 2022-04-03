@@ -67,13 +67,17 @@ class AuthState extends ChangeNotifier {
   /// Sends email withe instructions to change password
   Future<void> sendNewPassword(
       String email,
+      void Function() toggleLoader,
       void Function(FirebaseAuthException e) errorCallback,
       ) async {
+    toggleLoader();
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail( email: email);
+      await FirebaseAuth.instance.sendPasswordResetEmail( email: email)
+          .then((value) => toggleLoader());
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      toggleLoader();
     }
   }
 
@@ -88,16 +92,20 @@ class AuthState extends ChangeNotifier {
       String email,
       String password,
       void Function() navigator,
+      void Function() toggleLoader,
       void Function(FirebaseAuthException e) errorCallback,
     ) async {
+      toggleLoader();
       try {
           await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email,
             password: password,
-          );
-          navigator();
+          ).then((value) {
+            navigator();
+          });
       } on FirebaseAuthException catch (e) {
         errorCallback(e);
+        toggleLoader();
       }
     }
 
@@ -126,33 +134,38 @@ class AuthState extends ChangeNotifier {
       String password,
       File? profilePicture,
       List<String> interests,
-      void Function(FirebaseAuthException e) errorCallback) async {
-    try {
-      String? imageName = profilePicture?.path.split('/').last;
+      void Function() toggleLoader,
+      void Function(FirebaseAuthException e) errorCallback
+    ) async {
+      toggleLoader();
+      try {
+        String? imageName = profilePicture?.path.split('/').last;
 
-      uploadProfilePicture(profilePicture!, imageName!);
+        uploadProfilePicture(profilePicture!, imageName!);
 
-      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password);
-      await credential.user!.updateDisplayName(username)
-        .then((value) => FirebaseFirestore.instance
-        .collection('user_accounts')
-        .add(<String, dynamic>{
-          'username': FirebaseAuth.instance.currentUser!.displayName,
-          'email': FirebaseAuth.instance.currentUser!.email,
-          'userId': FirebaseAuth.instance.currentUser!.uid,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'profile_picture': imageName,
-          'interests': interests,
-          'business': false
-         })
-      );
+        var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email,
+            password: password);
+        await credential.user!.updateDisplayName(username)
+          .then((value) => FirebaseFirestore.instance
+          .collection('user_accounts')
+          .add(<String, dynamic>{
+            'username': FirebaseAuth.instance.currentUser!.displayName,
+            'email': FirebaseAuth.instance.currentUser!.email,
+            'userId': FirebaseAuth.instance.currentUser!.uid,
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'profile_picture': imageName,
+            'interests': interests,
+            'business': false
+           })
+        );
 
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
-    } on FirebaseAuthException catch (e) {
+      toggleLoader();
+      } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      toggleLoader();
     }
   }
   /// Registration is finished and business account created
@@ -165,35 +178,40 @@ class AuthState extends ChangeNotifier {
       String country,
       File? profilePicture,
       List<String> interests,
-      void Function(FirebaseAuthException e) errorCallback) async {
+      void Function() toggleLoader,
+      void Function(FirebaseAuthException e) errorCallback
+    ) async {
+    toggleLoader();
     try {
-      String? imageName = profilePicture?.path.split('/').last;
+        String? imageName = profilePicture?.path.split('/').last;
 
-      uploadProfilePicture(profilePicture!, imageName!);
+        uploadProfilePicture(profilePicture!, imageName!);
 
-      String address = '$street , $postcode, $country';
+        String address = '$street , $postcode, $country';
 
-      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password);
-      await credential.user!.updateDisplayName(entityName)
-        .then((value) => FirebaseFirestore.instance
-        .collection('entity_accounts')
-        .add(<String, dynamic>{
-          'entityName': FirebaseAuth.instance.currentUser!.displayName,
-          'email': FirebaseAuth.instance.currentUser!.email,
-          'userId': FirebaseAuth.instance.currentUser!.uid,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'profilePicture': profilePicture.path,
-          'interests': interests,
-          'business': true,
-          'address': address
-        })
-      );
-      _authState = AuthenticationState.loggedOut;
-      notifyListeners();
+        var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email,
+            password: password);
+        await credential.user!.updateDisplayName(entityName)
+          .then((value) => FirebaseFirestore.instance
+          .collection('entity_accounts')
+          .add(<String, dynamic>{
+            'entityName': FirebaseAuth.instance.currentUser!.displayName,
+            'email': FirebaseAuth.instance.currentUser!.email,
+            'userId': FirebaseAuth.instance.currentUser!.uid,
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'profilePicture': profilePicture.path,
+            'interests': interests,
+            'business': true,
+            'address': address
+          })
+        );
+        _authState = AuthenticationState.loggedOut;
+        notifyListeners();
+        toggleLoader();
     } on FirebaseAuthException catch (e) {
-      errorCallback(e);
+        errorCallback(e);
+        toggleLoader();
     }
   }
 

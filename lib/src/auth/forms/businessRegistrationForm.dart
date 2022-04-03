@@ -11,6 +11,8 @@ class BusinessRegisterForm extends StatefulWidget {
     required this.registerBusinessAccount,
     required this.cancel,
     required this.email,
+    required this.isLoading,
+    required this.toggleLoader
   });
 
   final String? email;
@@ -23,8 +25,11 @@ class BusinessRegisterForm extends StatefulWidget {
       String country,
     File? profilePicture,
     List<String> interests,
+    void Function() toggleLoader
   ) registerBusinessAccount;
   final void Function() cancel;
+  final bool isLoading;
+  final void Function() toggleLoader;
 
   @override
   _BusinessRegisterFormState createState() => _BusinessRegisterFormState();
@@ -323,6 +328,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                     text: 'Create',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
+                    isLoading: widget.isLoading,
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
@@ -335,6 +341,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                           _countryController.text,
                           _profilePicture,
                           _interests,
+                          () => widget.toggleLoader()
                         );
                       }
                     },
@@ -346,7 +353,8 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                     text: 'Cancel',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
-                    onPressed: widget.cancel,
+                    isLoading: false,
+                    onPressed: widget.isLoading ? null : widget.cancel
                   ),
                 ),
               ],
