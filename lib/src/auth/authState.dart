@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
-//import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-//import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geocode/geocode.dart';
+import 'package:dart_geohash/dart_geohash.dart';
 
 import './authMiddleware.dart';
 class AuthState extends ChangeNotifier {
@@ -21,9 +22,12 @@ class AuthState extends ChangeNotifier {
   /// init() function to check whether user is logged-in or -out
   Future<void> init() async {
     await Firebase.initializeApp();
-    FirebaseAuth.instance.userChanges().listen((user) {
+    FirebaseAuth.instance.userChanges().listen((user) async {
       if (user != null) {
-        _authState = AuthenticationState.loggedIn;
+        if (kDebugMode) {
+          print("User has signed in");
+        }
+        AuthenticationState.loggedIn;
         /*_reviewSubscription = FirebaseFirestore.instance
             .collection('reviews')
             .orderBy('timestamp', descending: true)
@@ -65,13 +69,17 @@ class AuthState extends ChangeNotifier {
   /// Sends email withe instructions to change password
   Future<void> sendNewPassword(
       String email,
+      void Function() toggleLoader,
       void Function(FirebaseAuthException e) errorCallback,
       ) async {
+    toggleLoader();
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail( email: email);
+      await FirebaseAuth.instance.sendPasswordResetEmail( email: email)
+          .then((value) => toggleLoader());
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      toggleLoader();
     }
   }
 
@@ -86,17 +94,20 @@ class AuthState extends ChangeNotifier {
       String email,
       String password,
       void Function() navigator,
+      void Function() toggleLoader,
       void Function(FirebaseAuthException e) errorCallback,
     ) async {
+      toggleLoader();
       try {
           await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email,
             password: password,
-          );
-          _authState = AuthenticationState.loggedIn;
-          navigator();
+          ).then((value) {
+            navigator();
+          });
       } on FirebaseAuthException catch (e) {
         errorCallback(e);
+        toggleLoader();
       }
     }
 
@@ -106,36 +117,109 @@ class AuthState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Navigates back to login page
+  void setAuthStateToRegisterBusiness() {
+    _authState = AuthenticationState.registerBusiness;
+    notifyListeners();
+  }
+
   ///  Registration process was interrupted
   void cancelRegistration() {
     _authState = AuthenticationState.loggedOut;
     notifyListeners();
   }
 
-  /// Registration is finished and account created
+  /// Registration is finished and user account created
   Future<void> registerUserAccount(
       String username,
       String email,
       String password,
-      void Function(FirebaseAuthException e) errorCallback) async {
-    try {
-      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password);
-      await credential.user!.updateDisplayName(username)
-        .then((value) => FirebaseFirestore.instance
+      File? profilePicture,
+      List<String> interests,
+      void Function() toggleLoader,
+      void Function(FirebaseAuthException e) errorCallback
+    ) async {
+      toggleLoader();
+      try {
+        String? imageName = profilePicture?.path.split('/').last;
+        if (imageName != null) {
+          uploadProfilePicture(profilePicture!, imageName);
+        }
+
+        var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email,
+            password: password);
+        await credential.user!.updateDisplayName(username)
+          .then((value) => FirebaseFirestore.instance
           .collection('user_accounts')
           .add(<String, dynamic>{
             'username': FirebaseAuth.instance.currentUser!.displayName,
             'email': FirebaseAuth.instance.currentUser!.email,
             'userId': FirebaseAuth.instance.currentUser!.uid,
             'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'profile_picture': imageName,
+            'interests': interests,
+            'business': false
            })
         );
+
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
-    } on FirebaseAuthException catch (e) {
+      toggleLoader();
+      } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      toggleLoader();
+    }
+  }
+  /// Registration is finished and business account created
+  Future<void> registerBusinessAccount(
+      String entityName,
+      String email,
+      String password,
+      String street,
+      String postcode,
+      String country,
+      File? profilePicture,
+      List<String> interests,
+      void Function() toggleLoader,
+      void Function(FirebaseAuthException e) errorCallback
+    ) async {
+    toggleLoader();
+    try {
+        String? imageName = profilePicture?.path.split('/').last;
+        if (imageName != null) {
+          uploadProfilePicture(profilePicture!, imageName);
+        }
+
+        String address = '$street , $postcode, $country';
+
+        var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email,
+            password: password);
+
+        var point = await createGeoPoint(address);
+
+        await credential.user!.updateDisplayName(entityName)
+          .then((value) => FirebaseFirestore.instance
+          .collection('entity_accounts')
+          .add(<String, dynamic>{
+            'entityName': FirebaseAuth.instance.currentUser!.displayName,
+            'email': FirebaseAuth.instance.currentUser!.email,
+            'userId': FirebaseAuth.instance.currentUser!.uid,
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'profilePicture': profilePicture?.path,
+            'interests': interests,
+            'business': true,
+            'address': address,
+            'point': point
+          })
+        );
+        _authState = AuthenticationState.loggedOut;
+        notifyListeners();
+        toggleLoader();
+    } on FirebaseAuthException catch (e) {
+        errorCallback(e);
+        toggleLoader();
     }
   }
 
@@ -144,18 +228,42 @@ class AuthState extends ChangeNotifier {
     FirebaseAuth.instance.signOut();
   }
 
-  /*Future<DocumentReference> submitReview(String message) {
-    if (_authState != AuthenticationState.loggedIn) {
-      throw Exception('Must be logged in');
-    }
+  /// Saves picture in Firebase Storage
+  void uploadProfilePicture(File profilePicture, String imageName) {
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('profile_pictures')
+        .child('/$imageName');
 
-    return FirebaseFirestore.instance
-        .collection('reviews')
-        .add(<String, dynamic>{
-      'text': message,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'name': FirebaseAuth.instance.currentUser!.displayName,
-      'userId': FirebaseAuth.instance.currentUser!.uid,
+    final metadata = firebase_storage.SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {'picked-file-path': profilePicture.path});
+
+    firebase_storage.UploadTask uploadTask = ref.putFile(File(profilePicture.path), metadata);
+    uploadTask.whenComplete(() {
+      if (kDebugMode) {
+        print('Photo was uploaded to storage');
+      }
     });
-  }*/
+  }
+
+  /// Creates geohash, longitude and latitude from address
+  Future<Object> createGeoPoint(String address) async {
+    var point = {};
+    GeoCode geoCode = GeoCode();
+
+    try {
+      Coordinates coordinates = await geoCode.forwardGeocoding(address: address);
+      GeoHash geoHash = GeoHash.fromDecimalDegrees(coordinates.longitude!, coordinates.latitude!);
+      point = {
+        'geohash': geoHash.geohash,
+        'geopoint': GeoPoint(coordinates.latitude!, coordinates.longitude!)
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    return point;
+  }
 }

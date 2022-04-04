@@ -8,11 +8,15 @@ class ForgotPasswordForm extends StatefulWidget {
     required this.email,
     required this.sendNewPassword,
     required this.setAuthStateToLoggedOut,
+    required this.isLoading,
+    required this.toggleLoader
   });
 
   final String? email;
-  final void Function(String email) sendNewPassword;
+  final void Function(String email, void Function() toggleLoader) sendNewPassword;
   final void Function() setAuthStateToLoggedOut;
+  final bool isLoading;
+  final void Function() toggleLoader;
 
   @override
   _ForgotPasswordForm createState() => _ForgotPasswordForm();
@@ -51,6 +55,8 @@ class _ForgotPasswordForm extends State<ForgotPasswordForm> {
                       color: Colors.blueGrey,
                       onPressed: () {},
                     ),
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                   ),
                 ),
                 Container(
@@ -60,9 +66,13 @@ class _ForgotPasswordForm extends State<ForgotPasswordForm> {
                     text: 'Send Email',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
+                    isLoading: widget.isLoading,
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        widget.sendNewPassword(_emailController.text);
+                        widget.sendNewPassword(
+                            _emailController.text,
+                            () => widget.toggleLoader()
+                        );
                       }
                     },
                   ),
@@ -73,9 +83,8 @@ class _ForgotPasswordForm extends State<ForgotPasswordForm> {
                     text: 'Back to Login',
                     textColor: Colors.black,
                     fillColor: Colors.orange,
-                    onPressed: () {
-                      widget.setAuthStateToLoggedOut();
-                    },
+                    isLoading: false,
+                    onPressed: widget.isLoading ? null : widget.setAuthStateToLoggedOut
                   ),
                 ),
               ],
