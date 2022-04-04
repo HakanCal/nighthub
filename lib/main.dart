@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:nighthub/src/auth/authState.dart';
+import 'package:nighthub/src/homepage.dart';
 
 void main() {
   runApp(
