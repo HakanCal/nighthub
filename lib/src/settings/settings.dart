@@ -2,10 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:nighthub/src/settings/editProfile.dart';
+
+import '../auth/authState.dart';
+import '../auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
-import 'auth/authState.dart';
-import 'auth/formFields/customChipList.dart';
+import '../information/about.dart';
+import '../information/description.dart';
+import '../information/impressum.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({required this.userData, required this.profilePicture, Key? key}) : super(key: key);
@@ -34,10 +39,17 @@ class _AppSettings extends State<AppSettings> {
   Widget build(BuildContext context) {
     debugPaintSizeEnabled = false;
 
-        return Container(
-          height: MediaQuery.of(context).size.height,
-          color: const Color(0xFF262626),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+      return Container(
+        height: MediaQuery.of(context).size.height,
+        color: const Color(0xFF262626),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const EditProfile()),
+            );
+          },
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +80,7 @@ class _AppSettings extends State<AppSettings> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Text(widget.userData['email'], style: const TextStyle(fontSize: 20, color: Colors.white)),
-                      ),
+                      ),//
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: CustomChipList(
@@ -81,36 +93,53 @@ class _AppSettings extends State<AppSettings> {
                     ],
                   ),
                 ),
-              AddItem(iconData: Icons.question_mark, text: 'What is nightHub', onPress: () => {}),
-              AddItem(iconData: Icons.wrap_text, text: 'Impressum', onPress: () => {}),
-              AddItem(iconData: Icons.abc_rounded, text: 'About', onPress: () => {}),
-              AddItem(iconData: Icons.logout, text: 'Log out', onPress: () {
+                AddItem(iconData: Icons.question_mark, text: 'What is nightHub', onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Description()),
+                  );
+                }),
+                AddItem(iconData: Icons.wrap_text, text: 'Impressum', onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Impressum()),
+                  );
+                }),
+                AddItem(iconData: Icons.abc_rounded, text: 'About', onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const About()),
+                  );
+                }),
+                AddItem(iconData: Icons.logout, text: 'Log out', onPress: () {
                 Provider.of<AuthState>(context, listen: false).logOut();
                 Navigator.pushNamed(context, '/');
               }),
             ],
           )
-      )
-        );
+        )
+      ),
+    );
   }
 }
 
 //Settings Item Logo + Text
 class AddItem extends StatefulWidget {
+
   //Widget parameters
   const AddItem({
     required this.iconData,
     required this.text,
-    required this.onPress
+    required this.onPress,
   });
-  
-  //Hard coded values
+
+  //Fix values
   final Color iconColor = Colors.white;
   final Color itemColor = const Color(0x8c8c8c8c);
-  final double iconSize = 30;
-  final double fontSize = 20;
-  final double itemPadding = 5;
-  final double borderRadius = 15;
+  final double iconSize = 30.00;
+  final double fontSize = 20.00;
+  final double itemPadding = 12.00;
+  final double borderRadius = 15.00;
 
   //Variable values
   final IconData iconData;
@@ -132,21 +161,21 @@ class _AddItemState extends State<AddItem> {
         color: widget.itemColor,
         borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
       ),
-      child: TextButton(
-        onPressed: widget.onPress,
+      child: InkWell(
+        onTap: widget.onPress,
         child: Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Icon(
-                widget.iconData,
-                color: widget.iconColor,
-                size: widget.iconSize,
-              )
-            ),
-            Text(widget.text, style: TextStyle(color: Colors.white, fontSize: widget.fontSize))
-          ],
-        ),
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Icon(
+                  widget.iconData,
+                  color: widget.iconColor,
+                  size: widget.iconSize,
+                )
+              ),
+              Text(widget.text, style: TextStyle(color: Colors.white, fontSize: widget.fontSize))
+            ],
+          ),
       ),
     );
   }

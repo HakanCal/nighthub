@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nighthub/src/auth/authFlowScreens.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nighthub/src/homepage.dart';
-import 'package:nighthub/src/settings.dart';
+import 'package:nighthub/src/settings/settings.dart';
 import 'package:nighthub/src/auth/authState.dart';
 
 void main() {
