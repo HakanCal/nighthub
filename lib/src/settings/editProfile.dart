@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nighthub/src/auth/settings/settings.dart';
+import 'package:nighthub/src/settings/settings.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);

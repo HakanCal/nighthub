@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:nighthub/src/auth/settings/editProfile.dart';
+import 'package:nighthub/src/settings/editProfile.dart';
 
-import '../authState.dart';
-import '../formFields/customChipList.dart';
+import '../auth/authState.dart';
+import '../auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
 import '../information/about.dart';
