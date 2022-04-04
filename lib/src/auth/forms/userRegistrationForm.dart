@@ -62,7 +62,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
     });
   }
 
-  /// Method for sending a selected or taken photo to the EditPage
+  /// Method for sending a selected or taken photo to the Registration page
   Future selectOrTakePhoto(ImageSource imageSource) async {
     final pickedFile = await imagePicker.pickImage(source: imageSource);
 
@@ -81,7 +81,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
       children: [
         const Header('Create account'),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
