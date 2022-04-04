@@ -40,6 +40,8 @@ dependencies:
 
   # Google fonts:
   google_fonts: ^2.3.1
+  geolocator: ^8.2.0
+  geoflutterfire: ^3.0.3
 
 dev_dependencies:
   flutter_test:
