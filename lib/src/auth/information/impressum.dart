@@ -1,15 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nighthub/src/auth/settings/settings.dart';
 
-class EditProfile extends StatefulWidget {
-  const EditProfile({Key? key}) : super(key: key);
+class Impressum extends StatefulWidget {
+  const Impressum({Key? key}) : super(key: key);
+
 
   @override
-  State<StatefulWidget> createState() => _EditProfile();
+  State<StatefulWidget> createState() => _Impressum();
 
 }
 
-class _EditProfile extends State<EditProfile> {
+class _Impressum extends State<Impressum> {
 
   @override
   void initState() {
@@ -28,9 +29,7 @@ class _EditProfile extends State<EditProfile> {
           },
         ),
       ),
-      body: Container(
-        //TODO
-      ),
+      body: const Text('#TODO'),
     );
   }
 
