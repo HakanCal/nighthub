@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:nighthub/src/settings.dart';
+import 'package:nighthub/src/auth/settings/settings.dart';
 
 import 'auth/authState.dart';
 import 'navbar.dart';

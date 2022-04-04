@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:nighthub/src/auth/settings/editProfile.dart';
 
-import 'auth/formFields/customChipList.dart';
+import '../formFields/customChipList.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({required this.userData, Key? key}) : super(key: key);
@@ -30,52 +31,59 @@ class _AppSettings extends State<AppSettings> {
 
     debugPaintSizeEnabled = false;
 
-        return Container(
-          color: const Color(0xFF262626),
-          child: Column(
+      return Container(
+        color: const Color(0xFF262626),
+        child: Column(
             mainAxisAlignment: MainAxisAlignment.start, // Oben anfangen lassen
             children: <Widget>[
-
               //Profile bubble
+              Flexible(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0x8c8c8c8c),
+                    borderRadius: BorderRadius.all(Radius.circular(15.00)),
+                  ),
+                  margin: EdgeInsets.fromLTRB(marginCards, marginCards+5.00, marginCards, marginCards+5.00),
+                  padding: const EdgeInsets.symmetric(vertical: 25.00),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
 
-              Container(
-                decoration: const BoxDecoration(
-                  color: Color(0x8c8c8c8c),
-                  borderRadius: BorderRadius.all(Radius.circular(15.00)),
-                ),
-                margin: EdgeInsets.fromLTRB(marginCards, marginCards+5.00, marginCards, marginCards+5.00),
-                padding: const EdgeInsets.symmetric(vertical: 25.00),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-
-                    Container(
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15.00)),
-                      ),
-                      child: Column(
-                        children: [
-                          const ProfilePic(width: 150.00, height: 150.00, imgPath: 'assets/dummy-profile-pic.png'),
-                          Text(widget.userData['username'], style: const TextStyle(fontSize: 30, color: Colors.white)),
-                          Text(widget.userData['email'], style: const TextStyle(fontSize: 20, color: Colors.white)),
-                          CustomChipList(
-                            values: getUserInterests(widget.userData['interests']),
-                            chipBuilder: (String value) {
-                              return Chip(label: Text(value));
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                      Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(15.00)),
+                        ),
+                        child: Column(
+                          children: [
+                            const ProfilePic(width: 150.00, height: 150.00, imgPath: 'assets/dummy-profile-pic.png'),
+                            Text(widget.userData['username'], style: const TextStyle(fontSize: 30, color: Colors.white)),
+                            Text(widget.userData['email'], style: const TextStyle(fontSize: 20, color: Colors.white)),
+                            CustomChipList(
+                              values: getUserInterests(widget.userData['interests']),
+                              chipBuilder: (String value) {
+                                return Chip(label: Text(value));
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
-              AddItem(margin: marginCards, iconData: Icons.question_mark, text: 'What is nightHub'),
-              AddItem(margin: marginCards, iconData: Icons.wrap_text, text: 'Impressum'),
-              AddItem(margin: marginCards, iconData: Icons.abc_rounded, text: 'About'),
-              AddItem(margin: marginCards, iconData: Icons.logout, text: 'Logout')
-            ],
+              Flexible(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AddItem(margin: marginCards, iconData: Icons.question_mark, text: 'What is nightHub'),
+                    AddItem(margin: marginCards, iconData: Icons.wrap_text, text: 'Impressum'),
+                    AddItem(margin: marginCards, iconData: Icons.abc_rounded, text: 'About'),
+                    AddItem(margin: marginCards, iconData: Icons.logout, text: 'Logout')
+                  ],
+                ),
+              )
+            ]
           )
       );
   }
@@ -89,7 +97,7 @@ class _AppSettings extends State<AppSettings> {
     final Color itemColor = const Color(0x8c8c8c8c);
     final double iconSize = 30.00;
     final double fontSize = 20.00;
-    final double itemPadding = 10.00;
+    final double itemPadding = 12.00;
     final double borderRadius = 15.00;
 
     //Variable values
