@@ -30,7 +30,7 @@ class _CustomDropdownField extends State<CustomDropdownField> {
         DropdownButtonFormField(
           isExpanded: true,
           isDense: true,
-          borderRadius: BorderRadius.circular(30),
+          //borderRadius: BorderRadius.circular(30),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
             enabledBorder: OutlineInputBorder(

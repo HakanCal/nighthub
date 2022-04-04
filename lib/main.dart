@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nighthub/src/auth/authFlowScreens.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nighthub/src/auth/authFlowScreens.dart';
 import 'package:nighthub/src/homepage.dart';
+import 'package:nighthub/src/settings.dart';
 import 'package:nighthub/src/auth/authState.dart';
 
 void main() {
@@ -23,6 +25,7 @@ class NightHub extends StatelessWidget {
         title: 'Welcome Screen',
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
+          //! CHANGED: BEFORE -> const AuthFlowScreens()
           '/': (BuildContext context) => const AuthFlowScreens(),
           '/home': (BuildContext context) => const HomePage(),
         },

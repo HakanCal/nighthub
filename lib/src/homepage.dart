@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:nighthub/src/settings.dart';
 
 import 'auth/authState.dart';
 import 'navbar.dart';
@@ -18,25 +19,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage> {
-  final List <Widget> menuSelects = <Widget>[
-    //Swiper
-    //Near me
-    //Setting
-    const Text('LOG OUT'), //TODO: What we want in the screens
-    const Text('Select 1'),
-    const Text('Select 2')
-  ];
-
   late Future<dynamic> _future;
 
   Map<String, dynamic> _accountData = <String, dynamic>{};
   Map<String, dynamic> get accountData => _accountData;
   File? _tempImageFile;
+  List<Widget> menuSelects = <Widget>[
+    //Swiper
+    //Near me
+    //Setting
+    const Text('LOG OUT'), //TODO: What we want in the screens
+    const Text('Select 1'),
+    const AppSettings(userData: {}, profilePicture: null)
+  ];
 
   @override
   void initState() {
-    _future = getUserData();
     super.initState();
+    _future = getUserData();
   }
 
   var _selectedIndex = 0;
@@ -45,17 +45,18 @@ class _HomePage extends State<HomePage> {
   Future<dynamic> getUserData() async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
     .collection('user_accounts')
     .where('userId', isEqualTo: userId)
     .get()
-    .then((value) => {
+    .then((value) async {
       for (final document in value.docs) {
         setState(() {
           _accountData = document.data();
-        })
+        });
       }
-    }).then((value) => getImageFile());
+      await getImageFile();
+    });
   }
 
   /// Preloads the profile picture from Firebase Storage
@@ -65,19 +66,33 @@ class _HomePage extends State<HomePage> {
       final tempDir = await getTemporaryDirectory();
       final File tempFile = File('${tempDir.path}/$imageName');
 
-      setState(() {
-        _tempImageFile = tempFile;
-      });
-
       /// If file doesn't exist, it will try downloading
       if (!tempFile.existsSync()) {
         try {
           tempFile.create(recursive: true);
-          await firebase_storage.FirebaseStorage.instance.ref('/profile_pictures/$imageName').writeToFile(tempFile);
+          await firebase_storage.FirebaseStorage.instance.ref(
+              '/profile_pictures/$imageName').writeToFile(tempFile);
+          setState(() {
+            _tempImageFile = tempFile;
+            menuSelects = <Widget>[
+              const Text('LOG OUT'), //TODO: What we want in the screens
+              const Text('Select 1'),
+              AppSettings(userData: accountData, profilePicture: _tempImageFile)
+            ];
+          });
         } catch (e) {
           /// If there is an error the created file will be deleted
           await tempFile.delete(recursive: true);
         }
+      } else {
+        setState(() {
+          _tempImageFile = tempFile;
+          menuSelects = <Widget>[
+            const Text('LOG OUT'), //TODO: What we want in the screens
+            const Text('Select 1'),
+            AppSettings(userData: accountData, profilePicture: _tempImageFile)
+          ];
+        });
       }
     }
   }
@@ -96,18 +111,21 @@ class _HomePage extends State<HomePage> {
         builder: (context, snapshot) {
           return WillPopScope(
             onWillPop: () async => false,
-            child: Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: Colors.black,
-                automaticallyImplyLeading: false,
-                title: const Text('Home Page'),
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/nighthub.png'),
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              child: Scaffold(
+                appBar: AppBar(
+                  centerTitle: true,
+                  backgroundColor: Colors.black,
+                  automaticallyImplyLeading: false,
+                  title: const Text('Home Page'),
+                  leading: IconButton(
+                    onPressed: () {},
+                    icon: Image.asset('assets/nighthub.png'),
+                  ),
                 ),
-              ),
-              body: arguments["isBusinessAccount"] ?
+                body: false ? //arguments["isBusinessAccount"] ?
 
               ///TODO: Here is where the different screens should be put: user account or business account
               Center(
@@ -128,7 +146,7 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
               ) : Center(
-                child: ElevatedButton(
+                child: menuSelects[_selectedIndex]/*ElevatedButton(
                   onPressed: () {
                     Provider.of<AuthState>(context, listen: false).logOut();
                     Navigator.pushNamed(context, '/');
@@ -144,13 +162,14 @@ class _HomePage extends State<HomePage> {
                     )
                   ),
                 ),
-              ),
+              */),
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex, onItemTap: _onItemTap
               ),
             ),
-          );
-        }
+          ),
+        );
+      }
     );
   }
 }
