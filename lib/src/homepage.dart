@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,8 +25,8 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   late Future<dynamic> _future;
 
-  Map<String, dynamic> _accountData = <String, dynamic>{};
-  Map<String, dynamic> get accountData => _accountData;
+  Map<String, dynamic>? _accountData = <String, dynamic>{};
+  Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
   List <Widget> menuSelects = <Widget>[
     //Swiper
@@ -48,25 +48,21 @@ class _HomePage extends State<HomePage> {
 
   /// Get all the user-related information and load profile picture
   Future<dynamic> getUserData() async {
+    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    FirebaseFirestore.instance
-        .collection('user_accounts')
-        .where('userId', isEqualTo: userId)
-        .get()
-        .then((value) => {
-      for (final document in value.docs) {
-        setState(() {
-          _accountData = document.data();
-        })
-      }
+    realtimeDatabase.child('user_accounts/$userId/').get().then((snapshot) {
+      final data = Map<String, dynamic>.from(snapshot.value as dynamic);
+      setState(() {
+        _accountData = data;
+      });
     }).then((value) => getImageFile());
   }
 
   /// Preloads the profile picture from Firebase Storage
   Future<dynamic> getImageFile() async {
-    if (accountData.isNotEmpty) {
-      String imageName = accountData['profile_picture'];
+    if (accountData!.isNotEmpty) {
+      String imageName = accountData!['profile_picture'];
       final tempDir = await getTemporaryDirectory();
       final File tempFile = File('${tempDir.path}/$imageName');
 
@@ -81,7 +77,7 @@ class _HomePage extends State<HomePage> {
             menuSelects = <Widget>[
               const Discover(), //TODO: What we want in the screens
               const Radar(),
-              AppSettings(userData: accountData, profilePicture: _tempImageFile)
+              AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
         } catch (e) {
@@ -94,7 +90,7 @@ class _HomePage extends State<HomePage> {
           menuSelects = <Widget>[
             const Discover(), //TODO: What we want in the screens
             const Radar(),
-            AppSettings(userData: accountData, profilePicture: _tempImageFile)
+            AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
       }
@@ -126,7 +122,7 @@ class _HomePage extends State<HomePage> {
                   icon: Image.asset('assets/nighthub.png'),
                 ),
               ),
-              body: arguments["isBusinessAccount"] ?
+              body: arguments['isBusinessAccount'] ?
 
               ///TODO: Here is where the different screens should be put: user account or business account
               Center(
