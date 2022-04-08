@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geocode/geocode.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 
@@ -22,40 +22,17 @@ class AuthState extends ChangeNotifier {
   /// init() function to check whether user is logged-in or -out
   Future<void> init() async {
     await Firebase.initializeApp();
+
     FirebaseAuth.instance.userChanges().listen((user) async {
       if (user != null) {
-        if (kDebugMode) {
-          print("User has signed in");
-        }
+        debugPrint("User has signed in");
         AuthenticationState.loggedIn;
-        /*_reviewSubscription = FirebaseFirestore.instance
-            .collection('reviews')
-            .orderBy('timestamp', descending: true)
-            .snapshots()
-            .listen((snapshot) {
-          _reviewMessages = [];
-          for (final document in snapshot.docs) {
-            _reviewMessages.add(
-              ReviewMessage(
-                name: document.data()['name'] as String,
-                message: document.data()['text'] as String,
-              ),
-            );
-          }
-          notifyListeners();
-        });*/
       } else {
         _authState = AuthenticationState.loggedOut;
-        //_reviewMessages = [];
-        //_reviewSubscription?.cancel();
       }
       notifyListeners();
     });
   }
-
-  /*StreamSubscription<QuerySnapshot>? _reviewSubscription;
-  List<ReviewMessage> _reviewMessages = [];
-  List<ReviewMessage> get reviewMessages => _reviewMessages;*/
 
   String? _email;
   String? get email => _email;
@@ -141,6 +118,8 @@ class AuthState extends ChangeNotifier {
     ) async {
       toggleLoader();
       try {
+        DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
+
         String? imageName = profilePicture?.path.split('/').last;
         if (imageName != null) {
           uploadProfilePicture(profilePicture!, imageName);
@@ -149,18 +128,22 @@ class AuthState extends ChangeNotifier {
         var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email,
             password: password);
+
+        final newUserData = <String, dynamic> {
+          'username': username,
+          'email': email,
+          'userId': FirebaseAuth.instance.currentUser!.uid,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'profile_picture': imageName,
+          'interests': interests,
+          'business': false
+        };
+
         await credential.user!.updateDisplayName(username)
-          .then((value) => FirebaseFirestore.instance
-          .collection('user_accounts')
-          .add(<String, dynamic>{
-            'username': FirebaseAuth.instance.currentUser!.displayName,
-            'email': FirebaseAuth.instance.currentUser!.email,
-            'userId': FirebaseAuth.instance.currentUser!.uid,
-            'timestamp': DateTime.now().millisecondsSinceEpoch,
-            'profile_picture': imageName,
-            'interests': interests,
-            'business': false
-           })
+          .then((value) async => await realtimeDatabase.child('user_accounts/${FirebaseAuth.instance.currentUser!.uid}/')
+            .set(newUserData)
+            .then((value) => debugPrint('Did work the realtimeData'))
+            .catchError((onError) => debugPrint('Didn\'t work the realtimeData'))
         );
 
       _authState = AuthenticationState.loggedOut;
@@ -186,37 +169,41 @@ class AuthState extends ChangeNotifier {
     ) async {
     toggleLoader();
     try {
-        String? imageName = profilePicture?.path.split('/').last;
-        if (imageName != null) {
-          uploadProfilePicture(profilePicture!, imageName);
-        }
+      DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
 
-        String address = '$street , $postcode, $country';
+      String? imageName = profilePicture?.path.split('/').last;
+      if (imageName != null) {
+        uploadProfilePicture(profilePicture!, imageName);
+      }
 
-        var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email,
-            password: password);
+      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password);
 
-        var point = await createGeoPoint(address);
+      String address = '$street , $postcode, $country';
+      var point = await createGeoPoint(address);
 
-        await credential.user!.updateDisplayName(entityName)
-          .then((value) => FirebaseFirestore.instance
-          .collection('entity_accounts')
-          .add(<String, dynamic>{
-            'entityName': FirebaseAuth.instance.currentUser!.displayName,
-            'email': FirebaseAuth.instance.currentUser!.email,
-            'userId': FirebaseAuth.instance.currentUser!.uid,
-            'timestamp': DateTime.now().millisecondsSinceEpoch,
-            'profilePicture': profilePicture?.path,
-            'interests': interests,
-            'business': true,
-            'address': address,
-            'point': point
-          })
-        );
-        _authState = AuthenticationState.loggedOut;
-        notifyListeners();
-        toggleLoader();
+      final newUserData = <String, dynamic>{
+        'username': entityName,
+        'email': email,
+        'userId': FirebaseAuth.instance.currentUser!.uid,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'profile_picture': imageName,
+        'interests': interests,
+        'business': true,
+        'address': address,
+        'point': point
+      };
+
+      await credential.user!.updateDisplayName(entityName)
+        .then((value) async => await realtimeDatabase.child('user_accounts/${FirebaseAuth.instance.currentUser!.uid}/')
+          .set(newUserData)
+          .then((value) => debugPrint('Did work the realtimeData'))
+          .catchError((onError) => debugPrint('Didn\'t work the realtimeData: $onError'))
+      );
+      _authState = AuthenticationState.loggedOut;
+      notifyListeners();
+      toggleLoader();
     } on FirebaseAuthException catch (e) {
         errorCallback(e);
         toggleLoader();
@@ -229,7 +216,7 @@ class AuthState extends ChangeNotifier {
   }
 
   /// Saves picture in Firebase Storage
-  void uploadProfilePicture(File profilePicture, String imageName) {
+  void uploadProfilePicture(File profilePicture, String imageName) async {
     firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
         .ref()
         .child('profile_pictures')
@@ -241,9 +228,7 @@ class AuthState extends ChangeNotifier {
 
     firebase_storage.UploadTask uploadTask = ref.putFile(File(profilePicture.path), metadata);
     uploadTask.whenComplete(() {
-      if (kDebugMode) {
-        print('Photo was uploaded to storage');
-      }
+      debugPrint('Photo was uploaded to storage');
     });
   }
 
@@ -257,7 +242,10 @@ class AuthState extends ChangeNotifier {
       GeoHash geoHash = GeoHash.fromDecimalDegrees(coordinates.longitude!, coordinates.latitude!);
       point = {
         'geohash': geoHash.geohash,
-        'geopoint': GeoPoint(coordinates.latitude!, coordinates.longitude!)
+        'geopoint': {
+          'latitude': coordinates.latitude!,
+          'longitude': coordinates.longitude!
+        }
       };
     } catch (e) {
       if (kDebugMode) {

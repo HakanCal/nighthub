@@ -70,7 +70,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
     });
   }
 
-  /// Method for sending a selected or taken photo to the EditPage
+  /// Method for sending a selected or taken photo to the Registration page
   Future selectOrTakePhoto(ImageSource imageSource) async {
     final pickedFile = await imagePicker.pickImage(source: imageSource);
 
@@ -83,13 +83,51 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
     });
   }
 
+  /// Display the country picker (by default is Germany DE)
+  void renderCountryPicker(context) {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: false,
+      showWorldWide: false,
+      onSelect: (Country country) {
+        setState(() {
+          _countryController.text = country.countryCode;
+        });
+      },
+      countryListTheme: CountryListThemeData(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        inputDecoration: InputDecoration(
+          hintText: 'Search country',
+          prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+              color: Colors.grey,
+              width: 2,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+              color: Colors.grey,
+              width: 2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const Header('Create account'),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -248,49 +286,19 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                               if (_postCodeController.text == '') {
                                 return '';
                               }
+                              return null;
                             },
                             iconWidget: IconButton(
                               icon: const Icon(Icons.arrow_drop_down ),
                               color: Colors.blueGrey,
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              onPressed: () {},
+                              onPressed: () {
+                                renderCountryPicker(context);
+                              },
                             ),
                             onTap: () {
-                              showCountryPicker(
-                                context: context,
-                                showPhoneCode: false,
-                                showWorldWide: false,
-                                onSelect: (Country country) {
-                                  setState(() {
-                                    _countryController.text = country.countryCode;
-                                  });
-                                },
-                                countryListTheme: CountryListThemeData(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(30),
-                                    topRight: Radius.circular(30),
-                                  ),
-                                  inputDecoration: InputDecoration(
-                                    hintText: 'Search country',
-                                    prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: const BorderSide(
-                                        color: Colors.grey,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: const BorderSide(
-                                        color: Colors.grey,
-                                        width: 2,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
+                              renderCountryPicker(context);
                             },
                             textInputAction: TextInputAction.done,
                             onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
