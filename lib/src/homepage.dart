@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -36,12 +38,19 @@ class _HomePage extends State<HomePage> {
     const Radar(),
     const AppSettings(userData: {}, profilePicture: null)
   ];
+  late StreamSubscription<DatabaseEvent> _counterSubscription;
 
 
   @override
   void initState() {
     super.initState();
     _future = getUserData();
+  }
+
+  @override
+  void dispose() {
+    _counterSubscription.cancel();
+    super.dispose();
   }
 
   var _selectedIndex = 0;
@@ -51,12 +60,13 @@ class _HomePage extends State<HomePage> {
     DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    realtimeDatabase.child('user_accounts/$userId/').get().then((snapshot) {
-      final data = Map<String, dynamic>.from(snapshot.value as dynamic);
+    _counterSubscription = realtimeDatabase.child('user_accounts/$userId/').onValue.listen((event) async {
+      final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
       setState(() {
         _accountData = data;
       });
-    }).then((value) => getImageFile());
+      await getImageFile();
+    });
   }
 
   /// Preloads the profile picture from Firebase Storage
