@@ -47,7 +47,9 @@ class _AppSettings extends State<AppSettings> {
           onTap: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditProfile(userData: widget.userData, profilePicture: widget.profilePicture)),
+                MaterialPageRoute(
+                    builder: (context) => EditProfile(userData: widget.userData, profilePicture: widget.profilePicture)
+                ),
             );
           },
           child: SingleChildScrollView(
