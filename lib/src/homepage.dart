@@ -153,7 +153,7 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
               ) : Center(
-                child: menuSelects[_selectedIndex]
+                  child: menuSelects[_selectedIndex]
               ),
               bottomNavigationBar: NavBar(
                   selectedIndex: _selectedIndex, onItemTap: _onItemTap
