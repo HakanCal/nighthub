@@ -5,15 +5,11 @@ import 'package:flutter/services.dart';
 class Impressum extends StatefulWidget {
   const Impressum({Key? key}) : super(key: key);
 
-
   @override
   State<StatefulWidget> createState() => _Impressum();
-
 }
 
 class _Impressum extends State<Impressum> {
-
-
   String? data;
 
   void _loadData() async {

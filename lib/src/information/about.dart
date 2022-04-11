@@ -5,14 +5,11 @@ import 'package:flutter/services.dart';
 class About extends StatefulWidget {
   const About({Key? key}) : super(key: key);
 
-
   @override
   State<StatefulWidget> createState() => _About();
-
 }
 
 class _About extends State<About> {
-
   String? data;
 
   void _loadData() async {

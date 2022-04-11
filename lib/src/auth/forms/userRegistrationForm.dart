@@ -38,7 +38,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final imagePicker = ImagePicker();
-  final options = ["Club", "Bar", "Night Life", "Live Music", "Latin"];
+  final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
 
   bool _isPasswordHidden = true;
   String username = '';
@@ -91,7 +91,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Username",
+                    hint: 'Username',
                     controller: _usernameController,
                     onSaved: (input) {
                       username = input!;
@@ -114,7 +114,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Email",
+                    hint: 'Email',
                     controller: _emailController,
                     onSaved: (input) {
                       email = input!;
@@ -137,7 +137,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Password",
+                    hint: 'Password',
                     controller: _passwordController,
                     isHidden: _isPasswordHidden,
                     onSaved: (input) {},
@@ -163,7 +163,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Confirm password",
+                    hint: 'Confirm password',
                     controller: _confirmPasswordController,
                     isHidden: true,
                     onSaved: (input) {
