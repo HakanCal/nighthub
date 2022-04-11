@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nighthub/src/auth/formFields/customTextField.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:nighthub/src/widgets.dart';
+import 'package:provider/provider.dart';
 
+import '../auth/authState.dart';
 import '../auth/formFields/customDropdownField.dart';
 import '../auth/formFields/customFormButton.dart';
 import '../auth/formFields/customImagePicker.dart';
@@ -86,22 +91,32 @@ class _EditProfile extends State<EditProfile> {
     });
   }
 
-  Future updateUserAccount(BuildContext context, String username, String email, String password, File? profilePicture, List<String> interests, void Function() loader) async {/*
-    final _reviewSubscription = FirebaseFirestore.instance
-        .collection('reviews')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .listen((snapshot) {
-      _reviewMessages = [];
-      for (final document in snapshot.docs) {
-        _reviewMessages.add(
-          ReviewMessage(
-            name: document.data()['name'] as String,
-            message: document.data()['text'] as String,
-          ),
-        );
-      }*/
+  Future<void> updateUserAccount(BuildContext context, String username, String email, String password, File? profilePicture, List<String> interests, Function() loader) async {
 
+    toggleLoader();
+
+    String? imageName = profilePicture?.path.split('/').last;
+
+    if (imageName != null) {
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('profile_pictures')
+        .child('/${widget.userData['profile_picture']}');
+
+        await ref.delete()
+        .then((value) => Provider.of<AuthState>(context, listen: false).uploadProfilePicture(profilePicture!, imageName));
+    }
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$userId/');
+
+    realtimeDatabase.update({
+      'username': username,
+      'profile_picture': imageName,
+      'interests': interests
+    });
+
+    toggleLoader();
 
     Navigator.pop(context);
   }
@@ -112,6 +127,7 @@ class _EditProfile extends State<EditProfile> {
       backgroundColor: const Color(0xFF262626),
       appBar: AppBar(
         backgroundColor: Colors.black,
+        title: const Text('Edit profile'),
         automaticallyImplyLeading: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
@@ -123,16 +139,6 @@ class _EditProfile extends State<EditProfile> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget> [
-            Padding(
-              padding: const EdgeInsets.all(30.00),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text('Edit profile ', style: TextStyle(color: Colors.white, fontSize: 24.00)),
-                  Icon(Icons.create_outlined, size: 30.00, color: Colors.white)
-                ],
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(8),
               child: Form(
@@ -243,7 +249,7 @@ class _EditProfile extends State<EditProfile> {
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                       margin: const EdgeInsets.only(top: 10.0),
                       child: CustomFormButton(
-                        text: 'Create',
+                        text: 'Update',
                         textColor: Colors.black,
                         fillColor: Colors.orange,
                         isLoading: false,//widget.isLoading,

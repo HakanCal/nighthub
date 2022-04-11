@@ -72,7 +72,7 @@ class _AppSettings extends State<AppSettings> {
                         backgroundColor: Colors.transparent,
                         radius: 60,
                         backgroundImage: widget.profilePicture == null
-                            ? const AssetImage('assets/user_image.png',)
+                            ? const AssetImage('assets/user_image.png')
                             : Image.file(widget.profilePicture!, fit: BoxFit.cover).image,
                       ),
                       Padding(
@@ -168,7 +168,7 @@ class _AddItemState extends State<AddItem> {
         child: Row(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Icon(
                   widget.iconData,
                   color: widget.iconColor,
