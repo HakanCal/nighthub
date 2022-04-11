@@ -45,7 +45,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
   final _postCodeController = TextEditingController();
   final _countryController = TextEditingController();
   final imagePicker = ImagePicker();
-  final options = ["Club", "Bar", "Night Life", "Live Music", "Latin"];
+  final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
 
   bool _isPasswordHidden = true;
   String entityName = '';
@@ -137,7 +137,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Entity name",
+                    hint: 'Entity name',
                     controller: _entityNameController,
                     onSaved: (input) {
                       entityName = input!;
@@ -160,7 +160,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Email",
+                    hint: 'Email',
                     controller: _emailController,
                     onSaved: (input) {
                       email = input!;
@@ -183,7 +183,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Password",
+                    hint: 'Password',
                     controller: _passwordController,
                     isHidden: _isPasswordHidden,
                     onSaved: (input) {},
@@ -209,7 +209,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Confirm password",
+                    hint: 'Confirm password',
                     controller: _confirmPasswordController,
                     isHidden: true,
                     onSaved: (input) {
@@ -233,7 +233,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Street name, Nr.",
+                    hint: 'Street name, Nr.',
                     controller: _streetController,
                     onSaved: (input) {},
                     validator: (value) {
@@ -260,7 +260,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                       Flexible(
                         flex: 1,
                         child: CustomTextField(
-                          hint: "Postcode",
+                          hint: 'Postcode',
                           controller: _postCodeController,
                           onSaved: (input) {},
                           validator: (value) {
@@ -278,7 +278,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                         child: Padding (
                           padding: const EdgeInsets.only(left: 40),
                           child: CustomTextField(
-                            hint: "Country",
+                            hint: 'Country',
                             controller: _countryController,
                             onSaved: (input) {},
                             readOnly: true,
