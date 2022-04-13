@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -10,6 +11,8 @@ import 'package:provider/provider.dart';
 import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import 'package:nighthub/src/settings/settings.dart';
+
+import '../dialogs/customFadingDialog.dart';
 
 
 class EditProfile extends StatefulWidget {
@@ -31,12 +34,11 @@ class _EditProfile extends State<EditProfile> {
 
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _passwordController = TextEditingController(text: '<your password>');
 
   final imagePicker = ImagePicker();
   final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
 
-  bool _isPasswordHidden = true;
   String username = '';
   String email = '';
   String password = '';
@@ -117,6 +119,9 @@ class _EditProfile extends State<EditProfile> {
 
     toggleLoader();
     Navigator.pop(context);
+
+    showCustomFadingDialog(context, 'Profile changed successfully', Icons.check_circle_outlined, Colors.grey, Colors.green);
+
   }
 
   @override
@@ -152,6 +157,13 @@ class _EditProfile extends State<EditProfile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+                        child: CustomImagePicker(
+                          profilePicture: _profilePicture,
+                          selectOrTakePhoto: selectOrTakePhoto,
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24.00),
                         child: CustomTextField(
@@ -201,29 +213,21 @@ class _EditProfile extends State<EditProfile> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: CustomTextField(
-                          hint: '',
-                          controller: _passwordController, //text: widget.userData['password']
-                          isHidden: _isPasswordHidden,
-                          onSaved: (input) {},
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please password cannot be empty';
-                            }
-                            return null;
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        child: CustomFormButton(
+                          text: 'Change Password via Email',
+                          textColor: Colors.black,
+                          fillColor: Colors.orange,
+                          isLoading: false,
+                          onPressed: () async {
+
+                            String msg = 'You have been sent an email';
+                            showCustomFadingDialog(context, msg, Icons.mail_outline, Colors.grey, Colors.blue);
+
+                            await FirebaseAuth.instance
+                            .sendPasswordResetEmail(email: widget.userData['email']);
+
                           },
-                          iconWidget: IconButton(
-                            icon: _isPasswordHidden ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
-                            color: Colors.blueGrey,
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordHidden = !_isPasswordHidden;
-                              });
-                            },
-                          ),
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                         ),
                       ),
                       Padding(
@@ -239,13 +243,6 @@ class _EditProfile extends State<EditProfile> {
                             return null;
                           },
                           onChanged: onChangedInterest,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                        child: CustomImagePicker(
-                          profilePicture: _profilePicture,
-                          selectOrTakePhoto: selectOrTakePhoto,
                         ),
                       ),
                       Container(
