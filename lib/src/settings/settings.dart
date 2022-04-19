@@ -30,24 +30,27 @@ class _AppSettings extends State<AppSettings> {
 
   @override
   Widget build(BuildContext context) {
-      return Container(
+
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+
+    return Container(
         height: MediaQuery.of(context).size.height,
         color: const Color(0xFF262626),
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => EditProfile(userData: widget.userData, profilePicture: widget.profilePicture)
-                ),
-            );
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditProfile(userData: widget.userData, profilePicture: widget.profilePicture)
+                    ),
+                  );
+                },
+                child: Container(
                   width: MediaQuery.of(context).size.width,
                   margin: EdgeInsets.only(top: 15, bottom: marginCards+5),
                   padding: EdgeInsets.symmetric(vertical: marginCards + 5),
@@ -86,30 +89,30 @@ class _AppSettings extends State<AppSettings> {
                     ],
                   ),
                 ),
-                AddItem(iconData: Icons.question_mark, text: 'What is nightHub', onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Description()),
-                  );
-                }),
-                AddItem(iconData: Icons.wrap_text, text: 'Impressum', onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Impressum()),
-                  );
-                }),
-                AddItem(iconData: Icons.abc_rounded, text: 'About', onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const About()),
-                  );
-                }),
-                AddItem(iconData: Icons.logout, text: 'Log out', onPress: () {
-                Provider.of<AuthState>(context, listen: false).logOut();
-                Navigator.pushNamed(context, '/');
+              ),
+              AddItem(iconData: Icons.question_mark, text: 'What is nightHub', onPress: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Description()),
+                );
               }),
-            ],
-          )
+              AddItem(iconData: Icons.wrap_text, text: 'Impressum', onPress: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Impressum()),
+                );
+              }),
+              AddItem(iconData: Icons.abc_rounded, text: 'About', onPress: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const About()),
+                );
+              }),
+              AddItem(iconData: Icons.logout, text: 'Log out', onPress: () {
+              Provider.of<AuthState>(context, listen: false).logOut();
+              Navigator.pushNamed(context, '/');
+            }),
+          ],
         )
       ),
     );

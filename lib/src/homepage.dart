@@ -126,7 +126,7 @@ class _HomePage extends State<HomePage> {
                 centerTitle: true,
                 backgroundColor: Colors.black,
                 automaticallyImplyLeading: false,
-                title: const Text('Home Page'),
+                title: const Text('nightHub'),
                 leading: IconButton(
                   onPressed: () {},
                   icon: Image.asset('assets/nighthub.png'),
@@ -143,12 +143,14 @@ class _HomePage extends State<HomePage> {
                   },
                   child: menuSelects[_selectedIndex],
                   style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      primary: Colors.orange,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 20),
+                        horizontal: 50,
+                        vertical: 20
+                      ),
                       textStyle: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold
                       )
                   ),
                 ),
@@ -156,7 +158,8 @@ class _HomePage extends State<HomePage> {
                   child: menuSelects[_selectedIndex]
               ),
               bottomNavigationBar: NavBar(
-                  selectedIndex: _selectedIndex, onItemTap: _onItemTap
+                selectedIndex: _selectedIndex,
+                onItemTap: _onItemTap
               ),
             ),
           );
