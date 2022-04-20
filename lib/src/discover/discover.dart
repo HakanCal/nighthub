@@ -78,13 +78,14 @@ class _Discover extends State<Discover> {
                         iconSize: iconSize,
                         color: Colors.green,
                         onPressed: () {
-                          List<String> testTags = ['Test', 'yay', 'ilike'];
+                          List<String> testTags = ['shit', 'sexist', 'kanacken'];
                           Navigator.push(context, MaterialPageRoute(
                             builder: (context) => EntityPage(
-                                entityName: "PURE x cocolores",
-                                address: "Wagenburgstr. 153",
+                                entityName: 'PURE x cocolores',
+                                address: 'Wagenburgstr. 153',
+                                distance: 1.6,
                                 tags: testTags,
-                                about: "Lorem ipsum dolore est"
+                                about: 'Keine Genres, keine Grenzen – das COCOLORES verschreibt sich einzig der Liebe zur Musik und der Freude am Tanzen. Als Pop-up-Club auf dem ehemaligen Mainfloor des Pure, mitten im Herzen der Stadt, fügt sich das Coco als willkommener Neuzugang in das Stuttgarter Nachtleben ein. Seit Herbst 2016 verwandelt sich der Club jeden Freitag, Samstag und vor Feiertagen bereits ab 21 Uhr in eine bunte Manege, die mit wundersamer Atmosphäre zum ausgelassenen Feiern einlädt. Im COCOLORES feiert man getreu dem Motto „Kopfüber außer Rand & Band”. Auf der Tanzfläche werden dabei keine Grenzen gesetzt: Zwischen grandiosen Club-Dauerbrennern zu denen alle die Hüften schwingen, Lieblingssongs, bei denen es sich laut mitträllern lässt und Instant Classics ist alles erlaubt – Hauptsache die Stimmung steigt. Die festen Veranstaltungsreihen machen den Besuch im Coco durch besondere Specials noch lohnenswerter. Jeden Freitag wird ab 21 Uhr zum „Coco Friday“ geladen – inklusive freiem Eintritt bis 23 Uhr, einer Flasche Prosecco aufs Haus für alle Mädchen-Trios sowie zahlreichen Getränkespecials an der Bar. Auch Samstags bleibt der Eintritt bei „Cocobella“ bis 23 Uhr frei, während zahlreiche Drinks bis dahin für unter vier Euro über die Theke gehen. Und um dem Begriff „Feiertag“ mal wieder ordentlich Bedeutung zu verleihen, schließt sich Coco an den Abenden vor Feiertagen ihrem Schwesterclub PURE an und feiert die sogenannten „Bottle Nights“, bei denen jede Flaschenbestellung an der Bar direkt verdoppelt wird – zudem spart man sich bis 23 Uhr den Eintrittspreis. Wenn das mal nicht die idealen Voraussetzungen für legendäre Partynächte sind!'
                             ))
                           );
                           //TODO: onPressed Action -> Say yes to a club

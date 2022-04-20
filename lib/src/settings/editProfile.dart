@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -37,13 +38,15 @@ class _EditProfile extends State<EditProfile> {
   final _passwordController = TextEditingController(text: '<your password>');
 
   final imagePicker = ImagePicker();
-  final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
+  final options = ['Nightclub','Dance','Club','Bar','Night Life','Live Music','Latin','Festival','Event','Drinks','Cafe','Rock','Jazz','Metal','EDM','Pop','Techno','Electro','Hip Hop','Rap','Punk'];
 
   String username = '';
   String email = '';
   String password = '';
   File? _profilePicture;
   List<String> _interests = [];
+
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -52,9 +55,10 @@ class _EditProfile extends State<EditProfile> {
     _emailController.text = widget.userData['email'];
     _interests = getUserInterests(widget.userData['interests']);
     _profilePicture = widget.profilePicture;
-  }
-
-  bool isLoading = false;
+    options.sort((a, b) { //sorting in ascending order
+      return a.compareTo(b);
+    });
+   }
 
   /// Show loading spinner when communicating with Firebase
   void toggleLoader() async {

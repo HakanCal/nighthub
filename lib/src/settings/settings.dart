@@ -7,6 +7,7 @@ import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import './editProfile.dart';
 import '../information/index.dart';
+import 'editProfileBusiness.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({required this.userData, required this.profilePicture, Key? key}) : super(key: key);
@@ -41,55 +42,55 @@ class _AppSettings extends State<AppSettings> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EditProfile(userData: widget.userData, profilePicture: widget.profilePicture)
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.only(top: 15, bottom: marginCards+5),
+                padding: EdgeInsets.symmetric(vertical: marginCards + 5),
+                decoration: const BoxDecoration(
+                  color: Color(0x8c8c8c8c),
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 60,
+                      backgroundImage: widget.profilePicture == null
+                          ? const AssetImage('assets/user_image.png')
+                          : Image.file(widget.profilePicture!, fit: BoxFit.cover).image,
                     ),
-                  );
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.only(top: 15, bottom: marginCards+5),
-                  padding: EdgeInsets.symmetric(vertical: marginCards + 5),
-                  decoration: const BoxDecoration(
-                    color: Color(0x8c8c8c8c),
-                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        radius: 60,
-                        backgroundImage: widget.profilePicture == null
-                            ? const AssetImage('assets/user_image.png')
-                            : Image.file(widget.profilePicture!, fit: BoxFit.cover).image,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(widget.userData['username'], style: const TextStyle(fontSize: 30, color: Colors.white)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(widget.userData['email'], style: const TextStyle(fontSize: 20, color: Colors.white)),
+                    ),//
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: CustomChipList(
+                        values: getUserInterests(widget.userData['interests']),
+                        chipBuilder: (String value) {
+                          return Chip(label: Text(value));
+                        },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(widget.userData['username'], style: const TextStyle(fontSize: 30, color: Colors.white)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(widget.userData['email'], style: const TextStyle(fontSize: 20, color: Colors.white)),
-                      ),//
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: CustomChipList(
-                          values: getUserInterests(widget.userData['interests']),
-                          chipBuilder: (String value) {
-                            return Chip(label: Text(value));
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
+              AddItem(iconData: Icons.settings, text: 'Settings', onPress: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => arguments['isBusinessAccount'] ?
+                      EditProfile(userData: widget.userData, profilePicture: widget.profilePicture) :
+                      EditBusinessProfile(userData: widget.userData, profilePicture: widget.profilePicture)
+                  ),
+                );
+              }),
               AddItem(iconData: Icons.question_mark, text: 'What is nightHub', onPress: () {
                 Navigator.push(
                   context,
