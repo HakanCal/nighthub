@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import 'package:nighthub/src/settings/settings.dart';
-
 import '../dialogs/customFadingDialog.dart';
 
 
@@ -31,11 +30,13 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfile extends State<EditProfile> {
-  final _formKey = GlobalKey<FormState>(debugLabel: '_EditProfileFormState');
+  final userCredentials = FirebaseAuth.instance.currentUser;
 
+  final _formKey = GlobalKey<FormState>(debugLabel: '_EditUserProfileFormState');
   final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController(text: '<your password>');
+  late TextEditingController _emailController = TextEditingController();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
 
   final imagePicker = ImagePicker();
   final options = ['Nightclub','Dance','Club','Bar','Night Life','Live Music','Latin','Festival','Event','Drinks','Cafe','Rock','Jazz','Metal','EDM','Pop','Techno','Electro','Hip Hop','Rap','Punk'];
@@ -46,19 +47,23 @@ class _EditProfile extends State<EditProfile> {
   File? _profilePicture;
   List<String> _interests = [];
 
-  bool isLoading = false;
-
   @override
   void initState() {
     super.initState();
     _usernameController.text = widget.userData['username'];
-    _emailController.text = widget.userData['email'];
+    _emailController = TextEditingController(text: widget.userData['email']);
     _interests = getUserInterests(widget.userData['interests']);
     _profilePicture = widget.profilePicture;
     options.sort((a, b) { //sorting in ascending order
       return a.compareTo(b);
     });
    }
+
+  bool isLoading = false;
+  bool _isPasswordHidden = true;
+  bool _isUpdateEmail = false;
+  bool _isUpdatePassword = false;
+  String errorMessage = '';
 
   /// Show loading spinner when communicating with Firebase
   void toggleLoader() async {
@@ -93,39 +98,76 @@ class _EditProfile extends State<EditProfile> {
       BuildContext context,
       String username,
       String email,
-      String password,
       File? profilePicture,
       List<String> interests,
       Function() loader) async
   {
     toggleLoader();
 
-    String? imageName = profilePicture?.path.split('/').last;
-
-    if (imageName != widget.userData['profile_picture']) {
-      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
-        .ref()
-        .child('profile_pictures')
-        .child('/${widget.userData['profile_picture']}');
-
-        await ref.delete()
-        .then((value) => Provider.of<AuthState>(context, listen: false).uploadProfilePicture(profilePicture!, imageName!));
+    if (email.isNotEmpty && email != widget.userData['email']) {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: widget.userData['email'],
+        password: _currentPasswordController.text,
+      ).then((value) {
+        userCredentials?.updateEmail(email)
+            .then((value) {
+          debugPrint('Email was updated');
+        }).catchError((onError) {
+          setState(() {
+            errorMessage = 'Email empty or wrong format';
+          });
+        });
+      });
     }
 
-    String userId = FirebaseAuth.instance.currentUser!.uid;
-    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$userId/');
+    if (_newPasswordController.text.isNotEmpty) {
+      await userCredentials?.updatePassword(_newPasswordController.text)
+          .then((value) {
+        debugPrint('Password was updated');
+      }).catchError((onError) {
+        setState(() {
+          errorMessage = 'Password should be at least 6 characters';
+        });
+      });
+    }
 
-    realtimeDatabase.update({
-      'username': username,
-      'profile_picture': imageName,
-      'interests': interests
-    });
+    if (errorMessage.isNotEmpty) {
+      toggleLoader();
+      showCustomFadingDialog(
+          context, errorMessage, Icons.error_outline, Colors.grey, Colors.red);
+    } else {
+      String? imageName = profilePicture?.path
+          .split('/')
+          .last;
 
-    toggleLoader();
-    Navigator.pop(context);
+      if (imageName != widget.userData['profile_picture']) {
+        firebase_storage.Reference ref = firebase_storage.FirebaseStorage
+            .instance
+            .ref()
+            .child('profile_pictures')
+            .child('/${widget.userData['profile_picture']}');
 
-    showCustomFadingDialog(context, 'Profile changed successfully', Icons.check_circle_outlined, Colors.grey, Colors.green);
+        await ref.delete()
+            .then((value) =>
+            Provider.of<AuthState>(context, listen: false).uploadProfilePicture(
+                profilePicture!, imageName!));
+      }
 
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+      DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref(
+          'user_accounts/$userId/');
+
+      realtimeDatabase.update({
+        'username': username,
+        'email': email,
+        'profile_picture': imageName,
+        'interests': interests
+      });
+
+      toggleLoader();
+      Navigator.pop(context);
+      showCustomFadingDialog(context, 'Profile updated successfully', Icons.check_circle_outlined, Colors.grey, Colors.green);
+    }
   }
 
   @override
@@ -171,7 +213,7 @@ class _EditProfile extends State<EditProfile> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24.00),
                         child: CustomTextField(
-                          hint: '',
+                          hint: 'Enter username',
                           controller: _usernameController,
                           onSaved: (input) {
                             username = input!;
@@ -192,50 +234,6 @@ class _EditProfile extends State<EditProfile> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                        child: CustomTextField(
-                          hint: '',
-                          readOnly: true,
-                          controller: TextEditingController(
-                            text: widget.userData['email']
-                          ),
-                          onSaved: (input) {
-                            email = input!;
-                          },
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please email cannot be empty';
-                            }
-                            return null;
-                          },
-                          iconWidget: IconButton(
-                            icon: const Icon(Icons.email),
-                            color: Colors.blueGrey,
-                            onPressed: () {},
-                          ),
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                        child: CustomFormButton(
-                          text: 'Change Password via Email',
-                          textColor: Colors.black,
-                          fillColor: Colors.orange,
-                          isLoading: false,
-                          onPressed: () async {
-
-                            String msg = 'You have been sent an email';
-                            showCustomFadingDialog(context, msg, Icons.mail_outline, Colors.grey, Colors.blue);
-
-                            await FirebaseAuth.instance
-                            .sendPasswordResetEmail(email: widget.userData['email']);
-
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                         child: CustomDropdownField(
                           values: _interests,
                           hintText: 'Change interests',
@@ -248,6 +246,136 @@ class _EditProfile extends State<EditProfile> {
                           },
                           onChanged: onChangedInterest,
                         ),
+                      ),
+                      Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 35),
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Update Email',
+                                style: TextStyle(color: Colors.orange, fontSize: 16),
+                              ),
+                              IconButton(
+                                icon: Icon(_isUpdateEmail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                                color: Colors.orange,
+                                onPressed: () {
+                                  setState(() {
+                                    _isUpdateEmail = !_isUpdateEmail;
+                                  });
+                                },
+                              )
+                            ],
+                          )
+                      ),
+                      Container(
+                          child: _isUpdateEmail ?
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget> [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                                  child: CustomTextField(
+                                    hint: 'New Email',
+                                    controller: _emailController,
+                                    onSaved: (input) {
+                                      email = input!;
+                                    },
+                                    validator: (value) {
+                                      if (_isUpdateEmail && value!.isEmpty) {
+                                        return 'Please email cannot be empty';
+                                      }
+                                      return null;
+                                    },
+                                    iconWidget: IconButton(
+                                      icon: const Icon(Icons.email),
+                                      color: Colors.blueGrey,
+                                      onPressed: () {},
+                                    ),
+                                    textInputAction: TextInputAction.next,
+                                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                  child: CustomTextField(
+                                    hint: 'Current password',
+                                    isHidden: true,
+                                    controller: _currentPasswordController,
+                                    onSaved: (input) {
+                                      email = input!;
+                                    },
+                                    validator: (value) {
+                                      if (_isUpdateEmail && value!.isEmpty) {
+                                        return 'Please password cannot be empty';
+                                      }
+                                      return null;
+                                    },
+                                    iconWidget: IconButton(
+                                      icon: const Icon(Icons.password_outlined),
+                                      color: Colors.blueGrey,
+                                        onPressed: () {},
+                                    ),
+                                    textInputAction: TextInputAction.done,
+                                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                  ),
+                                ),
+                              ]
+                          ) : null
+                      ),
+                      Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 35),
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Update Password',
+                                style: TextStyle(color: Colors.orange, fontSize: 16),
+                              ),
+                              IconButton(
+                                icon: Icon(_isUpdatePassword ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                                color: Colors.orange,
+                                onPressed: () {
+                                  setState(() {
+                                    _isUpdatePassword = !_isUpdatePassword;
+                                  });
+                                },
+                              )
+                            ],
+                          )
+                      ),
+                      Container(
+                          child: _isUpdatePassword ?
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget> [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                                  child: CustomTextField(
+                                    hint: 'New password',
+                                    isHidden: _isPasswordHidden,
+                                    controller: _newPasswordController,
+                                    onSaved: (input) {
+                                      email = input!;
+                                    },
+                                    validator: (value) {
+                                      return null;
+                                    },
+                                    iconWidget: IconButton(
+                                      icon: _isPasswordHidden ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
+                                      color: Colors.blueGrey,
+                                      onPressed: () {
+                                        setState(() {
+                                          _isPasswordHidden = !_isPasswordHidden;
+                                        });
+                                      },
+                                    ),
+                                    textInputAction: TextInputAction.done,
+                                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                  ),
+                                ),
+                              ]
+                          ) : null
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -264,7 +392,6 @@ class _EditProfile extends State<EditProfile> {
                                   context,
                                   _usernameController.text,
                                   _emailController.text,
-                                  _passwordController.text,
                                   _profilePicture,
                                   _interests,
                                   () => toggleLoader()
@@ -277,8 +404,8 @@ class _EditProfile extends State<EditProfile> {
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                         child: CustomFormButton(
                           text: 'Cancel',
-                          textColor: Colors.black,
-                          fillColor: Colors.orange,
+                          textColor: Colors.orange,
+                          fillColor: const Color(0xFF262626),
                           isLoading: false,
                           onPressed: isLoading ? null : () {
                             Navigator.pop(context);
