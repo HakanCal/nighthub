@@ -30,14 +30,7 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic>? _accountData = <String, dynamic>{};
   Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
-  List <Widget> menuSelects = <Widget>[
-    //Swiper
-    //Near me
-    //Setting
-    const Discover(), //TODO: What we want in the screens
-    const Radar(),
-    const AppSettings(userData: {}, profilePicture: null)
-  ];
+  late List <Widget> menuSelects = <Widget>[];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
 
@@ -141,7 +134,7 @@ class _HomePage extends State<HomePage> {
                     Provider.of<AuthState>(context, listen: false).logOut();
                     Navigator.pushNamed(context, '/');
                   },
-                  child: menuSelects[_selectedIndex],
+                  child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null,
                   style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                       padding: const EdgeInsets.symmetric(
@@ -153,7 +146,7 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
               ) : Center(
-                  child: menuSelects[_selectedIndex]
+                  child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null
               ),
               bottomNavigationBar: NavBar(
                   selectedIndex: _selectedIndex, onItemTap: _onItemTap
