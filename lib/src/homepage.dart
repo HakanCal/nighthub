@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-import 'auth/authState.dart';
 import 'discover/discover.dart';
 import 'navbar.dart';
 import 'radar/radar.dart';
@@ -109,9 +106,6 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-
     void _onItemTap(int index){
       setState(() => {_selectedIndex = index});
     }
@@ -132,30 +126,13 @@ class _HomePage extends State<HomePage> {
                   icon: Image.asset('assets/nighthub.png'),
                 ),
               ),
-              body: arguments['isBusinessAccount'] ?
+              body: accountData!['business'] ?
 
               ///TODO: Here is where the different screens should be put: user account or business account
               Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Provider.of<AuthState>(context, listen: false).logOut();
-                    Navigator.pushNamed(context, '/');
-                  },
-                  child: menuSelects[_selectedIndex],
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 50,
-                        vertical: 20
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold
-                      )
-                  ),
-                ),
+                child: menuSelects[_selectedIndex] ///TODO: screens business account
               ) : Center(
-                  child: menuSelects[_selectedIndex]
+                  child: menuSelects[_selectedIndex] ///TODO: screens user account
               ),
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex,
