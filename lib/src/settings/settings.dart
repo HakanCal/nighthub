@@ -31,9 +31,6 @@ class _AppSettings extends State<AppSettings> {
 
   @override
   Widget build(BuildContext context) {
-
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-
     return Container(
         height: MediaQuery.of(context).size.height,
         color: const Color(0xFF262626),
@@ -85,7 +82,7 @@ class _AppSettings extends State<AppSettings> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => arguments['isBusinessAccount'] ?
+                      builder: (context) => !widget.userData['business'] ?
                       EditProfile(userData: widget.userData, profilePicture: widget.profilePicture) :
                       EditBusinessProfile(userData: widget.userData, profilePicture: widget.profilePicture)
                   ),
