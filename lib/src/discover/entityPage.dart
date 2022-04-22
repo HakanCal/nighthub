@@ -1,5 +1,8 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 import '../auth/formFields/customChipList.dart';
 
@@ -35,6 +38,9 @@ class _EntityPage extends State<EntityPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    ScrollController scroller = ScrollController();
+
     return Scaffold(
       backgroundColor: const Color(0xFF262626),
       appBar: AppBar(
@@ -49,9 +55,9 @@ class _EntityPage extends State<EntityPage> {
         ),
       ),
       body: ListView(
-        controller: ScrollController(),
+        controller: scroller,
         addAutomaticKeepAlives: true,
-
+        shrinkWrap: true,
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 10),
@@ -84,7 +90,7 @@ class _EntityPage extends State<EntityPage> {
                 const Padding(padding: EdgeInsets.only(top: 15.00)),
                 Text(
                   widget.about,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20.00
                   ),
@@ -99,18 +105,34 @@ class _EntityPage extends State<EntityPage> {
     );
   }
 
-  //TODO: Image swiper
-  Widget pictureSwiper() => ClipRRect(
-    child: Container(
-      width: MediaQuery.of(context).size.height * 0.7,
-      height: MediaQuery.of(context).size.width * 0.9,
-      decoration: const BoxDecoration(
-        color: Color(0x8c8c8c8c),
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        image: DecorationImage(
-          fit: BoxFit.cover,
-          image: AssetImage('assets/dance-club.gif'),
-        ),
+  final List<File> images = [File('assets/dance-club.gif'), File('assets/nighthub.png'), File('assets/dummy-profile-pic.jpg')];
+
+  Widget pictureSwiper() => Container(
+    width: MediaQuery.of(context).size.height * 0.7,
+    height: MediaQuery.of(context).size.width * 1,
+    decoration: const BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(5)),
+    ),
+    child: Swiper(
+      itemBuilder: (BuildContext context, int index) {
+        return Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage(images[index].path),
+              ),
+            ),
+            //child: Image.asset(File(images[index]).path, fit: BoxFit.cover)
+        );
+      },
+      index: 0,
+      scrollDirection: Axis.horizontal,
+      itemCount: images.length,
+      autoplay: false,
+      pagination: const SwiperPagination(),
+      control: const SwiperControl(
+        color: Colors.transparent,
       ),
     ),
   );

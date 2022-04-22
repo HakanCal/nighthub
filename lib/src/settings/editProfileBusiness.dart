@@ -5,6 +5,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +44,7 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
   final _aboutController = TextEditingController();
 
   final imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
   final options = ['Nightclub','Dance','Club','Bar','Night Life','Live Music','Latin','Festival','Event','Drinks','Cafe','Rock','Jazz','Metal','EDM','Pop','Techno','Electro','Hip Hop','Rap','Punk'];
 
   String username = '';
@@ -61,6 +63,17 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
     _streetController.text = widget.userData['address'].toString().split(',')[0];
     _postCodeController.text = widget.userData['address'].toString().split(',')[1].replaceAll(' ', '');
     _countryController.text = widget.userData['address'].toString().split(',')[2].replaceAll(' ', '');
+
+
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
+    images.add("Add Image");
   }
 
   bool isLoading = false;
@@ -215,6 +228,9 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
 
   @override
   Widget build(BuildContext context) {
+
+    ScrollController scroller = ScrollController();
+
     return Scaffold(
       backgroundColor: const Color(0xFF262626),
       appBar: AppBar(
@@ -229,30 +245,31 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
         ),
       ),
       body: ListView(
-        controller: ScrollController(),
-        addAutomaticKeepAlives: true,
-        padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
-        children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.only(top: 10),
-          ),
-          Column(
-            children: <Widget> [
-              Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Form(
-                    key: _formKey,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                          child: CustomImagePicker(
-                            profilePicture: _profilePicture,
-                            selectOrTakePhoto: selectOrTakePhoto,
+          shrinkWrap: true,
+          controller: scroller,
+          addAutomaticKeepAlives: true,
+          padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(top: 10),
+            ),
+            Column(
+              children: <Widget> [
+                Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+                            child: CustomImagePicker(
+                              profilePicture: _profilePicture,
+                              selectOrTakePhoto: selectOrTakePhoto,
+                            ),
                           ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: CustomTextField(
@@ -273,11 +290,12 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                 onPressed: () {},
                               ),
                               textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 20),
-                        ),
+                              onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 20),
+                          ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: CustomTextField(
@@ -372,81 +390,86 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                           ),
                         ),
                         Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Update Email',
-                                  style: TextStyle(color: Colors.orange, fontSize: 16),
-                                ),
-                                IconButton(
-                                  icon: Icon(_isUpdateEmail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
-                                  color: Colors.orange,
-                                  onPressed: () {
-                                    setState(() {
-                                      _isUpdateEmail = !_isUpdateEmail;
-                                    });
-                                  },
-                                )
-                              ],
-                            )
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            margin: const EdgeInsets.only(top: 10.0),
+                            child: buildGridView(scroller)
                         ),
-                        Container(
-                            child: _isUpdateEmail ?
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget> [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                                    child: CustomTextField(
-                                      hint: 'New Email',
-                                      controller: _emailController,
-                                      onSaved: (input) {
-                                        email = input!;
-                                      },
-                                      validator: (value) {
-                                        if (_isUpdateEmail && value!.isEmpty) {
-                                          return 'Please email cannot be empty';
-                                        }
-                                        return null;
-                                      },
-                                      iconWidget: IconButton(
-                                        icon: const Icon(Icons.email),
-                                        color: Colors.blueGrey,
-                                        onPressed: () {},
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                                    ),
+                          Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 35),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    'Update Email',
+                                    style: TextStyle(color: Colors.orange, fontSize: 16),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                    child: CustomTextField(
-                                      hint: 'Current password',
-                                      isHidden: true,
-                                      controller: _currentPasswordController,
-                                      onSaved: (input) {
-                                        email = input!;
-                                      },
-                                      validator: (value) {
-                                        if (_isUpdateEmail && value!.isEmpty) {
-                                          return 'Please password cannot be empty';
-                                        }
-                                        return null;
-                                      },
-                                      iconWidget: IconButton(
-                                        icon: const Icon(Icons.password_outlined),
-                                        color: Colors.blueGrey,
-                                        onPressed: () {},
+                                  IconButton(
+                                    icon: Icon(_isUpdateEmail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                                    color: Colors.orange,
+                                    onPressed: () {
+                                      setState(() {
+                                        _isUpdateEmail = !_isUpdateEmail;
+                                      });
+                                    },
+                                  )
+                                ],
+                              )
+                          ),
+                          Container(
+                              child: _isUpdateEmail ?
+                              Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget> [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                                      child: CustomTextField(
+                                        hint: 'New Email',
+                                        controller: _emailController,
+                                        onSaved: (input) {
+                                          email = input!;
+                                        },
+                                        validator: (value) {
+                                          if (_isUpdateEmail && value!.isEmpty) {
+                                            return 'Please email cannot be empty';
+                                          }
+                                          return null;
+                                        },
+                                        iconWidget: IconButton(
+                                          icon: const Icon(Icons.email),
+                                          color: Colors.blueGrey,
+                                          onPressed: () {},
+                                        ),
+                                        textInputAction: TextInputAction.next,
+                                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                                       ),
-                                      textInputAction: TextInputAction.done,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                                     ),
-                                  ),
-                                ]
-                            ) : null
-                        ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                      child: CustomTextField(
+                                        hint: 'Current password',
+                                        isHidden: true,
+                                        controller: _currentPasswordController,
+                                        onSaved: (input) {
+                                          email = input!;
+                                        },
+                                        validator: (value) {
+                                          if (_isUpdateEmail && value!.isEmpty) {
+                                            return 'Please password cannot be empty';
+                                          }
+                                          return null;
+                                        },
+                                        iconWidget: IconButton(
+                                          icon: const Icon(Icons.password_outlined),
+                                          color: Colors.blueGrey,
+                                          onPressed: () {},
+                                        ),
+                                        textInputAction: TextInputAction.done,
+                                        onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                      ),
+                                    ),
+                                  ]
+                              ) : null
+                          ),
                         Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -542,18 +565,140 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                       ],
                     ),
                   )
-              )
-            ],
-          ),
-        ],
-      ),
-    );
+                )
+              ],
+            ),
+          ],
+        ),
+      );
   }
 
-  Widget separationLine() => Container(
-    height: 2,
-    width: MediaQuery.of(context).size.width,
-    color: const Color(0xFF2F2F2F),
+  final multiPicker = ImagePicker();
+  List images = [];
+  late Future _imageFile;
+
+
+  Widget buildGridView(ScrollController scroller) => GridView.count(
+    shrinkWrap: true,
+    controller: scroller,
+    crossAxisCount: 3,
+    childAspectRatio: 0.65,
+    mainAxisSpacing: 3,
+    crossAxisSpacing: 3,
+    children: List.generate(images.length, (index) {
+      if(images[index] is ImageUploadModel) {
+        ImageUploadModel uploadModel = images[index];
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: <Widget>[
+              Image.file(
+                uploadModel.imageFile,
+                width: 300,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                right: 5,
+                top: 5,
+                child: InkWell(
+                  child: const Icon(
+                    Icons.remove_circle,
+                    size: 20,
+                    color: Colors.red,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      images.replaceRange(index, index + 1, ['Add Image']);
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return Card(
+          child: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              _onAddImageClick(index);
+            },
+          ),
+        );
+      }
+    }),
+
   );
 
+
+  /*
+  Widget buildGridView() => InkWell(
+    onTap: () {
+      //getMultiImages();
+    },
+    child: GridView.builder(
+      itemCount: 1,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3
+      ),
+      itemBuilder: (context, index) => Container(/*
+        color: Colors.grey,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.withOpacity(0.5))
+        ),
+        child: /*images!.isEmpty ?*/
+         Icon(
+          CupertinoIcons.camera,
+          color: Colors.grey.withOpacity(0.5),
+        ) /*: Image.file(File(images![index].path),
+        fit: BoxFit.cover)*/,
+      */),
+    ),
+  );*/
+
+  Future _onAddImageClick(int index) async {
+    setState(() {
+      _imageFile = ImagePicker().pickImage(source: ImageSource.gallery);
+      getFileImage(index);
+    });
+  }
+
+  void getFileImage(int index) async {
+//    var dir = await path_provider.getTemporaryDirectory();
+
+    _imageFile.then((file) async {
+      setState(() {
+        ImageUploadModel imageUpload = ImageUploadModel(isUploaded: false, uploading: false, imageFile: File(file.path), imageUrl: '');
+        images.replaceRange(index, index + 1, [imageUpload]);
+      });
+    });
+  }
 }
+
+/*
+  Future getMultiImages() async {
+    final List<XFile>? selectedImages = await multiPicker.pickMultiImage();
+    setState(() {
+      if(selectedImages!.isNotEmpty) {
+        images!.addAll(selectedImages);
+      } else {
+        print('No images selected');
+      }
+    });
+  }*/
+
+
+  class ImageUploadModel {
+    bool isUploaded;
+    bool uploading;
+    File imageFile;
+    String imageUrl;
+
+    ImageUploadModel({
+    required this.isUploaded,
+    required this.uploading,
+    required this.imageFile,
+    required this.imageUrl,
+    });
+  }
