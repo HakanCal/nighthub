@@ -32,7 +32,7 @@ class _Discover extends State<Discover> {
             create: (context) => CardProvider(),
             child: const Flexible(
               flex: 85,
-              child: SwipeCard(imageUrl: 'assets/dummy-club.png', isFront: true),
+              child: SwipeCard(imageUrl: 'assets/dummy-club.png', tags: ['Test', 'Cooltag', 'yay'], isFront: true),
             ),
           ),
           Flexible(
@@ -95,7 +95,7 @@ class _Discover extends State<Discover> {
     );
   }
 
-  Widget buildCards() {
+  Widget buildCards(List<String> tags) {
 
     final provider = Provider.of<CardProvider>(context);
     final images = provider.images;
@@ -104,6 +104,7 @@ class _Discover extends State<Discover> {
       children: images
           .map((image) => SwipeCard(
           imageUrl: image,
+          tags: tags,
           isFront: images.last == image,
       )).toList()
     );

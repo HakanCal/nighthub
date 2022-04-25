@@ -109,17 +109,6 @@ class _EditEntityProfile extends State<EditEntityPage> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
             backgroundColor: const Color(0xFF262626),
-            appBar: AppBar(
-              backgroundColor: Colors.black,
-              title: const Text('Your site'),
-              automaticallyImplyLeading: true,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
             body: ListView(
               shrinkWrap: true,
               controller: scroller,
