@@ -27,6 +27,7 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic>? _accountData = <String, dynamic>{};
   Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
+
   late List <Widget> menuSelects = <Widget>[];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
@@ -77,6 +78,7 @@ class _HomePage extends State<HomePage> {
             menuSelects = <Widget>[
               const Discover(), //TODO: What we want in the screens
               const Radar(),
+              const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -90,6 +92,7 @@ class _HomePage extends State<HomePage> {
           menuSelects = <Widget>[
             const Discover(), //TODO: What we want in the screens
             const Radar(),
+            const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
@@ -129,7 +132,8 @@ class _HomePage extends State<HomePage> {
               ),
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex,
-                onItemTap: _onItemTap
+                onItemTap: _onItemTap,
+                isBusinessAccount: accountData!['business'],
               ),
             ),
           );
