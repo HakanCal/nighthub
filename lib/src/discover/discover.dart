@@ -75,7 +75,7 @@ class _Discover extends State<Discover> {
                         iconSize: iconSize,
                         color: Colors.green,
                         onPressed: () {
-                          List<String> testTags = ['shit', 'sexist', 'kanacken'];
+                          List<String> testTags = ['shit', 'sexist', 'latin'];
                           Navigator.push(context, MaterialPageRoute(
                             builder: (context) => EntityPage(
                                 entityName: 'PURE x cocolores',

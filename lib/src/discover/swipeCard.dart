@@ -1,9 +1,7 @@
 
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nighthub/src/auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
 class SwipeCard extends StatefulWidget {
