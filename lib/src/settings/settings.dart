@@ -1,16 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:nighthub/src/settings/editProfile.dart';
-
-import '../auth/authState.dart';
-import '../auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
-import '../information/about.dart';
-import '../information/description.dart';
-import '../information/impressum.dart';
+import '../auth/authState.dart';
+import '../auth/formFields/index.dart';
+import './editProfile.dart';
+import '../information/index.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({required this.userData, required this.profilePicture, Key? key}) : super(key: key);
@@ -20,14 +16,11 @@ class AppSettings extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _AppSettings();
-
 }
 
 class _AppSettings extends State<AppSettings> {
 
   double marginCards = 5;
-  String username = "";
-  String email = "";
   List<dynamic> interests = [];
 
   @override
@@ -37,8 +30,6 @@ class _AppSettings extends State<AppSettings> {
 
   @override
   Widget build(BuildContext context) {
-    debugPaintSizeEnabled = false;
-
       return Container(
         height: MediaQuery.of(context).size.height,
         color: const Color(0xFF262626),
@@ -47,7 +38,9 @@ class _AppSettings extends State<AppSettings> {
           onTap: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const EditProfile()),
+                MaterialPageRoute(
+                    builder: (context) => EditProfile(userData: widget.userData, profilePicture: widget.profilePicture)
+                ),
             );
           },
           child: SingleChildScrollView(
@@ -70,7 +63,7 @@ class _AppSettings extends State<AppSettings> {
                         backgroundColor: Colors.transparent,
                         radius: 60,
                         backgroundImage: widget.profilePicture == null
-                            ? const AssetImage('assets/user_image.png',)
+                            ? const AssetImage('assets/user_image.png')
                             : Image.file(widget.profilePicture!, fit: BoxFit.cover).image,
                       ),
                       Padding(
@@ -123,7 +116,7 @@ class _AppSettings extends State<AppSettings> {
   }
 }
 
-//Settings Item Logo + Text
+/// Settings Item Logo + Text
 class AddItem extends StatefulWidget {
 
   //Widget parameters
@@ -166,7 +159,7 @@ class _AddItemState extends State<AddItem> {
         child: Row(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Icon(
                   widget.iconData,
                   color: widget.iconColor,

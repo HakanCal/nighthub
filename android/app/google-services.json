@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "975647460038",
+    "firebase_url": "https://nighthub-77c81-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "nighthub-77c81",
     "storage_bucket": "nighthub-77c81.appspot.com"
   },
@@ -29,6 +30,13 @@
             {
               "client_id": "975647460038-cl1t37orvnse32p5g1eq1uqo73992cd0.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "975647460038-amu1vscsv0rfgt14bttpaomv525copnn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dhbw.nighthub"
+              }
             }
           ]
         }

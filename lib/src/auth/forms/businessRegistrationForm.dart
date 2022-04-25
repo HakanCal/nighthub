@@ -45,7 +45,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
   final _postCodeController = TextEditingController();
   final _countryController = TextEditingController();
   final imagePicker = ImagePicker();
-  final options = ["Club", "Bar", "Night Life", "Live Music", "Latin"];
+  final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
 
   bool _isPasswordHidden = true;
   String entityName = '';
@@ -70,7 +70,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
     });
   }
 
-  /// Method for sending a selected or taken photo to the EditPage
+  /// Method for sending a selected or taken photo to the Registration page
   Future selectOrTakePhoto(ImageSource imageSource) async {
     final pickedFile = await imagePicker.pickImage(source: imageSource);
 
@@ -83,13 +83,51 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
     });
   }
 
+  /// Display the country picker (by default is Germany DE)
+  void renderCountryPicker(context) {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: false,
+      showWorldWide: false,
+      onSelect: (Country country) {
+        setState(() {
+          _countryController.text = country.countryCode;
+        });
+      },
+      countryListTheme: CountryListThemeData(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        inputDecoration: InputDecoration(
+          hintText: 'Search country',
+          prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+              color: Colors.grey,
+              width: 2,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+              color: Colors.grey,
+              width: 2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const Header('Create account'),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -99,7 +137,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Entity name",
+                    hint: 'Entity name',
                     controller: _entityNameController,
                     onSaved: (input) {
                       entityName = input!;
@@ -122,7 +160,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Email",
+                    hint: 'Email',
                     controller: _emailController,
                     onSaved: (input) {
                       email = input!;
@@ -145,7 +183,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Password",
+                    hint: 'Password',
                     controller: _passwordController,
                     isHidden: _isPasswordHidden,
                     onSaved: (input) {},
@@ -171,7 +209,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Confirm password",
+                    hint: 'Confirm password',
                     controller: _confirmPasswordController,
                     isHidden: true,
                     onSaved: (input) {
@@ -195,7 +233,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Street name, Nr.",
+                    hint: 'Street name, Nr.',
                     controller: _streetController,
                     onSaved: (input) {},
                     validator: (value) {
@@ -222,7 +260,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                       Flexible(
                         flex: 1,
                         child: CustomTextField(
-                          hint: "Postcode",
+                          hint: 'Postcode',
                           controller: _postCodeController,
                           onSaved: (input) {},
                           validator: (value) {
@@ -240,7 +278,7 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                         child: Padding (
                           padding: const EdgeInsets.only(left: 40),
                           child: CustomTextField(
-                            hint: "Country",
+                            hint: 'Country',
                             controller: _countryController,
                             onSaved: (input) {},
                             readOnly: true,
@@ -248,49 +286,19 @@ class _BusinessRegisterFormState extends State<BusinessRegisterForm> {
                               if (_postCodeController.text == '') {
                                 return '';
                               }
+                              return null;
                             },
                             iconWidget: IconButton(
                               icon: const Icon(Icons.arrow_drop_down ),
                               color: Colors.blueGrey,
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              onPressed: () {},
+                              onPressed: () {
+                                renderCountryPicker(context);
+                              },
                             ),
                             onTap: () {
-                              showCountryPicker(
-                                context: context,
-                                showPhoneCode: false,
-                                showWorldWide: false,
-                                onSelect: (Country country) {
-                                  setState(() {
-                                    _countryController.text = country.countryCode;
-                                  });
-                                },
-                                countryListTheme: CountryListThemeData(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(30),
-                                    topRight: Radius.circular(30),
-                                  ),
-                                  inputDecoration: InputDecoration(
-                                    hintText: 'Search country',
-                                    prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: const BorderSide(
-                                        color: Colors.grey,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: const BorderSide(
-                                        color: Colors.grey,
-                                        width: 2,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
+                              renderCountryPicker(context);
                             },
                             textInputAction: TextInputAction.done,
                             onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),

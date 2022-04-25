@@ -38,7 +38,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final imagePicker = ImagePicker();
-  final options = ["Club", "Bar", "Night Life", "Live Music", "Latin"];
+  final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
 
   bool _isPasswordHidden = true;
   String username = '';
@@ -62,7 +62,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
     });
   }
 
-  /// Method for sending a selected or taken photo to the EditPage
+  /// Method for sending a selected or taken photo to the Registration page
   Future selectOrTakePhoto(ImageSource imageSource) async {
     final pickedFile = await imagePicker.pickImage(source: imageSource);
 
@@ -81,7 +81,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
       children: [
         const Header('Create account'),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -91,7 +91,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Username",
+                    hint: 'Username',
                     controller: _usernameController,
                     onSaved: (input) {
                       username = input!;
@@ -114,7 +114,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Email",
+                    hint: 'Email',
                     controller: _emailController,
                     onSaved: (input) {
                       email = input!;
@@ -137,7 +137,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: CustomTextField(
-                    hint: "Password",
+                    hint: 'Password',
                     controller: _passwordController,
                     isHidden: _isPasswordHidden,
                     onSaved: (input) {},
@@ -163,7 +163,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomTextField(
-                    hint: "Confirm password",
+                    hint: 'Confirm password',
                     controller: _confirmPasswordController,
                     isHidden: true,
                     onSaved: (input) {
