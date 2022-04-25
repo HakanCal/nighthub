@@ -208,7 +208,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                  margin: const EdgeInsets.only(top: 10.0),
+                  margin: const EdgeInsets.only(top: 10),
                   child: CustomFormButton(
                   text: 'Create',
                   textColor: Colors.black,
