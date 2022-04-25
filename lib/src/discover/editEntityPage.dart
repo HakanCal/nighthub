@@ -17,7 +17,6 @@ import '../auth/formFields/index.dart';
 import '../dialogs/customFadingDialog.dart';
 import '../settings/settings.dart';
 
-
 class EditEntityPage extends StatefulWidget {
   const EditEntityPage({
     Key? key,
@@ -89,6 +88,17 @@ class _EditEntityProfile extends State<EditEntityPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF262626),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: const Text('Your site'),
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: ListView(
         shrinkWrap: true,
         controller: scroller,
@@ -110,7 +120,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
                       children: [
                         Container(
                           alignment: Alignment.center,
-                          child: const Text('Select your pictures', style: TextStyle(color: Colors.white, fontSize: 20.00)),
+                          child: const Text('Select your pictures', style: TextStyle(color: Colors.white, fontSize: 20)),
                         ),
                         Container(
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -249,36 +259,4 @@ class _EditEntityProfile extends State<EditEntityPage> {
     }),
 
   );
-
-  Future _onAddImageClick(int index) async {
-    setState(() {
-      _imageFile = ImagePicker().pickImage(source: ImageSource.gallery);
-      getFileImage(index);
-    });
-  }
-
-  void getFileImage(int index) async {
-//    var dir = await path_provider.getTemporaryDirectory();
-
-    _imageFile.then((file) async {
-      setState(() {
-        ImageUploadModel imageUpload = ImageUploadModel(isUploaded: false, uploading: false, imageFile: File(file.path), imageUrl: '');
-        images.replaceRange(index, index + 1, [imageUpload]);
-      });
-    });
-  }
-}
-
-class ImageUploadModel {
-  bool isUploaded;
-  bool uploading;
-  File imageFile;
-  String imageUrl;
-
-  ImageUploadModel({
-    required this.isUploaded,
-    required this.uploading,
-    required this.imageFile,
-    required this.imageUrl,
-  });
 }
