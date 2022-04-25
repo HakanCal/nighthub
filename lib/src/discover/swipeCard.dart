@@ -1,16 +1,16 @@
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SwipeCard extends StatefulWidget {
-
   final String imageUrl;
+  final bool isFront;
 
   const SwipeCard({
-      Key? key,
-      required this.imageUrl,
+    Key? key,
+    required this.imageUrl,
+    required this.isFront,
   }) : super(key: key);
 
   @override
@@ -18,7 +18,6 @@ class SwipeCard extends StatefulWidget {
 }
 
 class _SwipeCard extends State<SwipeCard> {
-
   @override
   void initState() {
     super.initState();
@@ -30,10 +29,7 @@ class _SwipeCard extends State<SwipeCard> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return buildFrontCard();
-
-  }
+  Widget build(BuildContext context) => widget.isFront ? buildFrontCard() : buildCard();
 
   Widget buildFrontCard() => GestureDetector(
     child: LayoutBuilder(
@@ -131,15 +127,21 @@ class _SwipeCard extends State<SwipeCard> {
 }
 
 class CardProvider extends ChangeNotifier {
+  List<String> _images = [];
 
   bool _isDragging = false;
   Offset _position = Offset.zero;
   Size _screenSize = Size.zero;
   double _angle = 0.00;
 
+  List<String> get images => _images;
   bool get isDragging => _isDragging;
   Offset get position => _position;
   double get angle => _angle;
+
+  CardProvider() {
+    resetEntities();
+  }
 
   void setScreenSize(Size screenSize) => _screenSize = screenSize;
 
@@ -163,6 +165,16 @@ class CardProvider extends ChangeNotifier {
     _isDragging = false;
     _position = Offset.zero;
     _angle = 0.00;
+    notifyListeners();
+  }
+
+  void resetEntities() {
+    _images = <String>[
+      'assets/dummy-club.png',
+      'assets/user_image.png',
+      'assets/app-logo.png',
+      'assets/dance-club.gif'
+    ].reversed.toList();
     notifyListeners();
   }
 

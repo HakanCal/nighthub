@@ -1,6 +1,3 @@
-
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:nighthub/src/discover/entityPage.dart';
 import 'package:nighthub/src/discover/swipeCard.dart';
@@ -14,9 +11,6 @@ class Discover extends StatefulWidget {
 }
 
 class _Discover extends State<Discover> {
-
-  Stack<Object> history = Stack<Object>();
-  Queue<Object> loadedEntities = Queue<Object>();
 
   @override
   void initState() {
@@ -38,7 +32,7 @@ class _Discover extends State<Discover> {
             create: (context) => CardProvider(),
             child: const Flexible(
               flex: 85,
-              child: SwipeCard(imageUrl: 'assets/dummy-club.png')
+              child: SwipeCard(imageUrl: 'assets/dummy-club.png', isFront: true),
             ),
           ),
           Flexible(
@@ -65,7 +59,7 @@ class _Discover extends State<Discover> {
                     child: IconButton(
                       icon: const Icon(Icons.keyboard_return_rounded),
                       iconSize: 35.00,
-                      color: history.isEmpty ? Colors.grey : Colors.yellow[600],
+                      color: true ? Colors.grey : Colors.yellow[600], //TODO: DO THIS!!!!
                       onPressed: () {
                         //TODO: return to last Club
                         //TODO: start grey, get yellow when rollback is avaliable
@@ -101,20 +95,18 @@ class _Discover extends State<Discover> {
     );
   }
 
-}
+  Widget buildCards() {
 
-class Stack<E> {
-  final _list = <E>[];
+    final provider = Provider.of<CardProvider>(context);
+    final images = provider.images;
 
-  void push(E value) => _list.add(value);
+    return Stack(
+      children: images
+          .map((image) => SwipeCard(
+          imageUrl: image,
+          isFront: images.last == image,
+      )).toList()
+    );
+  }
 
-  E pop() => _list.removeLast();
-
-  E get peek => _list.last;
-
-  bool get isEmpty => _list.isEmpty;
-  bool get isNotEmpty => _list.isNotEmpty;
-
-  @override
-  String toString() => _list.toString();
 }
