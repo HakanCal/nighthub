@@ -119,7 +119,7 @@ class _HomePage extends State<HomePage> {
                   icon: Image.asset('assets/nighthub.png'),
                 ),
               ),
-              body: accountData!['business'] ?
+              body: accountData!['business'] == true ?
 
               ///TODO: Here is where the different screens should be put: user account or business account
               Center(
