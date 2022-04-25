@@ -27,15 +27,8 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic>? _accountData = <String, dynamic>{};
   Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
-  List <Widget> menuSelects = <Widget>[
-    //Swiper
-    //Near me
-    //Setting
-    const Discover(), //TODO: What we want in the screens
-    const Radar(),
-    const Radar(), //TODO: FAVORITES
-    const AppSettings(userData: {}, profilePicture: null)
-  ];
+
+  late List <Widget> menuSelects = <Widget>[];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
 
@@ -129,13 +122,13 @@ class _HomePage extends State<HomePage> {
                   icon: Image.asset('assets/nighthub.png'),
                 ),
               ),
-              body: accountData!['business'] ?
+              body: accountData!['business'] == true ?
 
               ///TODO: Here is where the different screens should be put: user account or business account
               Center(
-                child: menuSelects[_selectedIndex] ///TODO: screens business account
+                child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null ///TODO: screens business account
               ) : Center(
-                  child: menuSelects[_selectedIndex] ///TODO: screens user account
+                child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null ///TODO: screens user account
               ),
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex,
