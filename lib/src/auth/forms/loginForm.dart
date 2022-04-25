@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets.dart';
@@ -44,16 +43,9 @@ class _LoginFormState extends State<LoginForm> {
 
   /// Check whether it is a user or business account and pass the value
   /// to the home page where different layouts should be displayed
-  Future<void> _navigateHome(String email) async {
-    bool isBusinessAccount = false;
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('entity_accounts').get();
-    for (var f in snapshot.docs) {
-      if (f['email'] == email) {
-        isBusinessAccount = true;
-      }
-    }
-    Navigator.pushNamed(context, '/home', arguments: {'isBusinessAccount': isBusinessAccount})
-        .then((value) => widget.toggleLoader());
+  void _navigateHome(String email) {
+    Navigator.pushNamed(context, '/home')
+      .then((value) => widget.toggleLoader());
   }
 
   bool _isPasswordHidden = true;
