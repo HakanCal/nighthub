@@ -63,17 +63,6 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
     _streetController.text = widget.userData['address'].toString().split(',')[0];
     _postCodeController.text = widget.userData['address'].toString().split(',')[1].replaceAll(' ', '');
     _countryController.text = widget.userData['address'].toString().split(',')[2].replaceAll(' ', '');
-
-
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
-    images.add("Add Image");
   }
 
   bool isLoading = false;
@@ -389,11 +378,6 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                             onChanged: onChangedInterest,
                           ),
                         ),
-                        Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                            margin: const EdgeInsets.only(top: 10.0),
-                            child: buildGridView(scroller)
-                        ),
                           Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -573,132 +557,4 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
       );
   }
 
-  final multiPicker = ImagePicker();
-  List images = [];
-  late Future _imageFile;
-
-
-  Widget buildGridView(ScrollController scroller) => GridView.count(
-    shrinkWrap: true,
-    controller: scroller,
-    crossAxisCount: 3,
-    childAspectRatio: 0.65,
-    mainAxisSpacing: 3,
-    crossAxisSpacing: 3,
-    children: List.generate(images.length, (index) {
-      if(images[index] is ImageUploadModel) {
-        ImageUploadModel uploadModel = images[index];
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          child: Stack(
-            children: <Widget>[
-              Image.file(
-                uploadModel.imageFile,
-                width: 300,
-                height: 300,
-                fit: BoxFit.cover,
-              ),
-              Positioned(
-                right: 5,
-                top: 5,
-                child: InkWell(
-                  child: const Icon(
-                    Icons.remove_circle,
-                    size: 20,
-                    color: Colors.red,
-                  ),
-                  onTap: () {
-                    setState(() {
-                      images.replaceRange(index, index + 1, ['Add Image']);
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      } else {
-        return Card(
-          child: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              _onAddImageClick(index);
-            },
-          ),
-        );
-      }
-    }),
-
-  );
-
-
-  /*
-  Widget buildGridView() => InkWell(
-    onTap: () {
-      //getMultiImages();
-    },
-    child: GridView.builder(
-      itemCount: 1,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3
-      ),
-      itemBuilder: (context, index) => Container(/*
-        color: Colors.grey,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withOpacity(0.5))
-        ),
-        child: /*images!.isEmpty ?*/
-         Icon(
-          CupertinoIcons.camera,
-          color: Colors.grey.withOpacity(0.5),
-        ) /*: Image.file(File(images![index].path),
-        fit: BoxFit.cover)*/,
-      */),
-    ),
-  );*/
-
-  Future _onAddImageClick(int index) async {
-    setState(() {
-      _imageFile = ImagePicker().pickImage(source: ImageSource.gallery);
-      getFileImage(index);
-    });
-  }
-
-  void getFileImage(int index) async {
-//    var dir = await path_provider.getTemporaryDirectory();
-
-    _imageFile.then((file) async {
-      setState(() {
-        ImageUploadModel imageUpload = ImageUploadModel(isUploaded: false, uploading: false, imageFile: File(file.path), imageUrl: '');
-        images.replaceRange(index, index + 1, [imageUpload]);
-      });
-    });
-  }
 }
-
-/*
-  Future getMultiImages() async {
-    final List<XFile>? selectedImages = await multiPicker.pickMultiImage();
-    setState(() {
-      if(selectedImages!.isNotEmpty) {
-        images!.addAll(selectedImages);
-      } else {
-        print('No images selected');
-      }
-    });
-  }*/
-
-
-  class ImageUploadModel {
-    bool isUploaded;
-    bool uploading;
-    File imageFile;
-    String imageUrl;
-
-    ImageUploadModel({
-    required this.isUploaded,
-    required this.uploading,
-    required this.imageFile,
-    required this.imageUrl,
-    });
-  }

@@ -1,6 +1,20 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:country_picker/country_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:nighthub/src/discover/discover.dart';
+import 'package:provider/provider.dart';
+
+import '../auth/authState.dart';
+import '../auth/formFields/index.dart';
+import '../dialogs/customFadingDialog.dart';
+import '../settings/settings.dart';
 
 class EditEntityPage extends StatefulWidget {
   const EditEntityPage({
@@ -13,19 +27,61 @@ class EditEntityPage extends StatefulWidget {
   final File? profilePicture;
 
   @override
-  State<StatefulWidget> createState() => _EditEntityPage();
+  State<StatefulWidget> createState() => _EditEntityProfile();
 }
 
-class _EditEntityPage extends State<EditEntityPage> {
+class _EditEntityProfile extends State<EditEntityPage> {
+
+  final _formKey = GlobalKey<FormState>(debugLabel: '_EditEntityPageFormState');
+
+  final _aboutController = TextEditingController();
+
+  final imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
 
   @override
   void initState() {
     super.initState();
+
+    if (widget.userData['about'] != null) {
+      _aboutController.text = widget.userData['about'];
+    }
+
+
+    for (int i = 0; i < 9; i++) {
+      images.add("Add Image");
+    }
+
+  }
+
+  bool isLoading = false;
+  String errorMessage = '';
+
+  /// Show loading spinner when communicating with Firebase
+  void toggleLoader() async {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
+
+  /// Updates the user data if desired
+  Future<void> updateBusinessAccount(BuildContext context, String about, Function() loader) async {
+
+    toggleLoader();
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$userId/');
+
+    realtimeDatabase.update({
+      'about': about
+    });
+
+    toggleLoader();
+    showCustomFadingDialog(context, 'Profile updated successfully', Icons.check_circle_outlined, Colors.grey, Colors.green);
   }
 
   @override
   Widget build(BuildContext context) {
-
 
     ScrollController scroller = ScrollController();
 
@@ -61,131 +117,9 @@ class _EditEntityPage extends State<EditEntityPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                          child: CustomImagePicker(
-                            profilePicture: _profilePicture,
-                            selectOrTakePhoto: selectOrTakePhoto,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: CustomTextField(
-                              hint: 'Name Business',
-                              controller: _entityNameController,
-                              onSaved: (input) {
-                                username = input!;
-                              },
-                              validator: (value) {
-                                if(value!.isEmpty) {
-                                  return 'Please username cannot be empty';
-                                }
-                                return null;
-                              },
-                              iconWidget: IconButton(
-                                icon: const Icon(Icons.account_circle_rounded),
-                                color: Colors.blueGrey,
-                                onPressed: () {},
-                              ),
-                              textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 20),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: CustomTextField(
-                            hint: 'Street name, Nr.',
-                            controller: _streetController,
-                            onSaved: (input) {},
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Field cannot be empty';
-                              }
-                              return null;
-                            },
-                            iconWidget: IconButton(
-                              icon: const Icon(Icons.house_rounded ),
-                              color: Colors.blueGrey,
-                              onPressed: () {},
-                            ),
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                          ),
-                        ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                          width: MediaQuery.of(context).size.width,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  flex: 1,
-                                  child: CustomTextField(
-                                    hint: 'Postcode',
-                                    controller: _postCodeController,
-                                    onSaved: (input) {},
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Empty field';
-                                      }
-                                      return null;
-                                    },
-                                    iconWidget: null,
-                                    textInputAction: TextInputAction.done,
-                                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Padding (
-                                    padding: const EdgeInsets.only(left: 40),
-                                    child: CustomTextField(
-                                      hint: 'Country',
-                                      controller: _countryController,
-                                      onSaved: (input) {},
-                                      readOnly: true,
-                                      validator: (value) {
-                                        if (_postCodeController.text == '') {
-                                          return '';
-                                        }
-                                        return null;
-                                      },
-                                      iconWidget: IconButton(
-                                        icon: const Icon(Icons.arrow_drop_down ),
-                                        color: Colors.blueGrey,
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                        onPressed: () {
-                                          renderCountryPicker(context);
-                                        },
-                                      ),
-                                      onTap: () {
-                                        renderCountryPicker(context);
-                                      },
-                                      textInputAction: TextInputAction.done,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
-                                    ),
-                                  ),
-                                ),
-                              ]
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                          child: CustomDropdownField(
-                            values: _interests,
-                            hintText: 'Change interests',
-                            options: options,
-                            validator: (value) {
-                              if (_interests.length < 3) {
-                                return 'Please select at least 3 interests';
-                              }
-                              return null;
-                            },
-                            onChanged: onChangedInterest,
-                          ),
+                          alignment: Alignment.center,
+                          child: const Text('Select your pictures', style: TextStyle(color: Colors.white, fontSize: 20)),
                         ),
                         Container(
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -193,134 +127,48 @@ class _EditEntityPage extends State<EditEntityPage> {
                             child: buildGridView(scroller)
                         ),
                         Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Update Email',
-                                  style: TextStyle(color: Colors.orange, fontSize: 16),
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          child: const Text('Select your text', style: TextStyle(color: Colors.white, fontSize: 20.00)),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          margin: const EdgeInsets.only(top: 10.0),
+                          child: TextFormField(
+                            controller: _aboutController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: InputDecoration(
+                              hintStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
+                              hintText: 'description',
+                              contentPadding: const EdgeInsets.all(20),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 2,
                                 ),
-                                IconButton(
-                                  icon: Icon(_isUpdateEmail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
-                                  color: Colors.orange,
-                                  onPressed: () {
-                                    setState(() {
-                                      _isUpdateEmail = !_isUpdateEmail;
-                                    });
-                                  },
-                                )
-                              ],
-                            )
-                        ),
-                        Container(
-                            child: _isUpdateEmail ?
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget> [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                                    child: CustomTextField(
-                                      hint: 'New Email',
-                                      controller: _emailController,
-                                      onSaved: (input) {
-                                        email = input!;
-                                      },
-                                      validator: (value) {
-                                        if (_isUpdateEmail && value!.isEmpty) {
-                                          return 'Please email cannot be empty';
-                                        }
-                                        return null;
-                                      },
-                                      iconWidget: IconButton(
-                                        icon: const Icon(Icons.email),
-                                        color: Colors.blueGrey,
-                                        onPressed: () {},
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                    child: CustomTextField(
-                                      hint: 'Current password',
-                                      isHidden: true,
-                                      controller: _currentPasswordController,
-                                      onSaved: (input) {
-                                        email = input!;
-                                      },
-                                      validator: (value) {
-                                        if (_isUpdateEmail && value!.isEmpty) {
-                                          return 'Please password cannot be empty';
-                                        }
-                                        return null;
-                                      },
-                                      iconWidget: IconButton(
-                                        icon: const Icon(Icons.password_outlined),
-                                        color: Colors.blueGrey,
-                                        onPressed: () {},
-                                      ),
-                                      textInputAction: TextInputAction.done,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
-                                    ),
-                                  ),
-                                ]
-                            ) : null
-                        ),
-                        Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Update Password',
-                                  style: TextStyle(color: Colors.orange, fontSize: 16),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 2,
                                 ),
-                                IconButton(
-                                  icon: Icon(_isUpdatePassword ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
-                                  color: Colors.orange,
-                                  onPressed: () {
-                                    setState(() {
-                                      _isUpdatePassword = !_isUpdatePassword;
-                                    });
-                                  },
-                                )
-                              ],
-                            )
-                        ),
-                        Container(
-                            child: _isUpdatePassword ?
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget> [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                                    child: CustomTextField(
-                                      hint: 'New password',
-                                      isHidden: _isPasswordHidden,
-                                      controller: _newPasswordController,
-                                      onSaved: (input) {
-                                        email = input!;
-                                      },
-                                      validator: (value) {
-                                        return null;
-                                      },
-                                      iconWidget: IconButton(
-                                        icon: _isPasswordHidden ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
-                                        color: Colors.blueGrey,
-                                        onPressed: () {
-                                          setState(() {
-                                            _isPasswordHidden = !_isPasswordHidden;
-                                          });
-                                        },
-                                      ),
-                                      textInputAction: TextInputAction.done,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
-                                    ),
-                                  ),
-                                ]
-                            ) : null
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                          )
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -335,28 +183,10 @@ class _EditEntityPage extends State<EditEntityPage> {
                                 _formKey.currentState!.save();
                                 updateBusinessAccount(
                                     context,
-                                    _entityNameController.text,
-                                    _emailController.text,
-                                    _streetController.text,
-                                    _postCodeController.text,
-                                    _countryController.text,
-                                    _profilePicture,
-                                    _interests,
-                                        () => toggleLoader()
+                                    _aboutController.text,
+                                    () => toggleLoader()
                                 );
                               }
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                          child: CustomFormButton(
-                            text: 'Cancel',
-                            textColor: Colors.orange,
-                            fillColor: const Color(0xFF262626),
-                            isLoading: false,
-                            onPressed: isLoading ? null : () {
-                              Navigator.pop(context);
                             },
                           ),
                         ),
@@ -369,7 +199,62 @@ class _EditEntityPage extends State<EditEntityPage> {
         ],
       ),
     );
-
   }
 
+  final multiPicker = ImagePicker();
+  List images = [];
+  late Future _imageFile;
+
+  Widget buildGridView(ScrollController scroller) => GridView.count(
+    shrinkWrap: true,
+    controller: scroller,
+    crossAxisCount: 3,
+    childAspectRatio: 0.65,
+    mainAxisSpacing: 3,
+    crossAxisSpacing: 3,
+    children: List.generate(images.length, (index) {
+      if(images[index] is ImageUploadModel) {
+        ImageUploadModel uploadModel = images[index];
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: <Widget>[
+              Image.file(
+                uploadModel.imageFile,
+                width: 300,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                right: 5,
+                top: 5,
+                child: InkWell(
+                  child: const Icon(
+                    Icons.remove_circle,
+                    size: 20,
+                    color: Colors.red,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      images.replaceRange(index, index + 1, ['Add Image']);
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return Card(
+          child: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              _onAddImageClick(index);
+            },
+          ),
+        );
+      }
+    }),
+
+  );
 }

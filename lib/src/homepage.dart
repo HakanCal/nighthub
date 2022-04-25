@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:nighthub/src/discover/editEntityPage.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -91,6 +92,7 @@ class _HomePage extends State<HomePage> {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
             const Discover(), //TODO: What we want in the screens
+            EditEntityPage(userData: accountData!, profilePicture: _tempImageFile),
             const Radar(),
             const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
@@ -133,7 +135,7 @@ class _HomePage extends State<HomePage> {
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex,
                 onItemTap: _onItemTap,
-                isBusinessAccount: accountData!['business'],
+                isBusinessAccount: accountData!['business']
               ),
             ),
           );
