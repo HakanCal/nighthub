@@ -99,11 +99,11 @@ class _RadarList extends State<RadarList>{
           user_account.child("point/geopoint/longitude").value as double,
           user_account.child("point/geopoint/latitude").value as double
       ) / 1000;
-
+      Image __logo = await _getProfilepicture(user_account.child("profile_picture").value as String);
       radarItems.add(
           RadarItem(
             name: user_account.child("username").value as String,
-            logo: _logo,
+            logo: __logo,
             address: user_account.child("address").value as String,
             distance: distance,
             categories: user_account.child("interests").value as List,
