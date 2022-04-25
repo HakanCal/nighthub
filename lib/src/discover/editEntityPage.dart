@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nighthub/src/discover/discover.dart';
+import 'package:nighthub/src/discover/entityPage.dart';
 import 'package:provider/provider.dart';
 
 import '../auth/authState.dart';
@@ -66,7 +67,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
   }
 
   /// Updates the user data if desired
-  Future<void> updateBusinessAccount(BuildContext context, String about, Function() loader) async {
+  Future<void> updateBusinessAccount(BuildContext context, String about, Map<String, dynamic> userData, Function() loader) async {
 
     toggleLoader();
 
@@ -174,6 +175,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
                                 updateBusinessAccount(
                                     context,
                                     _aboutController.text,
+                                    widget.userData,
                                     () => toggleLoader()
                                 );
                               }
