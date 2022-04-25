@@ -9,9 +9,11 @@ class NavBar extends StatefulWidget {
   const NavBar({
     required this.selectedIndex,
     required this.onItemTap,
+    required this.isBusinessAccount,
   });
 
   final int selectedIndex;
+  final bool isBusinessAccount;
   final void Function(int index) onItemTap;
 
   @override
@@ -22,16 +24,20 @@ class _NavBar extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-            icon: Icon(Icons.local_bar_rounded, color: Colors.orangeAccent),
+      items: <BottomNavigationBarItem>[
+        const BottomNavigationBarItem(
+            icon: Icon(Icons.bolt_outlined, color: Colors.orangeAccent),
             label: 'Discover',
             tooltip: 'Discover local Bars!'),
-        BottomNavigationBarItem(
+        widget.isBusinessAccount ? const BottomNavigationBarItem(
+            icon: Icon(Icons.pentagon_outlined, color: Colors.orangeAccent),
+            label: 'Page settings',
+            tooltip: 'Page settings') :
+        const BottomNavigationBarItem(
             icon: Icon(Icons.pin_drop_rounded, color: Colors.orangeAccent),
             label: 'Near me',
             tooltip: 'Local Bars near me'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.settings, color: Colors.orangeAccent),
             label: 'Settings',
             tooltip: 'Settings')
