@@ -26,10 +26,10 @@ class RadarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () => {print('shop')}, //go to shop page
+        onTap: () => {print(name)}, //go to shop page
         child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
-            height: 120,
+            height: 150,
             decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(color: Colors.deepOrange, width: 5),

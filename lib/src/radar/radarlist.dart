@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:nighthub/src/radar/radaritem.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart' as fbd;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:geolocator/geolocator.dart';
 
 class RadarList extends StatefulWidget{
   const RadarList({this.sortMethod = 'distance' ,Key? key}) : super(key: key);
@@ -17,19 +16,28 @@ class RadarList extends StatefulWidget{
 
 
 class _RadarList extends State<RadarList>{
-  Geoflutterfire geo = Geoflutterfire();
-  Position _userPos = const Position(latitude: 48.783333, longitude: 9.183333, accuracy: 1.0, altitude: 1, speedAccuracy: 1.0, timestamp: null, speed: 1.0, heading: 1.0);
-  List<RadarItem> _radaritems = [];
-  sortBy(){
-      switch(widget.sortMethod){
-        case 'distance':
-          _radaritems.sort((a, b) => a.distance.compareTo(b.distance));
-          break;
-        case 'rating':
-          _radaritems.sort((a, b) => b.rating.compareTo(a.rating));
-          break;
-      }
+
+  late Position _userPos;
+  List<RadarItem> _radarItems = [];
+  final Image _logo = Image.network('https://logos-download.com/wp-content/uploads/2016/05/Coffeeshop_Company_logo_logotype.png');
+  /*
+  const Position(
+      latitude: 48.783333,
+      longitude: 9.183333,
+      accuracy: 1.0,
+      altitude: 1,
+      speedAccuracy: 1.0,
+      timestamp: null,
+      speed: 1.0,
+      heading: 1.0
+  ); */
+
+  @override
+  void initState() {
+    _updateRadarItems();
+    super.initState();
   }
+
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -56,67 +64,91 @@ class _RadarList extends State<RadarList>{
 
     return await Geolocator.getCurrentPosition();
   }
-  static Image logo = Image.network('https://logos-download.com/wp-content/uploads/2016/05/Coffeeshop_Company_logo_logotype.png');
 
-  Future<void> _getItems() async {
+
+  Future<Image> _getProfilepicture(String filename) async{
+
+    firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+    String downloadURL = await storage.ref().child('profile_pictures/$filename').getDownloadURL();
+    return Image.network(downloadURL);
+  }
+
+  Future<List<RadarItem>> _getRadarItems() async {
+
+    List<RadarItem> radarItems = [];
     print('getting new items...');
     await Firebase.initializeApp();
     _userPos = await _determinePosition();
-    // Geo query nearby items 25km
-    GeoFirePoint center = geo.point(latitude: _userPos.latitude, longitude: _userPos.longitude);
-    Query<Map<String,dynamic>> collectionRef = FirebaseFirestore.instance.collection('entity_accounts');
-    Stream<List<DistanceDocSnapshot>> stream = geo.collection(collectionRef: collectionRef)
-        .withinWithDistance(center: center, radius: 25, field: 'point');
 
-    _radaritems = [];
-    stream.listen((List<DistanceDocSnapshot> shopDocuments) => {
-       shopDocuments.forEach((shop) {
-         setState(() {
-              _radaritems.add(
-                  RadarItem(
-                    name: shop.documentSnapshot['entityName'],
-                    logo: logo,
-                    address: shop.documentSnapshot['address'],
-                    distance: shop.kmDistance,
-                    categories: shop.documentSnapshot['interests'],
-                    rating: 1
-                  )
-              );
-          });
-      })
+    print('accessing realtime database...');
+    fbd.FirebaseDatabase database = fbd.FirebaseDatabase.instance;
+    database.databaseURL = "https://nighthub-77c81-default-rtdb.europe-west1.firebasedatabase.app";
 
+    // Query only user accounts with business set true
+    print('querying for businesses...');
+    fbd.Query query = database.ref('user_accounts').orderByChild('business').equalTo(true);
+    fbd.DataSnapshot event = await query.get();
+
+    // Add all the business to the list
+    event.children.forEach((user_account) async{
+      print(user_account.value);
+      // Distance from business to user location in kilometers
+      double distance = Geolocator.distanceBetween(
+          _userPos.latitude,
+          _userPos.longitude,
+          user_account.child("point/geopoint/longitude").value as double,
+          user_account.child("point/geopoint/latitude").value as double
+      ) / 1000;
+
+      radarItems.add(
+          RadarItem(
+            name: user_account.child("username").value as String,
+            logo: _logo,
+            address: user_account.child("address").value as String,
+            distance: distance,
+            categories: user_account.child("interests").value as List,
+            rating: 1
+          )
+      );
     });
-    sortBy();
-    //setState(() {_radaritems = _radaritems;});
+    // Sorts radaritem list by distance or whatever sormethod radar instance was called with
+    sortBy(widget.sortMethod, radarItems);
+    return radarItems;
   }
-  @override
-  void initState() {
-    _getItems().then((value) {
-      print('trying to sort');
-      sortBy();
-    });
-    super.initState();
 
+  sortBy(String sortMethod, List<RadarItem> radarItems){
+    switch(sortMethod){
+      case 'distance':
+        radarItems.sort((a, b) => a.distance.compareTo(b.distance));
+        break;
+      case 'rating':
+        radarItems.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+    }
+  }
+
+  Future<void> _updateRadarItems() async{
+    _radarItems = await _getRadarItems();
+    setState((){});
   }
 
   @override
   Widget build(BuildContext context) {
 
-    print(_radaritems);
     return RefreshIndicator(
         child: ListView.separated(
             itemBuilder: (BuildContext context, int index) {
-              RadarItem radaritem = _radaritems[index];
-              return Center(child: radaritem);
+              RadarItem radaritem = _radarItems[index];
+              return radaritem;
             },
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
-            itemCount: _radaritems.length,
+            itemCount: _radarItems.length,
             separatorBuilder: (BuildContext context, int index) {
               return const SizedBox(height: 10);
             }
         ),
-        onRefresh: _getItems // refreshes list content on swiping down
+        onRefresh: _updateRadarItems // refreshes list content on swiping down
     );
   }
 }
