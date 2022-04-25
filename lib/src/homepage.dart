@@ -33,6 +33,7 @@ class _HomePage extends State<HomePage> {
     //Setting
     const Discover(), //TODO: What we want in the screens
     const Radar(),
+    const Radar(), //TODO: FAVORITES
     const AppSettings(userData: {}, profilePicture: null)
   ];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
@@ -84,6 +85,7 @@ class _HomePage extends State<HomePage> {
             menuSelects = <Widget>[
               const Discover(), //TODO: What we want in the screens
               const Radar(),
+              const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -97,6 +99,7 @@ class _HomePage extends State<HomePage> {
           menuSelects = <Widget>[
             const Discover(), //TODO: What we want in the screens
             const Radar(),
+            const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
@@ -136,7 +139,8 @@ class _HomePage extends State<HomePage> {
               ),
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex,
-                onItemTap: _onItemTap
+                onItemTap: _onItemTap,
+                isBusinessAccount: accountData!['business'],
               ),
             ),
           );

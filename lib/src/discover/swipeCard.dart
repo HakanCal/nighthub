@@ -1,9 +1,7 @@
 
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nighthub/src/auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
 class SwipeCard extends StatefulWidget {
@@ -24,7 +22,7 @@ class _SwipeCard extends State<SwipeCard> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       final size = MediaQuery.of(context).size;
       final provider = Provider.of<CardProvider>(context, listen: false);
       provider.setScreenSize(size);
