@@ -38,7 +38,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final imagePicker = ImagePicker();
-  final options = ['Club', 'Bar', 'Night Life', 'Live Music', 'Latin'];
+  final options = ['Nightclub','Dance','Club','Bar','Night Life','Live Music','Latin','Festival','Event','Drinks','Cafe','Rock','Jazz','Metal','EDM','Pop','Techno','Electro','Hip Hop','Rap','Punk'];
 
   bool _isPasswordHidden = true;
   String username = '';
@@ -233,8 +233,8 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   child: CustomFormButton(
                     text: 'Cancel',
-                    textColor: Colors.black,
-                    fillColor: Colors.orange,
+                    textColor: Colors.orange,
+                    fillColor: Colors.black,
                     isLoading: false,
                     onPressed: widget.isLoading ? null : widget.cancel,
                   ),

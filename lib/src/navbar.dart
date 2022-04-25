@@ -24,15 +24,15 @@ class _NavBar extends State<NavBar> {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-            icon: Icon(Icons.local_bar_rounded, color: Colors.red),
+            icon: Icon(Icons.local_bar_rounded, color: Colors.orangeAccent),
             label: 'Discover',
             tooltip: 'Discover local Bars!'),
         BottomNavigationBarItem(
-            icon: Icon(Icons.pin_drop_rounded, color: Colors.red),
+            icon: Icon(Icons.pin_drop_rounded, color: Colors.orangeAccent),
             label: 'Near me',
             tooltip: 'Local Bars near me'),
         BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.orange),
+            icon: Icon(Icons.settings, color: Colors.orangeAccent),
             label: 'Settings',
             tooltip: 'Settings')
       ],
@@ -40,6 +40,7 @@ class _NavBar extends State<NavBar> {
       iconSize: 24,
       currentIndex: widget.selectedIndex,
       onTap: widget.onItemTap,
+      showSelectedLabels: false,
     );
   }
 }
