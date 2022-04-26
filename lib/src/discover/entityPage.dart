@@ -38,9 +38,6 @@ class _EntityPage extends State<EntityPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    ScrollController scroller = ScrollController();
-
     return Scaffold(
       backgroundColor: const Color(0xFF262626),
       appBar: AppBar(
@@ -55,7 +52,7 @@ class _EntityPage extends State<EntityPage> {
         ),
       ),
       body: ListView(
-        controller: scroller,
+        controller: ScrollController(),
         addAutomaticKeepAlives: true,
         shrinkWrap: true,
         children: [
@@ -63,43 +60,44 @@ class _EntityPage extends State<EntityPage> {
             padding: EdgeInsets.only(top: 10),
           ),
           Container(
-          height: MediaQuery.of(context).size.height,
-          color: const Color(0xFF262626),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                pictureSwiper(),
-                const Padding(padding: EdgeInsets.only(top: 15.00)),
-                entityName(),
-                const Padding(padding: EdgeInsets.only(top: 5.00)),
-                entityAddress(),
-                const Padding(padding: EdgeInsets.only(top: 5.00)),
-                entityDistance(),
-                const Padding(padding: EdgeInsets.only(top: 15.00)),
-                separationLine(),
-                const Padding(padding: EdgeInsets.only(top: 15.00)),
-                CustomChipList(
-                  values: widget.tags,
-                  chipBuilder: (String value) {
-                    return Chip(label: Text(value));
-                  },
-                ),
-                const Padding(padding: EdgeInsets.only(top: 15.00)),
-                separationLine(),
-                const Padding(padding: EdgeInsets.only(top: 15.00)),
-                Text(
-                  widget.about,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.00
+            height: MediaQuery.of(context).size.height,
+            color: const Color(0xFF262626),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
+              child: Column(
+                children: [
+                  pictureSwiper(),
+                  const Padding(padding: EdgeInsets.only(top: 15)),
+                  entityName(),
+                  const Padding(padding: EdgeInsets.only(top: 5)),
+                  entityAddress(),
+                  const Padding(padding: EdgeInsets.only(top: 5)),
+                  entityDistance(),
+                  const Padding(padding: EdgeInsets.only(top: 15)),
+                  separationLine(),
+                  const Padding(padding: EdgeInsets.only(top: 15)),
+                  CustomChipList(
+                    values: widget.tags,
+                    chipBuilder: (String value) {
+                      return Chip(label: Text(value));
+                    },
                   ),
-                ),
-                const Padding(padding: EdgeInsets.only(bottom: 50.00)),
-              ],
+                  const Padding(padding: EdgeInsets.only(top: 15)),
+                  separationLine(),
+                  const Padding(padding: EdgeInsets.only(top: 15)),
+                  Text(
+                    widget.about,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.00
+                    ),
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 50)),
+                ],
+              ),
             ),
           ),
-        ),
         ]
       ),
     );
@@ -152,13 +150,13 @@ class _EntityPage extends State<EntityPage> {
   Widget entityAddress() => Row(
     children: [
       const Icon(Icons.location_on_outlined, color: Colors.white),
-      const Padding(padding: EdgeInsets.only(right: 10.00)),
+      const Padding(padding: EdgeInsets.only(right: 10)),
       Flexible(
         child: Text(
           widget.address,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16.00,
+            fontSize: 16,
           ),
         ),
       )
@@ -168,13 +166,13 @@ class _EntityPage extends State<EntityPage> {
   Widget entityDistance() => Row(
     children: [
       const Icon(Icons.directions_walk, color: Colors.white),
-      const Padding(padding: EdgeInsets.only(right: 10.00)),
+      const Padding(padding: EdgeInsets.only(right: 10)),
       Flexible(
         child: Text(
           '${widget.distance} km',
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16.00,
+            fontSize: 16,
           ),
         ),
       )

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:country_picker/country_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -12,10 +11,8 @@ import 'package:nighthub/src/discover/discover.dart';
 import 'package:nighthub/src/discover/entityPage.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import '../dialogs/customFadingDialog.dart';
-import '../settings/settings.dart';
 
 class EditEntityPage extends StatefulWidget {
   const EditEntityPage({
@@ -32,13 +29,14 @@ class EditEntityPage extends StatefulWidget {
 }
 
 class _EditEntityProfile extends State<EditEntityPage> {
-
+  late Future<dynamic> _future;
   final _formKey = GlobalKey<FormState>(debugLabel: '_EditEntityPageFormState');
 
   final _aboutController = TextEditingController();
 
   final imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
+  File? _profilePicture;
 
   @override
   void initState() {
@@ -48,15 +46,37 @@ class _EditEntityProfile extends State<EditEntityPage> {
       _aboutController.text = widget.userData['about'];
     }
 
-
-    for (int i = 0; i < 9; i++) {
-      images.add("Add Image");
-    }
-
+    _future = getImagesArray();
   }
 
   bool isLoading = false;
   String errorMessage = '';
+  List<dynamic> images = [];
+
+  /// Get all the user-related information and load profile picture
+  Future<void> getImagesArray() async {
+    final businessPictures = await firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('business_pictures/${widget.userData['userId']}').listAll();
+
+    Future.wait(businessPictures.items.map((e) async {
+      await e.getDownloadURL().then((value) {
+        setState(() {
+          images.add(value.toString());
+        });
+
+      });
+    })).then((value) {
+      if (businessPictures.items.length < 9) {
+        int imagesArraySize = businessPictures.items.length;
+        for(imagesArraySize; imagesArraySize < 9; imagesArraySize++) {
+          setState(() {
+            images.add('Add Image');
+          });
+        }
+      }
+    });
+  }
 
   /// Show loading spinner when communicating with Firebase
   void toggleLoader() async {
@@ -86,86 +106,114 @@ class _EditEntityProfile extends State<EditEntityPage> {
 
     ScrollController scroller = ScrollController();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF262626),
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text('Your site'),
-        automaticallyImplyLeading: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: ListView(
-        shrinkWrap: true,
-        controller: scroller,
-        addAutomaticKeepAlives: true,
-        padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
-        children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.only(top: 10),
-          ),
-          Column(
-            children: <Widget> [
-              Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Form(
-                    key: _formKey,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          alignment: Alignment.center,
-                          child: const Text('Select your pictures', style: TextStyle(color: Colors.white, fontSize: 20)),
-                        ),
-                        Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                            margin: const EdgeInsets.only(top: 10.0),
-                            child: buildGridView(scroller)
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          child: const Text('Select your text', style: TextStyle(color: Colors.white, fontSize: 20.00)),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: TextFormField(
-                            controller: _aboutController,
-                            style: const TextStyle(color: Colors.white),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              hintStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
-                              hintText: 'description',
-                              contentPadding: const EdgeInsets.all(20),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                  width: 2,
-                                ),
+    return FutureBuilder<dynamic>(
+        future: _future,
+        builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Scaffold(
+            backgroundColor: const Color(0xFF262626),
+            body: ListView(
+              shrinkWrap: true,
+              controller: scroller,
+              addAutomaticKeepAlives: true,
+              padding: const EdgeInsets.only(
+                  bottom: kFloatingActionButtonMargin + 48),
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.only(top: 10),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Form(
+                          key: _formKey,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                child: const Text('Select your pictures',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20)),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                  width: 2,
-                                ),
+                              Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 10),
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: buildGridView(scroller)
                               ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                  width: 2,
+                              Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 15),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: const Text('Select your text',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20)),
+                              ),
+                              Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 10),
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: TextFormField(
+                                    controller: _aboutController,
+                                    style: const TextStyle(color: Colors.white),
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    decoration: InputDecoration(
+                                      hintStyle: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.blueGrey),
+                                      hintText: 'description',
+                                      contentPadding: const EdgeInsets.all(20),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                        borderSide: const BorderSide(
+                                          color: Colors.grey,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                        borderSide: const BorderSide(
+                                          color: Colors.grey,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                        borderSide: const BorderSide(
+                                          color: Colors.grey,
+                                          width: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 10),
+                                margin: const EdgeInsets.only(top: 10),
+                                child: CustomFormButton(
+                                  text: 'Update',
+                                  textColor: Colors.black,
+                                  fillColor: Colors.orange,
+                                  isLoading: isLoading,
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      _formKey.currentState!.save();
+                                      updateBusinessAccount(
+                                        context,
+                                        _aboutController.text,
+                                        () => toggleLoader()
+                                      );
+                                    }
+                                  },
                                 ),
                               ),
                             ),
@@ -191,21 +239,19 @@ class _EditEntityProfile extends State<EditEntityPage> {
                               }
                             },
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-              )
-            ],
-          ),
-        ],
-      ),
+                        )
+                    )
+                  ],
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Container();
+        }
+      }
     );
   }
-
-  final multiPicker = ImagePicker();
-  List images = [];
-  late Future _imageFile;
 
   Widget buildGridView(ScrollController scroller) => GridView.count(
     shrinkWrap: true,
@@ -215,14 +261,13 @@ class _EditEntityProfile extends State<EditEntityPage> {
     mainAxisSpacing: 3,
     crossAxisSpacing: 3,
     children: List.generate(images.length, (index) {
-      if(images[index] is ImageUploadModel) {
-        ImageUploadModel uploadModel = images[index];
+      if(images[index] != 'Add Image') {
         return Card(
           clipBehavior: Clip.antiAlias,
           child: Stack(
             children: <Widget>[
-              Image.file(
-                uploadModel.imageFile,
+              Image(
+                image: images[index] is! File && images[index].contains('https://') ?  NetworkImage(images[index]) : FileImage(images[index]) as ImageProvider,
                 width: 300,
                 height: 300,
                 fit: BoxFit.cover,
@@ -237,6 +282,13 @@ class _EditEntityProfile extends State<EditEntityPage> {
                     color: Colors.red,
                   ),
                   onTap: () {
+                    if (images[index].contains('https://')) {
+                      String imageName = images[index];
+                      deleteBusinessPicture(imageName);
+                    } else {
+                      String imageName = images[index].path.split('/').last;
+                      deleteBusinessPicture(imageName);
+                    }
                     setState(() {
                       images.replaceRange(index, index + 1, ['Add Image']);
                     });
@@ -257,6 +309,57 @@ class _EditEntityProfile extends State<EditEntityPage> {
         );
       }
     }),
-
   );
+
+  /// Selects image from gallery
+  Future<void> _onAddImageClick(int index) async {
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profilePicture = File(pickedFile.path);
+      });
+
+      String? imageName = _profilePicture!.path.split('/').last;
+      setState(() {
+        images.replaceRange(index, index + 1, [_profilePicture]);
+      });
+
+      uploadBusinessPicture(_profilePicture!, imageName);
+    }
+  }
+
+  /// Uploads the selected picture to Firestore Storage
+  void uploadBusinessPicture(File profilePicture, String imageName) async {
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('business_pictures/${widget.userData['userId']}')
+        .child('/$imageName');
+
+    final metadata = firebase_storage.SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {'picked-file-path': profilePicture.path});
+
+    firebase_storage.UploadTask uploadTask = ref.putFile(File(profilePicture.path), metadata);
+    uploadTask.whenComplete(() {
+      debugPrint('Photo was uploaded to storage');
+    });
+  }
+
+  /// Deletes picture from one of the 9 boxes
+  void deleteBusinessPicture(String imageName) async {
+    if (imageName.contains('https://')) {
+      await firebase_storage.FirebaseStorage.instance.refFromURL(imageName).delete().then((_) {
+        debugPrint('Photo was deleted from the database');
+      });
+    } else {
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('business_pictures/${widget.userData['userId']}')
+          .child('/$imageName');
+
+      ref.delete().then((_) {
+        debugPrint('Photo was deleted from the database');
+      });
+    }
+  }
 }

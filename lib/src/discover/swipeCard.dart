@@ -1,18 +1,20 @@
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:nighthub/src/auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
 class SwipeCard extends StatefulWidget {
 
   final String imageUrl;
+  final List<String> tags;
   final bool isFront;
 
   const SwipeCard({
     Key? key,
     required this.imageUrl,
     required this.isFront,
+    required this.tags,
   }) : super(key: key);
 
   @override
@@ -20,7 +22,6 @@ class SwipeCard extends StatefulWidget {
 }
 
 class _SwipeCard extends State<SwipeCard> {
-
   @override
   void initState() {
     super.initState();
@@ -83,11 +84,10 @@ class _SwipeCard extends State<SwipeCard> {
         ),
       ),
       child: Container(
-        padding: EdgeInsets.all(20.00),
+        padding: const EdgeInsets.all(45.00),
         child: Column(
           children: [
-            Spacer(),
-            buildState(),
+            const Spacer(),
             buildName()
           ],
         ),
@@ -95,42 +95,29 @@ class _SwipeCard extends State<SwipeCard> {
     ),
   );
 
-  Widget buildName() => Row(
-    children: const [
-      Flexible(
-        child: Text(
-          'Clubname', //TODO: Insert Clubname
-          style: TextStyle(
-            fontSize: 32,
-            color: Colors.white,
-            fontWeight: FontWeight.bold
-          ),
-        ),
-      ),
-      SizedBox(width: 16),
-      //TODO: Chiplist --> CustomChipList(values: , chipBuilder: chipBuilder)
-    ],
-  );
-
-  Widget buildState() => Row(
+  Widget buildName() => Column(
     children: [
-      Container(
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.green,
+      const Text(
+        'Clubname', //TODO: Insert Clubname
+        style: TextStyle(
+          fontSize: 32,
+          color: Colors.white,
+          fontWeight: FontWeight.bold
         ),
-        width: 12,
-        height: 12,
       ),
-      const SizedBox(width: 8),
-      const Text('Open/Closed', style: TextStyle(color: Colors.white))
+      const Padding(padding: EdgeInsets.only(bottom: 5.00)),
+      CustomChipList(
+        values: widget.tags,
+        chipBuilder: (String value) {
+          return Chip(label: Text(value));
+        },
+      ),
     ],
   );
 
 }
 
 class CardProvider extends ChangeNotifier {
-
   List<String> _images = [];
 
   bool _isDragging = false;

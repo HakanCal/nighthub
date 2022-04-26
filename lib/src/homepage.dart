@@ -78,7 +78,6 @@ class _HomePage extends State<HomePage> {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
               const Discover(), //TODO: What we want in the screens
-              const Radar(),
               const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
@@ -92,9 +91,7 @@ class _HomePage extends State<HomePage> {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
             const Discover(), //TODO: What we want in the screens
-            EditEntityPage(userData: accountData!, profilePicture: _tempImageFile),
-            const Radar(),
-            const Radar(), //TODO: FAVORITES
+            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
@@ -135,7 +132,7 @@ class _HomePage extends State<HomePage> {
               bottomNavigationBar: NavBar(
                 selectedIndex: _selectedIndex,
                 onItemTap: _onItemTap,
-                isBusinessAccount: accountData!['business']
+                isBusinessAccount: accountData!['business'] == true ? true : false
               ),
             ),
           );

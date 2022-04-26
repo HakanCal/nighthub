@@ -234,31 +234,33 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
         ),
       ),
       body: ListView(
-          shrinkWrap: true,
-          controller: scroller,
-          addAutomaticKeepAlives: true,
-          padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(top: 10),
-            ),
-            Column(
-              children: <Widget> [
-                Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                            child: CustomImagePicker(
-                              profilePicture: _profilePicture,
-                              selectOrTakePhoto: selectOrTakePhoto,
-                            ),
+        shrinkWrap: true,
+        controller: scroller,
+        addAutomaticKeepAlives: true,
+        padding: const EdgeInsets.only(
+            bottom: kFloatingActionButtonMargin + 48),
+        children: <Widget>[
+          const Padding(
+            padding: EdgeInsets.only(top: 10),
+          ),
+          Column(
+            children: <Widget>[
+              Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 15),
+                          child: CustomImagePicker(
+                            profilePicture: _profilePicture,
+                            selectOrTakePhoto: selectOrTakePhoto,
                           ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: CustomTextField(
@@ -268,23 +270,26 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                 username = input!;
                               },
                               validator: (value) {
-                                if(value!.isEmpty) {
+                                if (value!.isEmpty) {
                                   return 'Please username cannot be empty';
                                 }
                                 return null;
                               },
                               iconWidget: IconButton(
-                                icon: const Icon(Icons.account_circle_rounded),
+                                icon: const Icon(
+                                    Icons.account_circle_rounded),
                                 color: Colors.blueGrey,
                                 onPressed: () {},
                               ),
                               textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()
-                            ),
+                              onFieldSubmitted: (_) =>
+                                  FocusScope.of(context)
+                                      .nextFocus()
                           ),
-                          const Padding(
-                            padding: EdgeInsets.only(bottom: 20),
-                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 20),
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: CustomTextField(
@@ -298,19 +303,26 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                               return null;
                             },
                             iconWidget: IconButton(
-                              icon: const Icon(Icons.house_rounded ),
+                              icon: const Icon(Icons.house_rounded),
                               color: Colors.blueGrey,
                               onPressed: () {},
                             ),
                             textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                            onFieldSubmitted: (_) =>
+                                FocusScope.of(context)
+                                    .nextFocus(),
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 10),
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width,
                           child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment
+                                  .spaceBetween,
                               children: [
                                 Flexible(
                                   flex: 1,
@@ -326,11 +338,12 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                     },
                                     iconWidget: null,
                                     textInputAction: TextInputAction.done,
-                                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                    onFieldSubmitted: (_) =>
+                                        FocusScope.of(context).unfocus(),
                                   ),
                                 ),
                                 Flexible(
-                                  child: Padding (
+                                  child: Padding(
                                     padding: const EdgeInsets.only(left: 40),
                                     child: CustomTextField(
                                       hint: 'Country',
@@ -344,7 +357,8 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                         return null;
                                       },
                                       iconWidget: IconButton(
-                                        icon: const Icon(Icons.arrow_drop_down ),
+                                        icon: const Icon(
+                                            Icons.arrow_drop_down),
                                         color: Colors.blueGrey,
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
@@ -356,7 +370,8 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                         renderCountryPicker(context);
                                       },
                                       textInputAction: TextInputAction.done,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                      onFieldSubmitted: (_) =>
+                                          FocusScope.of(context).unfocus(),
                                     ),
                                   ),
                                 ),
@@ -364,7 +379,8 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 10),
                           child: CustomDropdownField(
                             values: _interests,
                             hintText: 'Change interests',
@@ -378,93 +394,109 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                             onChanged: onChangedInterest,
                           ),
                         ),
-                          Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 35),
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    'Update Email',
-                                    style: TextStyle(color: Colors.orange, fontSize: 16),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(_isUpdateEmail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
-                                    color: Colors.orange,
-                                    onPressed: () {
-                                      setState(() {
-                                        _isUpdateEmail = !_isUpdateEmail;
-                                      });
-                                    },
-                                  )
-                                ],
-                              )
-                          ),
-                          Container(
-                              child: _isUpdateEmail ?
-                              Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget> [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                                      child: CustomTextField(
-                                        hint: 'New Email',
-                                        controller: _emailController,
-                                        onSaved: (input) {
-                                          email = input!;
-                                        },
-                                        validator: (value) {
-                                          if (_isUpdateEmail && value!.isEmpty) {
-                                            return 'Please email cannot be empty';
-                                          }
-                                          return null;
-                                        },
-                                        iconWidget: IconButton(
-                                          icon: const Icon(Icons.email),
-                                          color: Colors.blueGrey,
-                                          onPressed: () {},
-                                        ),
-                                        textInputAction: TextInputAction.next,
-                                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                      child: CustomTextField(
-                                        hint: 'Current password',
-                                        isHidden: true,
-                                        controller: _currentPasswordController,
-                                        onSaved: (input) {
-                                          email = input!;
-                                        },
-                                        validator: (value) {
-                                          if (_isUpdateEmail && value!.isEmpty) {
-                                            return 'Please password cannot be empty';
-                                          }
-                                          return null;
-                                        },
-                                        iconWidget: IconButton(
-                                          icon: const Icon(Icons.password_outlined),
-                                          color: Colors.blueGrey,
-                                          onPressed: () {},
-                                        ),
-                                        textInputAction: TextInputAction.done,
-                                        onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
-                                      ),
-                                    ),
-                                  ]
-                              ) : null
-                          ),
                         Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 35),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'Update Email',
+                                  style: TextStyle(
+                                      color: Colors.orange, fontSize: 16),
+                                ),
+                                IconButton(
+                                  icon: Icon(_isUpdateEmail
+                                      ? Icons.keyboard_arrow_up
+                                      : Icons.keyboard_arrow_down),
+                                  color: Colors.orange,
+                                  onPressed: () {
+                                    setState(() {
+                                      _isUpdateEmail = !_isUpdateEmail;
+                                    });
+                                  },
+                                )
+                              ],
+                            )
+                        ),
+                        Container(
+                            child: _isUpdateEmail ?
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceBetween,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
+                                    child: CustomTextField(
+                                      hint: 'New Email',
+                                      controller: _emailController,
+                                      onSaved: (input) {
+                                        email = input!;
+                                      },
+                                      validator: (value) {
+                                        if (_isUpdateEmail &&
+                                            value!.isEmpty) {
+                                          return 'Please email cannot be empty';
+                                        }
+                                        return null;
+                                      },
+                                      iconWidget: IconButton(
+                                        icon: const Icon(Icons.email),
+                                        color: Colors.blueGrey,
+                                        onPressed: () {},
+                                      ),
+                                      textInputAction: TextInputAction.next,
+                                      onFieldSubmitted: (_) =>
+                                          FocusScope.of(context).nextFocus(),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 10),
+                                    child: CustomTextField(
+                                      hint: 'Current password',
+                                      isHidden: true,
+                                      controller: _currentPasswordController,
+                                      onSaved: (input) {
+                                        email = input!;
+                                      },
+                                      validator: (value) {
+                                        if (_isUpdateEmail &&
+                                            value!.isEmpty) {
+                                          return 'Please password cannot be empty';
+                                        }
+                                        return null;
+                                      },
+                                      iconWidget: IconButton(
+                                        icon: const Icon(
+                                            Icons.password_outlined),
+                                        color: Colors.blueGrey,
+                                        onPressed: () {},
+                                      ),
+                                      textInputAction: TextInputAction.done,
+                                      onFieldSubmitted: (_) =>
+                                          FocusScope.of(context).unfocus(),
+                                    ),
+                                  ),
+                                ]
+                            ) : null
+                        ),
+                        Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 35),
                             child: Row(
                               children: [
                                 const Text(
                                   'Update Password',
-                                  style: TextStyle(color: Colors.orange, fontSize: 16),
+                                  style: TextStyle(
+                                      color: Colors.orange, fontSize: 16),
                                 ),
                                 IconButton(
-                                  icon: Icon(_isUpdatePassword ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                                  icon: Icon(_isUpdatePassword ? Icons
+                                      .keyboard_arrow_up : Icons
+                                      .keyboard_arrow_down),
                                   color: Colors.orange,
                                   onPressed: () {
                                     setState(() {
@@ -478,10 +510,12 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                         Container(
                             child: _isUpdatePassword ?
                             Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget> [
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceBetween,
+                                children: <Widget>[
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
                                     child: CustomTextField(
                                       hint: 'New password',
                                       isHidden: _isPasswordHidden,
@@ -493,23 +527,28 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                         return null;
                                       },
                                       iconWidget: IconButton(
-                                        icon: _isPasswordHidden ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
+                                        icon: _isPasswordHidden
+                                            ? const Icon(Icons.visibility_off)
+                                            : const Icon(Icons.visibility),
                                         color: Colors.blueGrey,
                                         onPressed: () {
                                           setState(() {
-                                            _isPasswordHidden = !_isPasswordHidden;
+                                            _isPasswordHidden =
+                                            !_isPasswordHidden;
                                           });
                                         },
                                       ),
                                       textInputAction: TextInputAction.done,
-                                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                      onFieldSubmitted: (_) =>
+                                          FocusScope.of(context).unfocus(),
                                     ),
                                   ),
                                 ]
                             ) : null
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 10),
                           margin: const EdgeInsets.only(top: 10.0),
                           child: CustomFormButton(
                             text: 'Update',
@@ -520,22 +559,23 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
                                 updateBusinessAccount(
-                                  context,
-                                  _entityNameController.text,
-                                  _emailController.text,
-                                  _streetController.text,
-                                  _postCodeController.text,
-                                  _countryController.text,
-                                  _profilePicture,
-                                  _interests,
-                                    () => toggleLoader()
+                                    context,
+                                    _entityNameController.text,
+                                    _emailController.text,
+                                    _streetController.text,
+                                    _postCodeController.text,
+                                    _countryController.text,
+                                    _profilePicture,
+                                    _interests,
+                                        () => toggleLoader()
                                 );
                               }
                             },
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 10),
                           child: CustomFormButton(
                             text: 'Cancel',
                             textColor: Colors.orange,
@@ -549,12 +589,11 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                       ],
                     ),
                   )
-                )
-              ],
-            ),
-          ],
-        ),
-      );
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
-
 }
