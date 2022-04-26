@@ -7,6 +7,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nighthub/src/discover/discover.dart';
+import 'package:nighthub/src/discover/entityPage.dart';
+import 'package:provider/provider.dart';
 
 import '../auth/formFields/index.dart';
 import '../dialogs/customFadingDialog.dart';
@@ -83,7 +86,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
   }
 
   /// Updates the user data if desired
-  Future<void> updateBusinessAccount(BuildContext context, String about, Function() loader) async {
+  Future<void> updateBusinessAccount(BuildContext context, String about, Map<String, dynamic> userData, Function() loader) async {
 
     toggleLoader();
 
@@ -213,7 +216,28 @@ class _EditEntityProfile extends State<EditEntityPage> {
                                   },
                                 ),
                               ),
-                            ],
+                            ),
+                          )
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          margin: const EdgeInsets.only(top: 10.0),
+                          child: CustomFormButton(
+                            text: 'Update',
+                            textColor: Colors.black,
+                            fillColor: Colors.orange,
+                            isLoading: isLoading,
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                updateBusinessAccount(
+                                    context,
+                                    _aboutController.text,
+                                    widget.userData,
+                                    () => toggleLoader()
+                                );
+                              }
+                            },
                           ),
                         )
                     )
