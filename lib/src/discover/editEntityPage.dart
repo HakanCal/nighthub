@@ -197,7 +197,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 10),
+                                    horizontal: 24, vertical: 10),
                                 margin: const EdgeInsets.only(top: 10),
                                 child: CustomFormButton(
                                   text: 'Update',
@@ -208,36 +208,16 @@ class _EditEntityProfile extends State<EditEntityPage> {
                                     if (_formKey.currentState!.validate()) {
                                       _formKey.currentState!.save();
                                       updateBusinessAccount(
-                                        context,
-                                        _aboutController.text,
-                                        () => toggleLoader()
+                                          context,
+                                          _aboutController.text,
+                                          widget.userData,
+                                          () => toggleLoader()
                                       );
                                     }
                                   },
                                 ),
                               ),
-                            ),
-                          )
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: CustomFormButton(
-                            text: 'Update',
-                            textColor: Colors.black,
-                            fillColor: Colors.orange,
-                            isLoading: isLoading,
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                updateBusinessAccount(
-                                    context,
-                                    _aboutController.text,
-                                    widget.userData,
-                                    () => toggleLoader()
-                                );
-                              }
-                            },
+                            ],
                           ),
                         )
                     )
@@ -249,9 +229,10 @@ class _EditEntityProfile extends State<EditEntityPage> {
         } else {
           return Container();
         }
-      }
+        }
     );
   }
+
 
   Widget buildGridView(ScrollController scroller) => GridView.count(
     shrinkWrap: true,

@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:nighthub/src/auth/formFields/customChipList.dart';
 import 'package:provider/provider.dart';
 
+import 'cardProvider.dart';
+import 'entity.dart';
+
 class SwipeCard extends StatefulWidget {
 
-  final String imageUrl;
-  final List<String> tags;
+  final Entity entity;
   final bool isFront;
 
   const SwipeCard({
     Key? key,
-    required this.imageUrl,
+    required this.entity,
     required this.isFront,
-    required this.tags,
   }) : super(key: key);
 
   @override
@@ -22,6 +23,7 @@ class SwipeCard extends StatefulWidget {
 }
 
 class _SwipeCard extends State<SwipeCard> {
+
   @override
   void initState() {
     super.initState();
@@ -80,7 +82,7 @@ class _SwipeCard extends State<SwipeCard> {
         borderRadius: const BorderRadius.all(Radius.circular(5)),
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: AssetImage(widget.imageUrl),
+          image: widget.entity.primaryImage,
         ),
       ),
       child: Container(
@@ -97,76 +99,26 @@ class _SwipeCard extends State<SwipeCard> {
 
   Widget buildName() => Column(
     children: [
-      const Text(
-        'Clubname', //TODO: Insert Clubname
-        style: TextStyle(
+      Text(
+        widget.entity.name,
+        style: const TextStyle(
           fontSize: 32,
           color: Colors.white,
-          fontWeight: FontWeight.bold
+          fontWeight: FontWeight.bold,
+          shadows: [Shadow(color: Colors.black, offset: Offset(0.00 , 2.00), blurRadius: 5.00)],
         ),
       ),
       const Padding(padding: EdgeInsets.only(bottom: 5.00)),
       CustomChipList(
-        values: widget.tags,
+        values: widget.entity.tags,
         chipBuilder: (String value) {
-          return Chip(label: Text(value));
+          return Chip(
+            label: Text(value),
+            shadowColor: Colors.black54,
+          );
         },
       ),
     ],
   );
-
-}
-
-class CardProvider extends ChangeNotifier {
-  List<String> _images = [];
-
-  bool _isDragging = false;
-  Offset _position = Offset.zero;
-  Size _screenSize = Size.zero;
-  double _angle = 0.00;
-
-  List<String> get images => _images;
-  bool get isDragging => _isDragging;
-  Offset get position => _position;
-  double get angle => _angle;
-
-  CardProvider() {
-    resetEntities();
-  }
-
-  void setScreenSize(Size screenSize) => _screenSize = screenSize;
-
-  void startPosition(DragStartDetails details) {
-    _isDragging = true;
-    notifyListeners();
-  }
-
-  void updatePosition(DragUpdateDetails details) {
-    _position += details.delta;
-    final x = _position.dx;
-    _angle = 35 * x / _screenSize.width;
-    notifyListeners();
-  }
-
-  void endPosition() {
-    resetPosition();
-  }
-
-  void resetPosition() {
-    _isDragging = false;
-    _position = Offset.zero;
-    _angle = 0.00;
-    notifyListeners();
-  }
-
-  void resetEntities() {
-    _images = <String>[
-      'assets/dummy-club.png',
-      'assets/user_image.png',
-      'assets/app-logo.png',
-      'assets/dance-club.gif'
-    ].reversed.toList();
-    notifyListeners();
-  }
 
 }
