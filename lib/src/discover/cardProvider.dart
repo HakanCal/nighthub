@@ -11,7 +11,6 @@ enum CardStatus {
 class CardProvider extends ChangeNotifier {
 
   List<Entity> _entities = [];
-  List<String> _images = [];
 
   bool _isDragging = false;
   Offset _position = Offset.zero;
@@ -19,10 +18,14 @@ class CardProvider extends ChangeNotifier {
   double _angle = 0.00;
 
   List<Entity> get entities => _entities;
-  List<String> get images => _images;
   bool get isDragging => _isDragging;
   Offset get position => _position;
   double get angle => _angle;
+
+  void addEntity(Entity entity) {
+    _entities.add(entity);
+    notifyListeners();
+  }
 
   CardProvider() {
     resetEntities();
@@ -59,7 +62,7 @@ class CardProvider extends ChangeNotifier {
       default: resetPosition();
     }
 
-    resetPosition();
+    //resetPosition();
 
   }
 
@@ -71,27 +74,7 @@ class CardProvider extends ChangeNotifier {
   }
 
   void resetEntities() {
-
-    _entities = <Entity>[
-      Entity(
-        name: 'White Noise',
-        address: 'Wagenburgstr. 153',
-        distance: 1.6,
-        tags: ['shit', 'sexist', 'latin'],
-        about: 'Keine Genres, keine Grenzen – das COCOLORES verschreibt sich einzig der Liebe zur Musik und der Freude am Tanzen. Als Pop-up-Club auf dem ehemaligen Mainfloor des Pure, mitten im Herzen der Stadt, fügt sich das Coco als willkommener Neuzugang in das Stuttgarter Nachtleben ein. Seit Herbst 2016 verwandelt sich der Club jeden Freitag, Samstag und vor Feiertagen bereits ab 21 Uhr in eine bunte Manege, die mit wundersamer Atmosphäre zum ausgelassenen Feiern einlädt. Im COCOLORES feiert man getreu dem Motto „Kopfüber außer Rand & Band”. Auf der Tanzfläche werden dabei keine Grenzen gesetzt: Zwischen grandiosen Club-Dauerbrennern zu denen alle die Hüften schwingen, Lieblingssongs, bei denen es sich laut mitträllern lässt und Instant Classics ist alles erlaubt – Hauptsache die Stimmung steigt. Die festen Veranstaltungsreihen machen den Besuch im Coco durch besondere Specials noch lohnenswerter. Jeden Freitag wird ab 21 Uhr zum „Coco Friday“ geladen – inklusive freiem Eintritt bis 23 Uhr, einer Flasche Prosecco aufs Haus für alle Mädchen-Trios sowie zahlreichen Getränkespecials an der Bar. Auch Samstags bleibt der Eintritt bei „Cocobella“ bis 23 Uhr frei, während zahlreiche Drinks bis dahin für unter vier Euro über die Theke gehen. Und um dem Begriff „Feiertag“ mal wieder ordentlich Bedeutung zu verleihen, schließt sich Coco an den Abenden vor Feiertagen ihrem Schwesterclub PURE an und feiert die sogenannten „Bottle Nights“, bei denen jede Flaschenbestellung an der Bar direkt verdoppelt wird – zudem spart man sich bis 23 Uhr den Eintrittspreis. Wenn das mal nicht die idealen Voraussetzungen für legendäre Partynächte sind!',
-        primaryImage: NetworkImage('https://www.rbb24.de/content/dam/rbb/rbb/rbb24/2022/2022_04/dpa-account/274396294.jpg.jpg/size=708x398.jpg'),
-        images: [NetworkImage('https://www.reflect.de/wp-content/uploads/2015/02/news_0115_white-noise1_cmyk_web.jpg'), NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/White_noise.svg/1200px-White_noise.svg.png')],
-      ),
-      Entity(
-        name: 'White Noise',
-        address: 'Wagenburgstr. 153',
-        distance: 1.6,
-        tags: ['shit', 'sexist', 'latin'],
-        about: 'Keine Genres, keine Grenzen – das COCOLORES verschreibt sich einzig der Liebe zur Musik und der Freude am Tanzen. Als Pop-up-Club auf dem ehemaligen Mainfloor des Pure, mitten im Herzen der Stadt, fügt sich das Coco als willkommener Neuzugang in das Stuttgarter Nachtleben ein. Seit Herbst 2016 verwandelt sich der Club jeden Freitag, Samstag und vor Feiertagen bereits ab 21 Uhr in eine bunte Manege, die mit wundersamer Atmosphäre zum ausgelassenen Feiern einlädt. Im COCOLORES feiert man getreu dem Motto „Kopfüber außer Rand & Band”. Auf der Tanzfläche werden dabei keine Grenzen gesetzt: Zwischen grandiosen Club-Dauerbrennern zu denen alle die Hüften schwingen, Lieblingssongs, bei denen es sich laut mitträllern lässt und Instant Classics ist alles erlaubt – Hauptsache die Stimmung steigt. Die festen Veranstaltungsreihen machen den Besuch im Coco durch besondere Specials noch lohnenswerter. Jeden Freitag wird ab 21 Uhr zum „Coco Friday“ geladen – inklusive freiem Eintritt bis 23 Uhr, einer Flasche Prosecco aufs Haus für alle Mädchen-Trios sowie zahlreichen Getränkespecials an der Bar. Auch Samstags bleibt der Eintritt bei „Cocobella“ bis 23 Uhr frei, während zahlreiche Drinks bis dahin für unter vier Euro über die Theke gehen. Und um dem Begriff „Feiertag“ mal wieder ordentlich Bedeutung zu verleihen, schließt sich Coco an den Abenden vor Feiertagen ihrem Schwesterclub PURE an und feiert die sogenannten „Bottle Nights“, bei denen jede Flaschenbestellung an der Bar direkt verdoppelt wird – zudem spart man sich bis 23 Uhr den Eintrittspreis. Wenn das mal nicht die idealen Voraussetzungen für legendäre Partynächte sind!',
-        primaryImage: NetworkImage('https://c.tenor.com/GgNwQSmjIa0AAAAC/dance-club.gif'),
-        images: [NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/White_noise.svg/1200px-White_noise.svg.png'), NetworkImage('https://www.reflect.de/wp-content/uploads/2015/02/news_0115_white-noise1_cmyk_web.jpg')],
-      )
-    ].reversed.toList();
+    _entities = _entities.reversed.toList();
 
     notifyListeners();
   }
@@ -112,11 +95,12 @@ class CardProvider extends ChangeNotifier {
   }
 
   Future _nextCard() async {
-    if (_images.isEmpty) {
+    print(_entities);
+    if (_entities.isEmpty) {
       return;
     }
     await Future.delayed(const Duration(milliseconds: 200));
-    images.removeLast();
+    _entities.removeLast();
     resetPosition();
   }
 
@@ -140,6 +124,50 @@ class CardProvider extends ChangeNotifier {
 
   void initLazyLoader() {
     //TODO: Add 10 Entities to the _entity List<Entity>
+
+    //TESTDATA
+    addEntity(
+        Entity(
+          name: 'Schräglage',
+          address: 'Wagenburgstr. 153',
+          distance: 1.6,
+          tags: ['shit', 'sexist', 'latin'],
+          about: 'Keine Genres, keine Grenzen – das COCOLORES verschreibt sich einzig der Liebe zur Musik und der Freude am Tanzen. Als Pop-up-Club auf dem ehemaligen Mainfloor des Pure, mitten im Herzen der Stadt, fügt sich das Coco als willkommener Neuzugang in das Stuttgarter Nachtleben ein. Seit Herbst 2016 verwandelt sich der Club jeden Freitag, Samstag und vor Feiertagen bereits ab 21 Uhr in eine bunte Manege, die mit wundersamer Atmosphäre zum ausgelassenen Feiern einlädt. Im COCOLORES feiert man getreu dem Motto „Kopfüber außer Rand & Band”. Auf der Tanzfläche werden dabei keine Grenzen gesetzt: Zwischen grandiosen Club-Dauerbrennern zu denen alle die Hüften schwingen, Lieblingssongs, bei denen es sich laut mitträllern lässt und Instant Classics ist alles erlaubt – Hauptsache die Stimmung steigt. Die festen Veranstaltungsreihen machen den Besuch im Coco durch besondere Specials noch lohnenswerter. Jeden Freitag wird ab 21 Uhr zum „Coco Friday“ geladen – inklusive freiem Eintritt bis 23 Uhr, einer Flasche Prosecco aufs Haus für alle Mädchen-Trios sowie zahlreichen Getränkespecials an der Bar. Auch Samstags bleibt der Eintritt bei „Cocobella“ bis 23 Uhr frei, während zahlreiche Drinks bis dahin für unter vier Euro über die Theke gehen. Und um dem Begriff „Feiertag“ mal wieder ordentlich Bedeutung zu verleihen, schließt sich Coco an den Abenden vor Feiertagen ihrem Schwesterclub PURE an und feiert die sogenannten „Bottle Nights“, bei denen jede Flaschenbestellung an der Bar direkt verdoppelt wird – zudem spart man sich bis 23 Uhr den Eintrittspreis. Wenn das mal nicht die idealen Voraussetzungen für legendäre Partynächte sind!',
+          primaryImage: NetworkImage('https://c.tenor.com/GgNwQSmjIa0AAAAC/dance-club.gif'),
+          images: [
+            NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/White_noise.svg/1200px-White_noise.svg.png'),
+            NetworkImage('https://www.reflect.de/wp-content/uploads/2015/02/news_0115_white-noise1_cmyk_web.jpg')
+          ],
+        )
+    );
+    addEntity(
+        Entity(
+          name: 'White Noise',
+          address: 'Wagenburgstr. 153',
+          distance: 1.6,
+          tags: ['shit', 'sexist', 'latin'],
+          about: 'Keine Genres, keine Grenzen – das COCOLORES verschreibt sich einzig der Liebe zur Musik und der Freude am Tanzen. Als Pop-up-Club auf dem ehemaligen Mainfloor des Pure, mitten im Herzen der Stadt, fügt sich das Coco als willkommener Neuzugang in das Stuttgarter Nachtleben ein. Seit Herbst 2016 verwandelt sich der Club jeden Freitag, Samstag und vor Feiertagen bereits ab 21 Uhr in eine bunte Manege, die mit wundersamer Atmosphäre zum ausgelassenen Feiern einlädt. Im COCOLORES feiert man getreu dem Motto „Kopfüber außer Rand & Band”. Auf der Tanzfläche werden dabei keine Grenzen gesetzt: Zwischen grandiosen Club-Dauerbrennern zu denen alle die Hüften schwingen, Lieblingssongs, bei denen es sich laut mitträllern lässt und Instant Classics ist alles erlaubt – Hauptsache die Stimmung steigt. Die festen Veranstaltungsreihen machen den Besuch im Coco durch besondere Specials noch lohnenswerter. Jeden Freitag wird ab 21 Uhr zum „Coco Friday“ geladen – inklusive freiem Eintritt bis 23 Uhr, einer Flasche Prosecco aufs Haus für alle Mädchen-Trios sowie zahlreichen Getränkespecials an der Bar. Auch Samstags bleibt der Eintritt bei „Cocobella“ bis 23 Uhr frei, während zahlreiche Drinks bis dahin für unter vier Euro über die Theke gehen. Und um dem Begriff „Feiertag“ mal wieder ordentlich Bedeutung zu verleihen, schließt sich Coco an den Abenden vor Feiertagen ihrem Schwesterclub PURE an und feiert die sogenannten „Bottle Nights“, bei denen jede Flaschenbestellung an der Bar direkt verdoppelt wird – zudem spart man sich bis 23 Uhr den Eintrittspreis. Wenn das mal nicht die idealen Voraussetzungen für legendäre Partynächte sind!',
+          primaryImage: NetworkImage('https://www.rbb24.de/content/dam/rbb/rbb/rbb24/2022/2022_04/dpa-account/274396294.jpg.jpg/size=708x398.jpg'),
+          images: [
+            NetworkImage('https://www.reflect.de/wp-content/uploads/2015/02/news_0115_white-noise1_cmyk_web.jpg'),
+            NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/White_noise.svg/1200px-White_noise.svg.png')
+          ],
+        )
+    );
+    addEntity(
+        Entity(
+          name: 'AIRBEAT ONE Festival 2022',
+          address: 'Wagenburgstr. 153',
+          distance: 1.6,
+          tags: ['shit', 'sexist', 'latin'],
+          about: 'Keine Genres, keine Grenzen – das COCOLORES verschreibt sich einzig der Liebe zur Musik und der Freude am Tanzen. Als Pop-up-Club auf dem ehemaligen Mainfloor des Pure, mitten im Herzen der Stadt, fügt sich das Coco als willkommener Neuzugang in das Stuttgarter Nachtleben ein. Seit Herbst 2016 verwandelt sich der Club jeden Freitag, Samstag und vor Feiertagen bereits ab 21 Uhr in eine bunte Manege, die mit wundersamer Atmosphäre zum ausgelassenen Feiern einlädt. Im COCOLORES feiert man getreu dem Motto „Kopfüber außer Rand & Band”. Auf der Tanzfläche werden dabei keine Grenzen gesetzt: Zwischen grandiosen Club-Dauerbrennern zu denen alle die Hüften schwingen, Lieblingssongs, bei denen es sich laut mitträllern lässt und Instant Classics ist alles erlaubt – Hauptsache die Stimmung steigt. Die festen Veranstaltungsreihen machen den Besuch im Coco durch besondere Specials noch lohnenswerter. Jeden Freitag wird ab 21 Uhr zum „Coco Friday“ geladen – inklusive freiem Eintritt bis 23 Uhr, einer Flasche Prosecco aufs Haus für alle Mädchen-Trios sowie zahlreichen Getränkespecials an der Bar. Auch Samstags bleibt der Eintritt bei „Cocobella“ bis 23 Uhr frei, während zahlreiche Drinks bis dahin für unter vier Euro über die Theke gehen. Und um dem Begriff „Feiertag“ mal wieder ordentlich Bedeutung zu verleihen, schließt sich Coco an den Abenden vor Feiertagen ihrem Schwesterclub PURE an und feiert die sogenannten „Bottle Nights“, bei denen jede Flaschenbestellung an der Bar direkt verdoppelt wird – zudem spart man sich bis 23 Uhr den Eintrittspreis. Wenn das mal nicht die idealen Voraussetzungen für legendäre Partynächte sind!',
+          primaryImage: NetworkImage('https://media.resources.festicket.com/www/photos/AB12022artwork.jpg'),
+          images: [
+            NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/White_noise.svg/1200px-White_noise.svg.png'),
+            NetworkImage('https://www.reflect.de/wp-content/uploads/2015/02/news_0115_white-noise1_cmyk_web.jpg')
+          ],
+        )
+    );
   }
 
   void lazyLoad() {

@@ -76,6 +76,8 @@ class _SwipeCard extends State<SwipeCard> {
 
   Widget buildCard() => ClipRRect(
     child: Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       margin: const EdgeInsets.fromLTRB(2, 10, 2, 0),
       decoration: BoxDecoration(
         color: const Color(0x8c8c8c8c),
@@ -86,7 +88,9 @@ class _SwipeCard extends State<SwipeCard> {
         ),
       ),
       child: Container(
-        padding: const EdgeInsets.all(45.00),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        padding: const EdgeInsets.fromLTRB(10.00, 0.00, 10.00, 30.00),
         child: Column(
           children: [
             const Spacer(),
@@ -107,6 +111,7 @@ class _SwipeCard extends State<SwipeCard> {
           fontWeight: FontWeight.bold,
           shadows: [Shadow(color: Colors.black, offset: Offset(0.00 , 2.00), blurRadius: 5.00)],
         ),
+        textAlign: TextAlign.center,
       ),
       const Padding(padding: EdgeInsets.only(bottom: 5.00)),
       CustomChipList(

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nighthub/src/discover/entity.dart';
-import 'package:nighthub/src/discover/entityPage.dart';
 import 'package:nighthub/src/discover/swipeCard.dart';
 import 'package:provider/provider.dart';
 
@@ -22,8 +20,7 @@ class _Discover extends State<Discover> {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       final size = MediaQuery.of(context).size;
-      final provider = Provider.of<CardProvider>(context, listen: false);
-      provider.setScreenSize(size);
+      cardProv.setScreenSize(size);
     });
     cardProv.initLazyLoader();
   }
@@ -34,7 +31,6 @@ class _Discover extends State<Discover> {
     const double iconSize = 50.00;
 
     return Container(
-      height: MediaQuery.of(context).size.height,
       color: const Color(0xFF262626),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -87,7 +83,7 @@ class _Discover extends State<Discover> {
                           cardProv.like();
                           cardProv.lazyLoad();
                           //Navigator.push(context, MaterialPageRoute(
-                           // builder: (context) => EntityPage(entity: myEnt))
+                          // builder: (context) => EntityPage(entity: ))
                           //);
                         },
                     ),
