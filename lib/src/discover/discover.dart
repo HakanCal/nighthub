@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import './swipeCard.dart';
 
 import 'entity.dart';
@@ -13,6 +15,7 @@ class Discover extends StatefulWidget {
 }
 
 class _Discover extends State<Discover> {
+  DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
   bool loading = true;
 
   List<Entity> entities = [];
@@ -31,6 +34,11 @@ class _Discover extends State<Discover> {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       initLazyLoader();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        setState(() {
+          loading = false;
+        });
+      });
     });
   }
 
@@ -38,10 +46,13 @@ class _Discover extends State<Discover> {
     final size = MediaQuery.of(context).size;
     setScreenSize(size);
 
-    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
-    realtimeDatabase.child('user_accounts/').orderByKey().limitToFirst(10).get().then((snapshot) {
+    String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+    realtimeDatabase.child('user_accounts/').orderByKey().limitToFirst(30).get().then((snapshot) {
       Map<dynamic, dynamic> users = snapshot.value as Map;
       users.forEach((key, value) async {
+        bool dislike = false;
+
         if(value['business'] == true) {
           final businessPictures = await firebase_storage.FirebaseStorage.instance
               .ref()
@@ -53,21 +64,32 @@ class _Discover extends State<Discover> {
                 primaryImageUrl = value.toString();
               });
             }).then((_) {
-              setState(() {
-                entities.add(
-                    Entity(
-                      username: value['username'],
-                      address: value['address'],
-                      distance: 1.6,
-                      tags: getUserInterests(value['interests']),
-                      about: value['about'],
-                      primaryImage: NetworkImage(primaryImageUrl),
-                      /*images: [
-                    NetworkImage(images![images!.length - 2]),
-                  ],*/
-                    )
-                );
-              });
+              if (value['dislikes'] != null) {
+                Map<dynamic, dynamic> dislikes = value['dislikes'] as Map;
+                dislikes.forEach((key, userDislike) {
+                  if (userDislike == currentUserID) {
+                    dislike = true;
+                  }
+                });
+              }
+              if (dislike == false) {
+                setState(() {
+                  entities.add(
+                      Entity(
+                        userId: value['userId'],
+                        username: value['username'],
+                        address: value['address'],
+                        distance: 1.6,
+                        tags: getUserInterests(value['interests']),
+                        about: value['about'],
+                        primaryImage: NetworkImage(primaryImageUrl),
+                        /*images: [
+                            NetworkImage(images![images!.length - 2]),
+                          ],*/
+                      )
+                  );
+                });
+              }
             });
           }
 
@@ -79,11 +101,9 @@ class _Discover extends State<Discover> {
               });
             });
           }*/
-          loading = false;
         }
       });
     });
-    //TODO: Add 10 Entities to the _entity List<Entity>
   }
 
   void setScreenSize(Size screenSize) => _screenSize = screenSize;
@@ -129,13 +149,12 @@ class _Discover extends State<Discover> {
     });
   }
 
-  /*void resetEntities() {
-    setState(() {
-      _entities = _entities.reversed.toList();
-    });
-  }*/
-
   void dislike() {
+    String businessUserID = entities.last.userId;
+    String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$businessUserID/dislikes');
+
+    realtimeDatabase.push().set(currentUserID);
     setState(() {
       _angle = 20;
       _position -= Offset(2 * _screenSize.width, 0);
@@ -144,6 +163,11 @@ class _Discover extends State<Discover> {
   }
 
   void like() {
+    String businessUserID = entities.last.userId;
+    String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$businessUserID/likes');
+
+    realtimeDatabase.push().set(currentUserID);
     setState(() {
       _angle = 20;
       _position += Offset(2 * _screenSize.width, 0);
@@ -152,7 +176,6 @@ class _Discover extends State<Discover> {
   }
 
   Future _nextCard() async {
-    print(entities);
     if (entities.isEmpty) {
       return;
     }
@@ -183,82 +206,93 @@ class _Discover extends State<Discover> {
   Widget build(BuildContext context) {
     const double iconSize = 50;
 
-          return loading == true ? Container(/*TODO: show a spinner when loading*/) : Container(
-            color: const Color(0xFF262626),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              children: [
-                Flexible(
-                  flex: 85,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: entities.map((entity) =>
-                        SwipeCard(
-                          entity: entity,
-                          isFront: entities.last == entity,
-                          setScreenSize: setScreenSize,
-                          position: position,
-                          isDragging: isDragging,
-                          angle: angle,
-                          startPosition: startPosition,
-                          updatePosition: updatePosition,
-                          endPosition: endPosition,
-                        )).toList(),
-                  ),
+    return loading == true ? Container(
+      color: Colors.black,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
+          const SpinKitFadingCircle(
+            color: Colors.orange,
+            size: 60,
+          ) ,
+        ],
+      )) : Container(
+      color: const Color(0xFF262626),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Flexible(
+            flex: 85,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: entities.map((entity) =>
+                SwipeCard(
+                  entity: entity,
+                  isFront: entities.last == entity,
+                  setScreenSize: setScreenSize,
+                  position: position,
+                  isDragging: isDragging,
+                  angle: angle,
+                  startPosition: startPosition,
+                  updatePosition: updatePosition,
+                  endPosition: endPosition,
+                )).toList(),
+            ),
+          ),
+          Flexible(
+              flex: 13,
+              child: Container(
+                decoration: const BoxDecoration(
+                  //color: Color(0x8c8c8c8c),
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
-                Flexible(
-                    flex: 13,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        //color: Color(0x8c8c8c8c),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        iconSize: iconSize,
+                        color: Colors.red,
+                        onPressed: () {
+                          dislike();
+                          lazyLoad();
+                        },
                       ),
-                      alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: IconButton(
-                              icon: const Icon(Icons.close_rounded),
-                              iconSize: iconSize,
-                              color: Colors.red,
-                              onPressed: () {
-                                dislike();
-                                lazyLoad();
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: IconButton(
-                              icon: const Icon(Icons.keyboard_return_rounded),
-                              iconSize: 35,
-                              color: true ? Colors.grey : Colors.yellow[600],
-                              //TODO: DO THIS!!!!
-                              onPressed: () {
-                                //TODO: return to last Club
-                                //TODO: start grey, get yellow when rollback is avaliable
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: IconButton(
-                              icon: const Icon(Icons.check_rounded),
-                              iconSize: iconSize,
-                              color: Colors.green,
-                              onPressed: () {
-                                like();
-                                lazyLoad();
-                                //Navigator.push(context, MaterialPageRoute(
-                                // builder: (context) => EntityPage(entity: )) //TODO: with the username or so, get the other images later
-                                //);
-                              },
-                            ),
-                          )
-                        ],
+                    ),
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.keyboard_return_rounded),
+                        iconSize: 35,
+                        color: true ? Colors.grey : Colors.yellow[600],
+                        //TODO: DO THIS!!!!
+                        onPressed: () {
+                          //TODO: return to last Club
+                          //TODO: start grey, get yellow when rollback is avaliable
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.check_rounded),
+                        iconSize: iconSize,
+                        color: Colors.green,
+                        onPressed: () {
+                          like();
+                          lazyLoad();
+                          //Navigator.push(context, MaterialPageRoute(
+                          // builder: (context) => EntityPage(entity: )) //TODO: with the userId or so, get the other images later
+                          //);
+                        },
                       ),
                     )
-                )
-              ],
-            ),
-          );
+                  ],
+                ),
+              )
+          )
+        ],
+      ),
+    );
   }
 }
