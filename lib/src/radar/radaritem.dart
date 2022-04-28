@@ -6,7 +6,7 @@ class RadarItem extends StatelessWidget {
       {required this.name,
       required this.logo,
       required this.address,
-      required this.distance,
+      required this.distance, // distance in km
       required this.categories,
       required this.rating,
       Key? key})
@@ -37,7 +37,13 @@ class RadarItem extends StatelessWidget {
             child: Center(
               child: Row(children: [
                 Expanded(
-                    child: FittedBox(fit: BoxFit.contain, child: logo), flex: 1),
+                    child: FittedBox(fit: BoxFit.contain,
+                        child: ClipOval(
+                          child: SizedBox.fromSize(
+                            child: logo,
+                            size: Size.fromRadius(4)
+                          )
+                    )), flex: 1),
                 Expanded(
                     child: _RadarItemBody(name: name, categories: categories),
                     flex: 2),

@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:nighthub/src/radar/radaritem.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,7 +22,8 @@ class _RadarList extends State<RadarList>{
 
   late Position _userPos;
   List<RadarItem> _radarItems = [];
-  final Image _logo = Image.network('https://logos-download.com/wp-content/uploads/2016/05/Coffeeshop_Company_logo_logotype.png');
+  final firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+  //final Image _logo = Image.network('https://logos-download.com/wp-content/uploads/2016/05/Coffeeshop_Company_logo_logotype.png');
   /*
   const Position(
       latitude: 48.783333,
@@ -45,7 +49,7 @@ class _RadarList extends State<RadarList>{
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       await Geolocator.requestPermission();
-      //return Future.error('Location services are disabled.');
+      return Future.error('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
@@ -67,10 +71,9 @@ class _RadarList extends State<RadarList>{
 
 
   Future<Image> _getProfilepicture(String filename) async{
-
-    firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
-    String downloadURL = await storage.ref().child('profile_pictures/$filename').getDownloadURL();
-    return Image.network(downloadURL);
+    File _imgFile = File("/");
+    Uint8List? imageBytes = await storage.ref('profile_pictures/$filename').getData(10000000);
+    return Image.memory(imageBytes!);
   }
 
   Future<List<RadarItem>> _getRadarItems() async {
@@ -92,18 +95,20 @@ class _RadarList extends State<RadarList>{
     // Add all the business to the list
     event.children.forEach((user_account) async{
       print(user_account.value);
-      // Distance from business to user location in kilometers
+      // Distance from business to user location in meters
       double distance = Geolocator.distanceBetween(
           _userPos.latitude,
           _userPos.longitude,
           user_account.child("point/geopoint/longitude").value as double,
           user_account.child("point/geopoint/latitude").value as double
-      ) / 1000;
-      Image __logo = await _getProfilepicture(user_account.child("profile_picture").value as String);
+      );
+      distance /= 1000; // Distance in Kilometers now
+      print("Distance to this business: ${distance} km");
+      Image _logo = await _getProfilepicture(user_account.child("profile_picture").value as String);
       radarItems.add(
           RadarItem(
             name: user_account.child("username").value as String,
-            logo: __logo,
+            logo: _logo,
             address: user_account.child("address").value as String,
             distance: distance,
             categories: user_account.child("interests").value as List,
