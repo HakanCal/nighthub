@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class Entity {
-
+  final String userId;
   final String username;
   final String address;
   final double distance;
@@ -12,6 +12,7 @@ class Entity {
   //List<NetworkImage>? images;
 
   Entity({
+    required this.userId,
     required this.username,
     required this.address,
     required this.distance,

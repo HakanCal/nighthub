@@ -74,7 +74,7 @@ class _EntityPage extends State<EntityPage> {
                     widget.entity.about,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20.00
+                      fontSize: 20
                     ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 50)),

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nighthub/src/discover/editEntityPage.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
@@ -72,11 +73,11 @@ class _HomePage extends State<HomePage> {
         try {
           tempFile.create(recursive: true);
           await firebase_storage.FirebaseStorage.instance.ref(
-              '/profile_pictures/$imageName').writeToFile(tempFile);
+            '/profile_pictures/$imageName').writeToFile(tempFile);
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
-              const Discover(), //TODO: What we want in the screens
+              const Discover(),
               accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
@@ -89,7 +90,7 @@ class _HomePage extends State<HomePage> {
         setState(() {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
-            const Discover(), //TODO: What we want in the screens
+            const Discover(),
             accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
@@ -121,33 +122,33 @@ class _HomePage extends State<HomePage> {
                     icon: Image.asset('assets/nighthub.png'),
                   ),
                 ),
-                body: accountData!['business'] == true ?
-
-                ///TODO: Here is where the different screens should be put: user account or business account
-                Center(
-                    child: menuSelects.isNotEmpty
-                        ? menuSelects[_selectedIndex]
-                        : null
-
-                  ///TODO: screens business account
-                ) : Center(
-                    child: menuSelects.isNotEmpty
-                        ? menuSelects[_selectedIndex]
-                        : null
-
-                  ///TODO: screens user account
+                body: Center(
+                  child: menuSelects.isNotEmpty
+                      ? menuSelects[_selectedIndex]
+                      : null
                 ),
                 bottomNavigationBar: NavBar(
-                    selectedIndex: _selectedIndex,
-                    onItemTap: _onItemTap,
-                    isBusinessAccount: accountData!['business'] == true
-                        ? true
-                        : false
+                  selectedIndex: _selectedIndex,
+                  onItemTap: _onItemTap,
+                  isBusinessAccount: accountData!['business'] == true
+                    ? true
+                    : false
                 ),
               ),
             );
           } else {
-            return Container(); //TODO: Perhaps another spinner
+            return Container(
+                color: Colors.black,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
+                    const SpinKitFadingCircle(
+                      color: Colors.orange,
+                      size: 60,
+                    ) ,
+                  ],
+                ));
           }
         }
     );

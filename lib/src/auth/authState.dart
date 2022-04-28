@@ -130,13 +130,13 @@ class AuthState extends ChangeNotifier {
             password: password);
 
         final newUserData = <String, dynamic> {
+          'userId': FirebaseAuth.instance.currentUser!.uid,
+          'business': false,
           'username': username,
           'email': email,
-          'userId': FirebaseAuth.instance.currentUser!.uid,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
           'profile_picture': imageName,
           'interests': interests,
-          'business': false
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
         };
 
         await credential.user!.updateDisplayName(username)
@@ -184,15 +184,17 @@ class AuthState extends ChangeNotifier {
       var point = await createGeoPoint(address);
 
       final newUserData = <String, dynamic>{
+        'userId': FirebaseAuth.instance.currentUser!.uid,
+        'business': true,
         'username': entityName,
         'email': email,
-        'userId': FirebaseAuth.instance.currentUser!.uid,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
         'profile_picture': imageName,
         'interests': interests,
-        'business': true,
         'address': address,
-        'point': point
+        'point': point,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'likes': [],
+        'dislikes': []
       };
 
       await credential.user!.updateDisplayName(entityName)
@@ -201,9 +203,9 @@ class AuthState extends ChangeNotifier {
           .then((value) => debugPrint('Did work the realtimeData'))
           .catchError((onError) => debugPrint('Didn\'t work the realtimeData: $onError'))
       );
+      toggleLoader();
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
-      toggleLoader();
     } on FirebaseAuthException catch (e) {
         errorCallback(e);
         toggleLoader();
