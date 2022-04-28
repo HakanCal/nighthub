@@ -53,11 +53,11 @@ class _EditEntityProfile extends State<EditEntityPage> {
   String errorMessage = '';
   List<dynamic> images = [];
 
-  /// Get all the user-related information and load profile picture
+  /// Get the images uploaded by the entity and displays them
   Future<void> getImagesArray() async {
     final businessPictures = await firebase_storage.FirebaseStorage.instance
-        .ref()
-        .child('business_pictures/${widget.userData['userId']}').listAll();
+      .ref()
+      .child('business_pictures/${widget.userData['userId']}').listAll();
 
     Future.wait(businessPictures.items.map((e) async {
       await e.getDownloadURL().then((value) {

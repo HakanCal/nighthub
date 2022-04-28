@@ -32,7 +32,6 @@ class _HomePage extends State<HomePage> {
   late List <Widget> menuSelects = <Widget>[];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
-
   @override
   void initState() {
     super.initState();
@@ -78,7 +77,7 @@ class _HomePage extends State<HomePage> {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
               const Discover(), //TODO: What we want in the screens
-              const Radar(), //TODO: FAVORITES
+              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -108,34 +107,48 @@ class _HomePage extends State<HomePage> {
     return FutureBuilder<dynamic>(
         future: _future,
         builder: (context, snapshot) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: Colors.black,
-                automaticallyImplyLeading: false,
-                title: const Text('nightHub'),
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/nighthub.png'),
+          if (snapshot.connectionState == ConnectionState.done) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: Scaffold(
+                appBar: AppBar(
+                  centerTitle: true,
+                  backgroundColor: Colors.black,
+                  automaticallyImplyLeading: false,
+                  title: const Text('nightHub'),
+                  leading: IconButton(
+                    onPressed: () {},
+                    icon: Image.asset('assets/nighthub.png'),
+                  ),
+                ),
+                body: accountData!['business'] == true ?
+
+                ///TODO: Here is where the different screens should be put: user account or business account
+                Center(
+                    child: menuSelects.isNotEmpty
+                        ? menuSelects[_selectedIndex]
+                        : null
+
+                  ///TODO: screens business account
+                ) : Center(
+                    child: menuSelects.isNotEmpty
+                        ? menuSelects[_selectedIndex]
+                        : null
+
+                  ///TODO: screens user account
+                ),
+                bottomNavigationBar: NavBar(
+                    selectedIndex: _selectedIndex,
+                    onItemTap: _onItemTap,
+                    isBusinessAccount: accountData!['business'] == true
+                        ? true
+                        : false
                 ),
               ),
-              body: accountData!['business'] == true ?
-
-              ///TODO: Here is where the different screens should be put: user account or business account
-              Center(
-                child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null ///TODO: screens business account
-              ) : Center(
-                child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null ///TODO: screens user account
-              ),
-              bottomNavigationBar: NavBar(
-                selectedIndex: _selectedIndex,
-                onItemTap: _onItemTap,
-                isBusinessAccount: accountData!['business'] == true ? true : false
-              ),
-            ),
-          );
+            );
+          } else {
+            return Container(); //TODO: Perhaps another spinner
+          }
         }
     );
   }

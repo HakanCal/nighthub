@@ -25,7 +25,7 @@ class AuthState extends ChangeNotifier {
 
     FirebaseAuth.instance.userChanges().listen((user) async {
       if (user != null) {
-        debugPrint("User has signed in");
+        debugPrint('User has signed in');
         AuthenticationState.loggedIn;
       } else {
         _authState = AuthenticationState.loggedOut;
@@ -248,9 +248,7 @@ class AuthState extends ChangeNotifier {
         }
       };
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      debugPrint(e.toString());
     }
     return point;
   }

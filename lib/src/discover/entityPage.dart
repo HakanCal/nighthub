@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,11 +7,9 @@ import '../auth/formFields/customChipList.dart';
 import 'entity.dart';
 
 class EntityPage extends StatefulWidget {
-
   const EntityPage({
     Key? key,
     required this.entity
-
   }) : super(key: key);
 
   final Entity entity;
@@ -99,11 +96,11 @@ class _EntityPage extends State<EntityPage> {
     child: Swiper(
       itemBuilder: (BuildContext context, int index) {
         return Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: widget.entity.images[index],
+                image: NetworkImage('') //TODO: widget.entity.images[index],
               ),
             ),
             //child: Image.asset(File(images[index]).path, fit: BoxFit.cover)
@@ -111,7 +108,7 @@ class _EntityPage extends State<EntityPage> {
       },
       index: 0,
       scrollDirection: Axis.horizontal,
-      itemCount: widget.entity.images.length,
+      itemCount: 0, //widget.entity.images.length,
       autoplay: false,
       pagination: const SwiperPagination(),
       control: const SwiperControl(
@@ -123,10 +120,10 @@ class _EntityPage extends State<EntityPage> {
   Widget entityName() => Container(
     alignment: Alignment.bottomLeft,
     child: Text(
-      widget.entity.name,
+      widget.entity.username,
       style: const TextStyle(
         color: Colors.white,
-        fontSize: 33.00,
+        fontSize: 33,
         fontWeight: FontWeight.bold,
       ),
     ),
