@@ -7,9 +7,7 @@ class RadarList extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    if(radarItems.isEmpty){
-      return Text("Nothing seems to be nearby");
-    }
+
     return
       ListView.separated(
         itemBuilder: (BuildContext context, int index) {

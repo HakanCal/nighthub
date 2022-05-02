@@ -53,6 +53,7 @@ dependencies:
   geoflutterfire: ^3.0.3
   firebase_database: ^9.0.10
   firebase: ^9.0.2
+  multiselect: ^0.0.4
 
 dev_dependencies:
   flutter_test:
