@@ -23,6 +23,11 @@ class NightHub extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Welcome Screen',
+        theme: ThemeData(
+            scaffoldBackgroundColor: Colors.black12,
+            iconTheme: IconThemeData(color: Colors.amber),
+            textTheme: TextTheme(bodyText1: TextStyle(), bodyText2: TextStyle()).apply(bodyColor: Colors.white, displayColor: Colors.white)
+        ),
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
           //! CHANGED: BEFORE -> const AuthFlowScreens()

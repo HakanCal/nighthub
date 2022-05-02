@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import 'discover/discover.dart';
 import 'navbar.dart';
 import 'radar/radar.dart';
 import 'settings/settings.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({ Key? key}) : super(key: key);
@@ -35,7 +33,7 @@ class _HomePage extends State<HomePage> {
     //Near me
     //Setting
     const Discover(), //TODO: What we want in the screens
-    const Radar(),
+    Radar(),
     const AppSettings(userData: {}, profilePicture: null)
   ];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
@@ -61,7 +59,7 @@ class _HomePage extends State<HomePage> {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
     _counterSubscription = realtimeDatabase.child('user_accounts/$userId/').onValue.listen((event) async {
-      final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+      final data = Map<String, dynamic>.from(event.snapshot.value! as dynamic);
       setState(() {
         _accountData = data;
       });
@@ -86,7 +84,7 @@ class _HomePage extends State<HomePage> {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
               const Discover(), //TODO: What we want in the screens
-              const Radar(),
+              Radar(),
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -99,7 +97,7 @@ class _HomePage extends State<HomePage> {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
             const Discover(), //TODO: What we want in the screens
-            const Radar(),
+            Radar(),
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });

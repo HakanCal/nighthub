@@ -26,7 +26,7 @@ class RadarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () => {print(name)}, //go to shop page
+        onTap: () => {Navigator.push(context, MaterialPageRoute(builder: ))}, //go to shop page
         child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
             height: 120,
