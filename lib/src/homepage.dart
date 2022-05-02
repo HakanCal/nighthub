@@ -4,16 +4,17 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nighthub/src/discover/editEntityPage.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-import 'auth/authState.dart';
 import 'discover/discover.dart';
 import 'navbar.dart';
 import 'radar/radar.dart';
 import 'settings/settings.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({ Key? key}) : super(key: key);
@@ -38,7 +39,6 @@ class _HomePage extends State<HomePage> {
   ];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
-
   @override
   void initState() {
     super.initState();
@@ -59,7 +59,7 @@ class _HomePage extends State<HomePage> {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
     _counterSubscription = realtimeDatabase.child('user_accounts/$userId/').onValue.listen((event) async {
-      final data = Map<String, dynamic>.from(event.snapshot.value! as dynamic);
+      final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
       setState(() {
         _accountData = data;
       });
@@ -79,7 +79,7 @@ class _HomePage extends State<HomePage> {
         try {
           tempFile.create(recursive: true);
           await firebase_storage.FirebaseStorage.instance.ref(
-              '/profile_pictures/$imageName').writeToFile(tempFile);
+            '/profile_pictures/$imageName').writeToFile(tempFile);
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
@@ -107,9 +107,6 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-
     void _onItemTap(int index){
       setState(() => {_selectedIndex = index});
     }
@@ -117,47 +114,48 @@ class _HomePage extends State<HomePage> {
     return FutureBuilder<dynamic>(
         future: _future,
         builder: (context, snapshot) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: Colors.black,
-                automaticallyImplyLeading: false,
-                title: const Text('Home Page'),
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/nighthub.png'),
-                ),
-              ),
-              body: arguments['isBusinessAccount'] ?
-
-              ///TODO: Here is where the different screens should be put: user account or business account
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Provider.of<AuthState>(context, listen: false).logOut();
-                    Navigator.pushNamed(context, '/');
-                  },
-                  child: menuSelects[_selectedIndex],
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 20),
-                      textStyle: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold
-                      )
+          if (snapshot.connectionState == ConnectionState.done) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: Scaffold(
+                appBar: AppBar(
+                  centerTitle: true,
+                  backgroundColor: Colors.black,
+                  automaticallyImplyLeading: false,
+                  title: const Text('nightHub'),
+                  leading: IconButton(
+                    onPressed: () {},
+                    icon: Image.asset('assets/nighthub.png'),
                   ),
                 ),
-              ) : Center(
-                  child: menuSelects[_selectedIndex]
+                body: Center(
+                  child: menuSelects.isNotEmpty
+                      ? menuSelects[_selectedIndex]
+                      : null
+                ),
+                bottomNavigationBar: NavBar(
+                  selectedIndex: _selectedIndex,
+                  onItemTap: _onItemTap,
+                  isBusinessAccount: accountData!['business'] == true
+                    ? true
+                    : false
+                ),
               ),
-              bottomNavigationBar: NavBar(
-                  selectedIndex: _selectedIndex, onItemTap: _onItemTap
-              ),
-            ),
-          );
+            );
+          } else {
+            return Container(
+                color: Colors.black,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
+                    const SpinKitFadingCircle(
+                      color: Colors.orange,
+                      size: 60,
+                    ) ,
+                  ],
+                ));
+          }
         }
     );
   }

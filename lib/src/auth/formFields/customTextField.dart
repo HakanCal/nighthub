@@ -66,7 +66,7 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         suffixIcon: iconWidget != null ? Padding(
-          padding: const EdgeInsets.only(left: 0, right:10),
+          padding: const EdgeInsets.only(left: 0, right: 10),
           child: iconWidget
         ) : null,
       ),
