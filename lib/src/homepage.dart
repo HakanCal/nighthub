@@ -63,8 +63,8 @@ class _HomePage extends State<HomePage> {
 
   /// Preloads the profile picture from Firebase Storage
   Future<dynamic> getImageFile() async {
-    if (accountData!.isNotEmpty) {
-      String imageName = accountData!['profile_picture'];
+  if (accountData!.isNotEmpty) {
+  String imageName = accountData!['profile_picture'];
       final tempDir = await getTemporaryDirectory();
       final File tempFile = File('${tempDir.path}/$imageName');
 
@@ -77,7 +77,7 @@ class _HomePage extends State<HomePage> {
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
-              const Discover(),
+              Discover(userData: accountData!),
               accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
@@ -90,7 +90,7 @@ class _HomePage extends State<HomePage> {
         setState(() {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
-            const Discover(),
+            Discover(userData: accountData!),
             accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];

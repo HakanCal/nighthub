@@ -20,10 +20,17 @@ class _NavBar extends State<NavBar> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
+
+        widget.isBusinessAccount ?
         const BottomNavigationBarItem(
+            icon: Icon(Icons.remove_red_eye, color: Colors.orangeAccent),
+            label: 'Preview',
+            tooltip: 'Preview of your Bar'
+        ) : const BottomNavigationBarItem(
             icon: Icon(Icons.bolt_outlined, color: Colors.orangeAccent),
             label: 'Discover',
             tooltip: 'Discover local Bars!'),
+
         widget.isBusinessAccount == true ?
           const BottomNavigationBarItem(
               icon: Icon(Icons.pentagon_outlined, color: Colors.orangeAccent),
@@ -33,6 +40,7 @@ class _NavBar extends State<NavBar> {
               icon: Icon(Icons.pin_drop_rounded, color: Colors.orangeAccent),
               label: 'Near me',
               tooltip: 'Local Bars near me'),
+
         const BottomNavigationBarItem(
             icon: Icon(Icons.settings, color: Colors.orangeAccent),
             label: 'Settings',
