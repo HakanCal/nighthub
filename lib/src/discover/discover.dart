@@ -3,12 +3,20 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nighthub/src/discover/entityPage.dart';
 import './swipeCard.dart';
 
 import 'entity.dart';
 
 class Discover extends StatefulWidget {
-  const Discover({Key? key}) : super(key: key);
+
+  const Discover({
+    Key? key,
+    required this.userData
+  }) : super(key: key);
+
+  final Map<String, dynamic> userData;
+
 
   @override
   State<StatefulWidget> createState() => _Discover();
@@ -29,12 +37,18 @@ class _Discover extends State<Discover> {
   Offset get position => _position;
   double get angle => _angle;
 
+  bool get isBusiness => widget.userData['business'];
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      initLazyLoader();
-      Future.delayed(const Duration(milliseconds: 500), () {
+      if (!isBusiness) {
+        initLazyLoader();
+      } else {
+        getBusinessData();
+      }
+      Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
           loading = false;
         });
@@ -42,6 +56,48 @@ class _Discover extends State<Discover> {
     });
   }
 
+  //Load user Data
+  Future<void> getBusinessData() async {
+    final size = MediaQuery.of(context).size;
+    setScreenSize(size);
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    realtimeDatabase.child('user_accounts/$userId/').onValue.listen((event) async {
+
+      final value = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+      final businessPictures = await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('business_pictures/${value['userId']}').listAll();
+
+      if (businessPictures.items.isNotEmpty) {
+        await businessPictures.items.last.getDownloadURL().then((value) {
+          setState(() {
+            primaryImageUrl = value.toString();
+          });
+        });
+      }
+      setState(() {
+        entities.add(
+          Entity(
+            userId: value['userId'],
+            isBusiness: value['business'],
+            username: value['username'],
+            address: value['address'],
+            distance: 1.6,
+            tags: getUserInterests(value['interests']),
+            about: value['about'],
+            primaryImage: NetworkImage(primaryImageUrl),
+            /*images: [
+                NetworkImage(images![images!.length - 2]),
+              ],*/
+          )
+        );
+      });
+    });
+  }
+
+  //Lazy loader
   Future<void> initLazyLoader() async {
     final size = MediaQuery.of(context).size;
     setScreenSize(size);
@@ -77,6 +133,7 @@ class _Discover extends State<Discover> {
                   entities.add(
                       Entity(
                         userId: value['userId'],
+                        isBusiness: value['business'],
                         username: value['username'],
                         address: value['address'],
                         distance: 1.6,
@@ -217,7 +274,7 @@ class _Discover extends State<Discover> {
             size: 60,
           ) ,
         ],
-      )) : Container(
+      )) : !isBusiness ? Container(
       color: const Color(0xFF262626),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -293,6 +350,8 @@ class _Discover extends State<Discover> {
           )
         ],
       ),
+    ) : EntityPage(
+        entity: entities[0]
     );
   }
 }

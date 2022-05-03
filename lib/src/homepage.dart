@@ -77,7 +77,7 @@ class _HomePage extends State<HomePage> {
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
-              const Discover(),
+              Discover(userData: accountData!),
               accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
@@ -90,7 +90,7 @@ class _HomePage extends State<HomePage> {
         setState(() {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
-            const Discover(),
+            Discover(userData: accountData!),
             accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];

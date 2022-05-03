@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import 'package:nighthub/src/settings/settings.dart';
-import '../dialogs/customFadingDialog.dart';
+import '../dialogs/customFadingPopup.dart';
 
 
 class EditProfile extends StatefulWidget {
