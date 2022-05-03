@@ -55,7 +55,7 @@ class _Radar extends State<Radar> {
 
   // Filter variables
   List<RadarItem> _shownList = [];
-  List<String> _interests = ["latin"];
+  List<String> _interests = [];
   double _ratingFilterValue = 0;
   double _userRadius = 100.0;
 
@@ -180,21 +180,23 @@ class _Radar extends State<Radar> {
     print("Filtering by distance");
     List<RadarItem> filteredList = distanceFilter(completeList);
     print(filteredList);
-    // print("Filtering by category / interest");
-    //filteredList = interestFilter(filteredList);
-    //print(filteredList);
+    print("Filtering by category / interest");
+    filteredList = interestFilter(filteredList);
+    print(filteredList);
     return filteredList;
   }
-  //TODO CATEGORIES IS DYNAMIC LIST TYPE THIS CHECK DOES NOT WORK AND RETURN EMPTY ARRAY
+
   List<RadarItem> interestFilter( List<RadarItem> shownList) {
     List<RadarItem> filteredList = shownList;
     if (_interests.isNotEmpty) {
-      filteredList = [];
+      filteredList = <RadarItem>[];
       for(RadarItem item in shownList){
-        for(String interest in _interests){
-          if(item.categories.contains(interest)){ ///DOES NOT WORK
-            filteredList.add(item);
-          }
+          for(dynamic interest in item.categories){
+            String interestString = interest as String;
+            if(_interests.contains(interestString)) {
+              filteredList.add(item);
+              break;
+            }
         }
       }
     }
