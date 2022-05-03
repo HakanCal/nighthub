@@ -70,8 +70,8 @@ class _HomePage extends State<HomePage> {
 
   /// Preloads the profile picture from Firebase Storage
   Future<dynamic> getImageFile() async {
-  if (accountData!.isNotEmpty) {
-  String imageName = accountData!['profile_picture'];
+    if (accountData!.isNotEmpty) {
+      String imageName = accountData!['profile_picture'];
       final tempDir = await getTemporaryDirectory();
       final File tempFile = File('${tempDir.path}/$imageName');
 
@@ -80,12 +80,12 @@ class _HomePage extends State<HomePage> {
         try {
           tempFile.create(recursive: true);
           await firebase_storage.FirebaseStorage.instance.ref(
-            '/profile_pictures/$imageName').writeToFile(tempFile);
+              '/profile_pictures/$imageName').writeToFile(tempFile);
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
               Discover(isBusiness: accountData!['business']),
-              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(),
+              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : Radar(),
               const Favorites(),
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
@@ -99,7 +99,7 @@ class _HomePage extends State<HomePage> {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
             Discover(isBusiness: accountData!['business']),
-            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
+            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : Radar(), //TODO: FAVORITES
             const Favorites(),
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
@@ -132,16 +132,16 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
                 body: Center(
-                  child: menuSelects.isNotEmpty
-                      ? menuSelects[_selectedIndex]
-                      : null
+                    child: menuSelects.isNotEmpty
+                        ? menuSelects[_selectedIndex]
+                        : null
                 ),
                 bottomNavigationBar: NavBar(
-                  selectedIndex: _selectedIndex,
-                  onItemTap: _onItemTap,
-                  isBusinessAccount: accountData!['business'] == true
-                    ? true
-                    : false
+                    selectedIndex: _selectedIndex,
+                    onItemTap: _onItemTap,
+                    isBusinessAccount: accountData!['business'] == true
+                        ? true
+                        : false
                 ),
               ),
             );
