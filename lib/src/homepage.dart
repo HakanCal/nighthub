@@ -30,8 +30,14 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic>? _accountData = <String, dynamic>{};
   Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
-
-  late List <Widget> menuSelects = <Widget>[];
+  List <Widget> menuSelects = <Widget>[
+    //Swiper
+    //Near me
+    //Setting
+    const Discover(), //TODO: What we want in the screens
+    Radar(),
+    const AppSettings(userData: {}, profilePicture: null)
+  ];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
   @override
