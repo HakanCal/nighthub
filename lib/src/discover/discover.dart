@@ -187,7 +187,11 @@ class _Discover extends State<Discover> {
     const delta = 100;
 
     if (x >= delta) {
+      final Entity ent = entities.last;
       like();
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => EntityPage(entity: ent))
+      );
     } else if (x <= -delta) {
       dislike();
     } else if (y <= -delta / 2) {

@@ -42,27 +42,19 @@ class _EntityPage extends State<EntityPage> {
   }
 
   Future<void> loadCarouselPics() async {
-    realtimeDatabase.child('user_accounts/').orderByKey().limitToFirst(30).get().then((snapshot) {
-      Map<dynamic, dynamic> users = snapshot.value as Map;
-      users.forEach((key, value) async {
-        if(value['business'] == true) {
-          final businessPictures = await firebase_storage.FirebaseStorage
-              .instance
-              .ref()
-              .child('business_pictures/${value['userId']}').listAll();
-          if (businessPictures.items.isNotEmpty) {
-
-            for (var element in businessPictures.items) {
-              await element.getDownloadURL().then((value) {
-                setState(() {
-                  images.add(NetworkImage(value.toString()));
-                });
-              });
-            }
-          }
-        }
-      });
-    });
+    final businessPictures = await firebase_storage.FirebaseStorage
+        .instance
+        .ref()
+        .child('business_pictures/${widget.entity.userId}').listAll();
+    if (businessPictures.items.isNotEmpty) {
+      for (var element in businessPictures.items) {
+        await element.getDownloadURL().then((value) {
+          setState(() {
+            images.add(NetworkImage(value.toString()));
+          });
+        });
+      }
+    }
   }
 
 
