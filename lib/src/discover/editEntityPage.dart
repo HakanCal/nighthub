@@ -8,9 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:nighthub/src/discover/discover.dart';
-import 'package:nighthub/src/discover/entityPage.dart';
-import 'package:provider/provider.dart';
 
 import '../auth/formFields/index.dart';
 import '../dialogs/customFadingPopup.dart';

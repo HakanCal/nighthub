@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -152,12 +149,11 @@ class _EntityPage extends State<EntityPage> {
                 image: images[index]
               ),
             ),
-            //child: Image.asset(File(images[index]).path, fit: BoxFit.cover)
         );
       },
       index: 0,
       scrollDirection: Axis.horizontal,
-      itemCount: images.length, //widget.entity.images.length,
+      itemCount: images.length,
       autoplay: false,
       pagination: const SwiperPagination(),
       control: const SwiperControl(

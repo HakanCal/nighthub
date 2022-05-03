@@ -53,7 +53,7 @@ class _Discover extends State<Discover> {
     });
   }
 
-  //Load user Data
+  /// Load user Data
   Future<void> getBusinessData() async {
 
     final size = MediaQuery.of(context).size;
@@ -79,23 +79,20 @@ class _Discover extends State<Discover> {
         entities.add(
           Entity(
             userId: value['userId'],
-            isBusiness: value['business'],
+            isBusiness: true,
             username: value['username'],
             address: value['address'],
             distance: 1.6,
             tags: getUserInterests(value['interests']),
             about: value['about'],
-            primaryImage: NetworkImage(primaryImageUrl),
-            /*images: [
-                NetworkImage(images![images!.length - 2]),
-              ],*/
+            primaryImage: NetworkImage(primaryImageUrl)
           )
         );
       });
     });
   }
 
-  //Lazy loader
+  ///Lazy loader
   Future<void> initLazyLoader() async {
 
     final size = MediaQuery.of(context).size;
@@ -132,31 +129,19 @@ class _Discover extends State<Discover> {
                   entities.add(
                       Entity(
                         userId: value['userId'],
-                        isBusiness: value['business'],
+                        isBusiness: true,
                         username: value['username'],
                         address: value['address'],
                         distance: 1.6,
                         tags: getUserInterests(value['interests']),
                         about: value['about'],
-                        primaryImage: NetworkImage(primaryImageUrl),
-                        /*images: [
-                            NetworkImage(images![images!.length - 2]),
-                          ],*/
+                        primaryImage: NetworkImage(primaryImageUrl)
                       )
                   );
                 });
               }
             });
           }
-
-          /*for (var element in businessPictures.items) {
-            print(businessPictures.items.last);
-            await element.last.getDownloadURL().then((value) {
-              setState(() {
-                images?.add(value.toString());
-              });
-            });
-          }*/
         }
       });
     });
@@ -300,7 +285,6 @@ class _Discover extends State<Discover> {
               flex: 13,
               child: Container(
                 decoration: const BoxDecoration(
-                  //color: Color(0x8c8c8c8c),
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 alignment: Alignment.center,
