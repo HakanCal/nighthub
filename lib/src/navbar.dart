@@ -22,15 +22,14 @@ class _NavBar extends State<NavBar> {
       items: <BottomNavigationBarItem>[
 
         widget.isBusinessAccount ?
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.bolt_outlined, color: Colors.orangeAccent),
-              label: 'Discover',
-              tooltip: 'Discover local Bars!') :
-          const BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.remove_red_eye, color: Colors.orangeAccent),
             label: 'Preview',
             tooltip: 'Preview of your Bar'
-          ),
+        ) : const BottomNavigationBarItem(
+            icon: Icon(Icons.bolt_outlined, color: Colors.orangeAccent),
+            label: 'Discover',
+            tooltip: 'Discover local Bars!'),
 
         widget.isBusinessAccount == true ?
           const BottomNavigationBarItem(
