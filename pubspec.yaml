@@ -32,8 +32,8 @@ dependencies:
 
   cloud_firestore: ^3.1.10
   firebase_auth: ^3.3.11
+  firebase_core: ^1.0.3
   firebase_storage: ^10.2.9
-  firebase_database: ^9.0.9
   provider: ^6.0.2
   path_provider: ^2.0.9
   image_picker: ^0.8.4+11
@@ -51,6 +51,9 @@ dependencies:
   google_fonts: ^2.3.1
   geolocator: ^8.2.0
   geoflutterfire: ^3.0.3
+  firebase_database: ^9.0.10
+  firebase: ^9.0.2
+  multiselect: ^0.0.4
 
 dev_dependencies:
   flutter_test:

@@ -12,11 +12,10 @@ class Discover extends StatefulWidget {
 
   const Discover({
     Key? key,
-    required this.userData
+    required this.isBusiness,
   }) : super(key: key);
 
-  final Map<String, dynamic> userData;
-
+  final bool isBusiness;
 
   @override
   State<StatefulWidget> createState() => _Discover();
@@ -37,17 +36,14 @@ class _Discover extends State<Discover> {
   Offset get position => _position;
   double get angle => _angle;
 
-  bool get isBusiness => widget.userData['business'];
-
   @override
   void initState() {
     super.initState();
-    print('Initializing Discover...');
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      if (!isBusiness) {
-        initLazyLoader();
-      } else {
+      if (widget.isBusiness) {
         getBusinessData();
+      } else {
+        initLazyLoader();
       }
       Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
@@ -59,6 +55,7 @@ class _Discover extends State<Discover> {
 
   //Load user Data
   Future<void> getBusinessData() async {
+
     final size = MediaQuery.of(context).size;
     setScreenSize(size);
 
@@ -100,6 +97,7 @@ class _Discover extends State<Discover> {
 
   //Lazy loader
   Future<void> initLazyLoader() async {
+
     final size = MediaQuery.of(context).size;
     setScreenSize(size);
 
@@ -189,7 +187,11 @@ class _Discover extends State<Discover> {
     const delta = 100;
 
     if (x >= delta) {
+      final Entity ent = entities.last;
       like();
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => EntityPage(entity: ent))
+      );
     } else if (x <= -delta) {
       dislike();
     } else if (y <= -delta / 2) {
@@ -256,10 +258,6 @@ class _Discover extends State<Discover> {
     return list;
   }
 
-  void lazyLoad() {
-    //TODO: Add 1 Entity at the End of the List
-  }
-
   @override
   Widget build(BuildContext context) {
     const double iconSize = 50;
@@ -275,7 +273,7 @@ class _Discover extends State<Discover> {
             size: 60,
           ) ,
         ],
-      )) : !isBusiness ? Container(
+      )) : !widget.isBusiness ? Container(
       color: const Color(0xFF262626),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -315,19 +313,6 @@ class _Discover extends State<Discover> {
                         color: Colors.red,
                         onPressed: () {
                           dislike();
-                          lazyLoad();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(Icons.keyboard_return_rounded),
-                        iconSize: 35,
-                        color: true ? Colors.grey : Colors.yellow[600],
-                        //TODO: DO THIS!!!!
-                        onPressed: () {
-                          //TODO: return to last Club
-                          //TODO: start grey, get yellow when rollback is avaliable
                         },
                       ),
                     ),
@@ -337,11 +322,11 @@ class _Discover extends State<Discover> {
                         iconSize: iconSize,
                         color: Colors.green,
                         onPressed: () {
+                          final Entity ent = entities.last;
                           like();
-                          lazyLoad();
-                          //Navigator.push(context, MaterialPageRoute(
-                          // builder: (context) => EntityPage(entity: )) //TODO: with the userId or so, get the other images later
-                          //);
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => EntityPage(entity: ent))
+                          );
                         },
                       ),
                     )

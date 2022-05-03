@@ -21,7 +21,7 @@ class _NavBar extends State<NavBar> {
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
 
-        widget.isBusinessAccount ?
+        widget.isBusinessAccount == true ?
         const BottomNavigationBarItem(
             icon: Icon(Icons.remove_red_eye, color: Colors.orangeAccent),
             label: 'Preview',
@@ -37,9 +37,14 @@ class _NavBar extends State<NavBar> {
               label: 'Page settings',
               tooltip: 'Page settings') :
           const BottomNavigationBarItem(
-              icon: Icon(Icons.pin_drop_rounded, color: Colors.orangeAccent),
+              icon: Icon(Icons.location_on, color: Colors.orangeAccent),
               label: 'Near me',
               tooltip: 'Local Bars near me'),
+
+        const BottomNavigationBarItem(
+            icon: Icon(Icons.turned_in_outlined, color: Colors.orangeAccent),
+            label: 'Favorites',
+            tooltip: 'favorites'),
 
         const BottomNavigationBarItem(
             icon: Icon(Icons.settings, color: Colors.orangeAccent),
@@ -51,6 +56,7 @@ class _NavBar extends State<NavBar> {
       currentIndex: widget.selectedIndex,
       onTap: widget.onItemTap,
       showSelectedLabels: false,
+      type: BottomNavigationBarType.fixed
     );
   }
 }
