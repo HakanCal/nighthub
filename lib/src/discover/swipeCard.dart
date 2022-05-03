@@ -1,21 +1,32 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+
 import 'package:nighthub/src/auth/formFields/customChipList.dart';
-import 'package:provider/provider.dart';
+import 'entity.dart';
 
 class SwipeCard extends StatefulWidget {
-
-  final String imageUrl;
-  final List<String> tags;
-  final bool isFront;
-
   const SwipeCard({
     Key? key,
-    required this.imageUrl,
+    required this.entity,
     required this.isFront,
-    required this.tags,
+    required this.setScreenSize,
+    required this.position,
+    required this.isDragging,
+    required this.angle,
+    required this.startPosition,
+    required this.updatePosition,
+    required this.endPosition,
   }) : super(key: key);
+
+  final Entity entity;
+  final bool isFront;
+  final Function(Size size) setScreenSize;
+  final Offset position;
+  final bool isDragging;
+  final double angle;
+  final void Function(DragStartDetails details) startPosition;
+  final void Function(DragUpdateDetails details) updatePosition;
+  final void Function() endPosition;
 
   @override
   State<StatefulWidget> createState() => _SwipeCard();
@@ -27,8 +38,7 @@ class _SwipeCard extends State<SwipeCard> {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       final size = MediaQuery.of(context).size;
-      final provider = Provider.of<CardProvider>(context, listen: false);
-      provider.setScreenSize(size);
+      widget.setScreenSize(size);
     });
   }
 
@@ -38,13 +48,12 @@ class _SwipeCard extends State<SwipeCard> {
   Widget buildFrontCard() => GestureDetector(
     child: LayoutBuilder(
       builder: (context, constraints) {
-        final provider = Provider.of<CardProvider>(context, listen: true);
-        final position = provider.position;
-        final ms = provider.isDragging ? 0 : 400;
+        final position = widget.position;
+        final ms = widget.isDragging ? 0 : 400;
 
         final center = constraints.smallest.center(Offset.zero);
 
-        final angle = provider.angle * pi / 180;
+        final angle = widget.angle * pi / 180;
         final rotatedMatrix = Matrix4.identity()
           ..translate(center.dx, center.dy)
           ..rotateZ(angle)
@@ -59,32 +68,33 @@ class _SwipeCard extends State<SwipeCard> {
       },
     ),
     onPanStart: (details) {
-      final provider = Provider.of<CardProvider>(context, listen: false);
-      provider.startPosition(details);
+      widget.startPosition(details);
     },
     onPanUpdate: (details) {
-      final provider = Provider.of<CardProvider>(context, listen: false);
-      provider.updatePosition(details);
+      widget.updatePosition(details);
     },
     onPanEnd: (details) {
-      final provider = Provider.of<CardProvider>(context, listen: false);
-      provider.endPosition();
+      widget.endPosition();
     },
   );
 
   Widget buildCard() => ClipRRect(
     child: Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       margin: const EdgeInsets.fromLTRB(2, 10, 2, 0),
       decoration: BoxDecoration(
         color: const Color(0x8c8c8c8c),
         borderRadius: const BorderRadius.all(Radius.circular(5)),
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: AssetImage(widget.imageUrl),
+          image: widget.entity.primaryImage,
         ),
       ),
       child: Container(
-        padding: const EdgeInsets.all(45.00),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
         child: Column(
           children: [
             const Spacer(),
@@ -97,76 +107,26 @@ class _SwipeCard extends State<SwipeCard> {
 
   Widget buildName() => Column(
     children: [
-      const Text(
-        'Clubname', //TODO: Insert Clubname
-        style: TextStyle(
+      Text(
+        widget.entity.username,
+        style: const TextStyle(
           fontSize: 32,
           color: Colors.white,
-          fontWeight: FontWeight.bold
+          fontWeight: FontWeight.bold,
+          shadows: [Shadow(color: Colors.black, offset: Offset(0, 2), blurRadius: 5)],
         ),
+        textAlign: TextAlign.center,
       ),
-      const Padding(padding: EdgeInsets.only(bottom: 5.00)),
+      const Padding(padding: EdgeInsets.only(bottom: 5)),
       CustomChipList(
-        values: widget.tags,
+        values: widget.entity.tags,
         chipBuilder: (String value) {
-          return Chip(label: Text(value));
+          return Chip(
+            label: Text(value),
+            shadowColor: Colors.black54,
+          );
         },
       ),
     ],
   );
-
-}
-
-class CardProvider extends ChangeNotifier {
-  List<String> _images = [];
-
-  bool _isDragging = false;
-  Offset _position = Offset.zero;
-  Size _screenSize = Size.zero;
-  double _angle = 0.00;
-
-  List<String> get images => _images;
-  bool get isDragging => _isDragging;
-  Offset get position => _position;
-  double get angle => _angle;
-
-  CardProvider() {
-    resetEntities();
-  }
-
-  void setScreenSize(Size screenSize) => _screenSize = screenSize;
-
-  void startPosition(DragStartDetails details) {
-    _isDragging = true;
-    notifyListeners();
-  }
-
-  void updatePosition(DragUpdateDetails details) {
-    _position += details.delta;
-    final x = _position.dx;
-    _angle = 35 * x / _screenSize.width;
-    notifyListeners();
-  }
-
-  void endPosition() {
-    resetPosition();
-  }
-
-  void resetPosition() {
-    _isDragging = false;
-    _position = Offset.zero;
-    _angle = 0.00;
-    notifyListeners();
-  }
-
-  void resetEntities() {
-    _images = <String>[
-      'assets/dummy-club.png',
-      'assets/user_image.png',
-      'assets/app-logo.png',
-      'assets/dance-club.gif'
-    ].reversed.toList();
-    notifyListeners();
-  }
-
 }

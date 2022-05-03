@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import './settings.dart';
-import '../dialogs/customFadingDialog.dart';
+import '../dialogs/customFadingPopup.dart';
 
 
 class EditBusinessProfile extends StatefulWidget {
@@ -41,7 +41,6 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
   final _streetController = TextEditingController();
   final _postCodeController = TextEditingController();
   final _countryController = TextEditingController();
-  final _aboutController = TextEditingController();
 
   final imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
@@ -540,7 +539,7 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                       ),
                                       textInputAction: TextInputAction.done,
                                       onFieldSubmitted: (_) =>
-                                          FocusScope.of(context).unfocus(),
+                                        FocusScope.of(context).unfocus(),
                                     ),
                                   ),
                                 ]
@@ -567,7 +566,7 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
                                     _countryController.text,
                                     _profilePicture,
                                     _interests,
-                                        () => toggleLoader()
+                                    () => toggleLoader()
                                 );
                               }
                             },

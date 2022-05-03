@@ -20,7 +20,6 @@ class AppSettings extends StatefulWidget {
 }
 
 class _AppSettings extends State<AppSettings> {
-
   double marginCards = 5;
   List<dynamic> interests = [];
 

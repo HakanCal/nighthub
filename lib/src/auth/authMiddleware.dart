@@ -174,7 +174,7 @@ class _AuthMiddleware extends State<AuthMiddleware> {
       default:
         return Row(
           children: const [
-            Text("Internal error, something went wrong"),
+            Text('Internal error, something went wrong'),
           ],
         );
     }

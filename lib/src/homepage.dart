@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nighthub/src/discover/editEntityPage.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
@@ -31,7 +32,6 @@ class _HomePage extends State<HomePage> {
 
   late List <Widget> menuSelects = <Widget>[];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
-
 
   @override
   void initState() {
@@ -73,12 +73,12 @@ class _HomePage extends State<HomePage> {
         try {
           tempFile.create(recursive: true);
           await firebase_storage.FirebaseStorage.instance.ref(
-              '/profile_pictures/$imageName').writeToFile(tempFile);
+            '/profile_pictures/$imageName').writeToFile(tempFile);
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
-              const Discover(), //TODO: What we want in the screens
-              const Radar(), //TODO: FAVORITES
+              Discover(userData: accountData!),
+              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -90,7 +90,7 @@ class _HomePage extends State<HomePage> {
         setState(() {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
-            const Discover(), //TODO: What we want in the screens
+            Discover(userData: accountData!),
             accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
@@ -108,34 +108,48 @@ class _HomePage extends State<HomePage> {
     return FutureBuilder<dynamic>(
         future: _future,
         builder: (context, snapshot) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: Colors.black,
-                automaticallyImplyLeading: false,
-                title: const Text('nightHub'),
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/nighthub.png'),
+          if (snapshot.connectionState == ConnectionState.done) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: Scaffold(
+                appBar: AppBar(
+                  centerTitle: true,
+                  backgroundColor: Colors.black,
+                  automaticallyImplyLeading: false,
+                  title: const Text('nightHub'),
+                  leading: IconButton(
+                    onPressed: () {},
+                    icon: Image.asset('assets/nighthub.png'),
+                  ),
+                ),
+                body: Center(
+                  child: menuSelects.isNotEmpty
+                      ? menuSelects[_selectedIndex]
+                      : null
+                ),
+                bottomNavigationBar: NavBar(
+                  selectedIndex: _selectedIndex,
+                  onItemTap: _onItemTap,
+                  isBusinessAccount: accountData!['business'] == true
+                    ? true
+                    : false
                 ),
               ),
-              body: accountData!['business'] == true ?
-
-              ///TODO: Here is where the different screens should be put: user account or business account
-              Center(
-                child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null ///TODO: screens business account
-              ) : Center(
-                child: menuSelects.isNotEmpty ?  menuSelects[_selectedIndex] : null ///TODO: screens user account
-              ),
-              bottomNavigationBar: NavBar(
-                selectedIndex: _selectedIndex,
-                onItemTap: _onItemTap,
-                isBusinessAccount: accountData!['business'] == true ? true : false
-              ),
-            ),
-          );
+            );
+          } else {
+            return Container(
+                color: Colors.black,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
+                    const SpinKitFadingCircle(
+                      color: Colors.orange,
+                      size: 60,
+                    ) ,
+                  ],
+                ));
+          }
         }
     );
   }

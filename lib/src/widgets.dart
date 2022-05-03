@@ -45,8 +45,8 @@ class IconAndDetail extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
             detail,
-            style: const TextStyle(fontSize: 18),
-          )
+          style: const TextStyle(fontSize: 18),
+        )
       ],
     ),
   );

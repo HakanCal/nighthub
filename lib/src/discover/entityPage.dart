@@ -1,28 +1,18 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 import '../auth/formFields/customChipList.dart';
+import 'entity.dart';
 
 class EntityPage extends StatefulWidget {
-
   const EntityPage({
     Key? key,
-    required this.entityName,
-    required this.address,
-    required this.distance,
-    required this.tags,
-    required this.about
-
+    required this.entity
   }) : super(key: key);
 
-  final String entityName;
-  final String address;
-  final double distance;
-  final List<String> tags;
-  final String about;
+  final Entity entity;
 
   @override
   State<StatefulWidget> createState() => _EntityPage();
@@ -30,17 +20,11 @@ class EntityPage extends StatefulWidget {
 
 class _EntityPage extends State<EntityPage> {
 
-  Widget separationLine() => Container(
-    height: 2,
-    width: MediaQuery.of(context).size.width,
-    color: const Color(0xFF2F2F2F),
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF262626),
-      appBar: AppBar(
+      appBar: !widget.entity.isBusiness ? AppBar(
         backgroundColor: Colors.black,
         title: const Text(''),
         automaticallyImplyLeading: true,
@@ -50,7 +34,7 @@ class _EntityPage extends State<EntityPage> {
             Navigator.pop(context);
           },
         ),
-      ),
+      ) : null,
       body: ListView(
         controller: ScrollController(),
         addAutomaticKeepAlives: true,
@@ -78,7 +62,7 @@ class _EntityPage extends State<EntityPage> {
                   separationLine(),
                   const Padding(padding: EdgeInsets.only(top: 15)),
                   CustomChipList(
-                    values: widget.tags,
+                    values: widget.entity.tags,
                     chipBuilder: (String value) {
                       return Chip(label: Text(value));
                     },
@@ -87,10 +71,10 @@ class _EntityPage extends State<EntityPage> {
                   separationLine(),
                   const Padding(padding: EdgeInsets.only(top: 15)),
                   Text(
-                    widget.about,
+                    widget.entity.about,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20.00
+                      fontSize: 20
                     ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 50)),
@@ -103,8 +87,6 @@ class _EntityPage extends State<EntityPage> {
     );
   }
 
-  final List<File> images = [File('assets/dance-club.gif'), File('assets/nighthub.png'), File('assets/dummy-profile-pic.jpg')];
-
   Widget pictureSwiper() => Container(
     width: MediaQuery.of(context).size.height * 0.7,
     height: MediaQuery.of(context).size.width * 1,
@@ -114,11 +96,11 @@ class _EntityPage extends State<EntityPage> {
     child: Swiper(
       itemBuilder: (BuildContext context, int index) {
         return Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage(images[index].path),
+                image: NetworkImage('') //TODO: widget.entity.images[index],
               ),
             ),
             //child: Image.asset(File(images[index]).path, fit: BoxFit.cover)
@@ -126,7 +108,7 @@ class _EntityPage extends State<EntityPage> {
       },
       index: 0,
       scrollDirection: Axis.horizontal,
-      itemCount: images.length,
+      itemCount: 0, //widget.entity.images.length,
       autoplay: false,
       pagination: const SwiperPagination(),
       control: const SwiperControl(
@@ -138,10 +120,10 @@ class _EntityPage extends State<EntityPage> {
   Widget entityName() => Container(
     alignment: Alignment.bottomLeft,
     child: Text(
-      widget.entityName,
+      widget.entity.username,
       style: const TextStyle(
         color: Colors.white,
-        fontSize: 33.00,
+        fontSize: 33,
         fontWeight: FontWeight.bold,
       ),
     ),
@@ -153,7 +135,7 @@ class _EntityPage extends State<EntityPage> {
       const Padding(padding: EdgeInsets.only(right: 10)),
       Flexible(
         child: Text(
-          widget.address,
+          widget.entity.address,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -169,7 +151,7 @@ class _EntityPage extends State<EntityPage> {
       const Padding(padding: EdgeInsets.only(right: 10)),
       Flexible(
         child: Text(
-          '${widget.distance} km',
+          '${widget.entity.distance} km',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -177,6 +159,12 @@ class _EntityPage extends State<EntityPage> {
         ),
       )
     ],
+  );
+
+  Widget separationLine() => Container(
+    height: 2,
+    width: MediaQuery.of(context).size.width,
+    color: const Color(0xFF2F2F2F),
   );
 
 }
