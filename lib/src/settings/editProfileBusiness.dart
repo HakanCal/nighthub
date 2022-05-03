@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import '../auth/authState.dart';
 import '../auth/formFields/index.dart';
 import './settings.dart';
-import '../dialogs/customFadingDialog.dart';
+import '../dialogs/customFadingPopup.dart';
 
 
 class EditBusinessProfile extends StatefulWidget {

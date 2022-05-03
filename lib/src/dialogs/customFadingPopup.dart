@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
-class CustomDialog extends StatefulWidget {
+class CustomPopup extends StatefulWidget {
 
   //Widget parameters
-  const CustomDialog({
+  const CustomPopup({
     required this.text,
     required this.iconData,
     required this.startingColor,
@@ -18,10 +17,10 @@ class CustomDialog extends StatefulWidget {
   final Color fadingColor;
 
   @override
-  _CustomDialog createState() => _CustomDialog();
+  _CustomPopup createState() => _CustomPopup();
 }
 
-class _CustomDialog extends State<CustomDialog> {
+class _CustomPopup extends State<CustomPopup> {
 
   bool checkState = false;
 
@@ -60,7 +59,7 @@ void showCustomFadingDialog(BuildContext context, String text, IconData iconData
         Future.delayed(const Duration(milliseconds: 2000), () {
           Navigator.of(context).pop(true);
         });
-        return CustomDialog(text: text, iconData: iconData, startingColor: startingColor, fadingColor: fadingColor);
+        return CustomPopup(text: text, iconData: iconData, startingColor: startingColor, fadingColor: fadingColor);
       }
   );
 }

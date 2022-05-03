@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class Entity {
   final String userId;
+  final bool isBusiness;
   final String username;
   final String address;
   final double distance;
@@ -9,10 +10,10 @@ class Entity {
   final String about;
 
   final NetworkImage primaryImage;
-  //List<NetworkImage>? images;
 
   Entity({
     required this.userId,
+    required this.isBusiness,
     required this.username,
     required this.address,
     required this.distance,

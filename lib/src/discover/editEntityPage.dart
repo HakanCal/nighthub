@@ -13,7 +13,7 @@ import 'package:nighthub/src/discover/entityPage.dart';
 import 'package:provider/provider.dart';
 
 import '../auth/formFields/index.dart';
-import '../dialogs/customFadingDialog.dart';
+import '../dialogs/customFadingPopup.dart';
 
 class EditEntityPage extends StatefulWidget {
   const EditEntityPage({
@@ -30,6 +30,7 @@ class EditEntityPage extends StatefulWidget {
 }
 
 class _EditEntityProfile extends State<EditEntityPage> {
+
   bool imagesLoading = true;
   final _formKey = GlobalKey<FormState>(debugLabel: '_EditEntityPageFormState');
 

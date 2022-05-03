@@ -24,7 +24,7 @@ class _EntityPage extends State<EntityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF262626),
-      appBar: AppBar(
+      appBar: !widget.entity.isBusiness ? AppBar(
         backgroundColor: Colors.black,
         title: const Text(''),
         automaticallyImplyLeading: true,
@@ -34,7 +34,7 @@ class _EntityPage extends State<EntityPage> {
             Navigator.pop(context);
           },
         ),
-      ),
+      ) : null,
       body: ListView(
         controller: ScrollController(),
         addAutomaticKeepAlives: true,
