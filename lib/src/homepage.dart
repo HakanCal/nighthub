@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nighthub/src/discover/editEntityPage.dart';
+import 'package:nighthub/src/favorites/favorites.dart';
 import 'package:nighthub/src/settings/settings.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -83,8 +84,9 @@ class _HomePage extends State<HomePage> {
           setState(() {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
-              Discover(userData: accountData!),
-              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : Radar(), //TODO: FAVORITES
+              Discover(isBusiness: accountData!['business']),
+              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(),
+              const Favorites(),
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -96,8 +98,9 @@ class _HomePage extends State<HomePage> {
         setState(() {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
-            Discover(userData: accountData!),
-            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : Radar(), //TODO: FAVORITES
+            Discover(isBusiness: accountData!['business']),
+            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
+            const Favorites(),
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
@@ -154,7 +157,8 @@ class _HomePage extends State<HomePage> {
                       size: 60,
                     ) ,
                   ],
-                ));
+                )
+            );
           }
         }
     );
