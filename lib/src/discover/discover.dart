@@ -42,6 +42,7 @@ class _Discover extends State<Discover> {
   @override
   void initState() {
     super.initState();
+    print('Initializing Discover...');
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (!isBusiness) {
         initLazyLoader();
