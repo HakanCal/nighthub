@@ -44,7 +44,7 @@ class _Impressum extends State<Impressum> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Center(
+              const Center(
                 child: Icon(
                   Icons.wrap_text,
                   color: Colors.white,
@@ -52,7 +52,7 @@ class _Impressum extends State<Impressum> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.fromLTRB(5.00, 25.00, 5.00, 0.00),
+                margin: const EdgeInsets.fromLTRB(5.00, 25.00, 5.00, 0.00),
                   child: Text(data ?? '<error> please contact an admin', style: const TextStyle(color: Colors.white, fontSize: 20.00),))
             ],
           ),

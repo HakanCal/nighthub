@@ -19,8 +19,7 @@ class Entity {
     required this.distance,
     required this.tags,
     required this.about,
-    required this.primaryImage,
-    //this.images,
+    required this.primaryImage
   });
 
 }

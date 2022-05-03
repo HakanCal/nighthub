@@ -1,6 +1,10 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 import '../auth/formFields/customChipList.dart';
@@ -20,11 +24,64 @@ class EntityPage extends StatefulWidget {
 
 class _EntityPage extends State<EntityPage> {
 
+  final DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
+  List<NetworkImage> images = [];
+
+  bool loading = true;
+
+
+  @override
+  void initState() {
+    super.initState();
+    loadCarouselPics();
+    Future.delayed(const Duration(milliseconds: 700), () {
+      setState(() {
+        loading = false;
+      });
+    });
+  }
+
+  Future<void> loadCarouselPics() async {
+    realtimeDatabase.child('user_accounts/').orderByKey().limitToFirst(30).get().then((snapshot) {
+      Map<dynamic, dynamic> users = snapshot.value as Map;
+      users.forEach((key, value) async {
+        if(value['business'] == true) {
+          final businessPictures = await firebase_storage.FirebaseStorage
+              .instance
+              .ref()
+              .child('business_pictures/${value['userId']}').listAll();
+          if (businessPictures.items.isNotEmpty) {
+
+            for (var element in businessPictures.items) {
+              await element.getDownloadURL().then((value) {
+                setState(() {
+                  images.add(NetworkImage(value.toString()));
+                });
+              });
+            }
+          }
+        }
+      });
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading == true ? Container(
+        color: Colors.black,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
+            const SpinKitFadingCircle(
+              color: Colors.orange,
+              size: 60,
+            ) ,
+          ],
+        )) : Scaffold(
       backgroundColor: const Color(0xFF262626),
-      appBar: !widget.entity.isBusiness ? AppBar(
+      appBar: widget.entity.isBusiness ? AppBar(
         backgroundColor: Colors.black,
         title: const Text(''),
         automaticallyImplyLeading: true,
@@ -96,11 +153,11 @@ class _EntityPage extends State<EntityPage> {
     child: Swiper(
       itemBuilder: (BuildContext context, int index) {
         return Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage('') //TODO: widget.entity.images[index],
+                image: images[index]
               ),
             ),
             //child: Image.asset(File(images[index]).path, fit: BoxFit.cover)
@@ -108,7 +165,7 @@ class _EntityPage extends State<EntityPage> {
       },
       index: 0,
       scrollDirection: Axis.horizontal,
-      itemCount: 0, //widget.entity.images.length,
+      itemCount: images.length, //widget.entity.images.length,
       autoplay: false,
       pagination: const SwiperPagination(),
       control: const SwiperControl(
