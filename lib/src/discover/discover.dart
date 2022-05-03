@@ -3,13 +3,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:nighthub/src/discover/entityPage.dart';
-import './swipeCard.dart';
 
+import './entityPage.dart';
+import './swipeCard.dart';
 import 'entity.dart';
 
 class Discover extends StatefulWidget {
-
   const Discover({
     Key? key,
     required this.isBusiness,
@@ -53,17 +52,17 @@ class _Discover extends State<Discover> {
     });
   }
 
-  /// Load user Data
+  /// Load user-data related to Business-Accounts
   Future<void> getBusinessData() async {
-
     final size = MediaQuery.of(context).size;
     setScreenSize(size);
 
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    realtimeDatabase.child('user_accounts/$userId/').onValue.listen((event) async {
+    realtimeDatabase.child('user_accounts/$userId/').once().then((event) async {
 
-      final value = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+      final value = event.snapshot.value as dynamic;
+
       final businessPictures = await firebase_storage.FirebaseStorage.instance
           .ref()
           .child('business_pictures/${value['userId']}').listAll();
@@ -74,7 +73,12 @@ class _Discover extends State<Discover> {
             primaryImageUrl = value.toString();
           });
         });
+      } else {
+        setState(() {
+          primaryImageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shutterstock.com%2Fimage-vector%2Fuser-account-circle-profile-line-art-272552858&psig=AOvVaw09vPkiqW8eJkZuadboUcDS&ust=1651683080312000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCLi14JHlw_cCFQAAAAAdAAAAABAZ';
+        });
       }
+
       setState(() {
         entities.add(
           Entity(
@@ -92,9 +96,8 @@ class _Discover extends State<Discover> {
     });
   }
 
-  ///Lazy loader
+  /// Lazy loader fetches the first 30 Business-Accounts (more should be fetched later)
   Future<void> initLazyLoader() async {
-
     final size = MediaQuery.of(context).size;
     setScreenSize(size);
 
@@ -147,14 +150,17 @@ class _Discover extends State<Discover> {
     });
   }
 
+  /// Sets size of the cards for the swiper
   void setScreenSize(Size screenSize) => _screenSize = screenSize;
 
+  /// Detects the position where the user started to swipe
   void startPosition(DragStartDetails details) {
     setState(() {
       _isDragging = true;
     });
   }
 
+  /// Updates the swipe position while being dragged
   void updatePosition(DragUpdateDetails details) {
     setState(() {
       _position += details.delta;
@@ -162,6 +168,7 @@ class _Discover extends State<Discover> {
     });
   }
 
+  /// Detects the final position of the swipe action
   void endPosition() {
     setState(() {
       _isDragging = false;
@@ -186,6 +193,7 @@ class _Discover extends State<Discover> {
     }
   }
 
+  /// Resets position od the swiper so cards below are not seen
   void resetPosition() {
     setState(() {
       _isDragging = false;
@@ -194,6 +202,7 @@ class _Discover extends State<Discover> {
     });
   }
 
+  /// Attaches the dislike action to the corresponding user in the database
   void dislike() {
     String businessUserID = entities.last.userId;
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
@@ -207,6 +216,7 @@ class _Discover extends State<Discover> {
     _nextCard();
   }
 
+  /// Attaches the like action to the corresponding user in the database
   void like() {
     String businessUserID = entities.last.userId;
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
@@ -220,6 +230,7 @@ class _Discover extends State<Discover> {
     _nextCard();
   }
 
+  /// Next card of the swiper stack will be shown
   Future _nextCard() async {
     if (entities.isEmpty) {
       return;
@@ -229,12 +240,14 @@ class _Discover extends State<Discover> {
     resetPosition();
   }
 
+  /// When swiping to next card the previous one in the array should be removed
   void removeLastEntity() {
     setState(() {
       entities.removeLast();
     });
   }
 
+  /// Converts data related to the user interests into an array
   List<String> getUserInterests(List<dynamic> userData) {
     List<String> list = [];
     for (var elem in userData) {
@@ -321,7 +334,7 @@ class _Discover extends State<Discover> {
         ],
       ),
     ) : EntityPage(
-        entity: entities[0]
+      entity: entities[0]
     );
   }
 }

@@ -20,18 +20,16 @@ class EntityPage extends StatefulWidget {
 }
 
 class _EntityPage extends State<EntityPage> {
-
   final DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
   List<NetworkImage> images = [];
 
   bool loading = true;
 
-
   @override
   void initState() {
     super.initState();
     loadCarouselPics();
-    Future.delayed(const Duration(milliseconds: 700), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         loading = false;
       });
@@ -53,7 +51,6 @@ class _EntityPage extends State<EntityPage> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -116,11 +113,18 @@ class _EntityPage extends State<EntityPage> {
                   const Padding(padding: EdgeInsets.only(top: 15)),
                   separationLine(),
                   const Padding(padding: EdgeInsets.only(top: 15)),
-                  Text(
-                    widget.entity.about,
+                  widget.entity.about != null ? Text(
+                    widget.entity.about!,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20
+                    ),
+                  ) : const Text(
+                    '... Description still \nneeds to be given ...',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
                     ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 50)),
@@ -144,16 +148,19 @@ class _EntityPage extends State<EntityPage> {
         return Container(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(5)),
-              image: DecorationImage(
+              image: images.isNotEmpty ? DecorationImage(
                 fit: BoxFit.cover,
                 image: images[index]
+              ) : const DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage('assets/user_image.png')
               ),
             ),
         );
       },
       index: 0,
       scrollDirection: Axis.horizontal,
-      itemCount: images.length,
+      itemCount: images.isNotEmpty ? images.length : 1,
       autoplay: false,
       pagination: const SwiperPagination(),
       control: const SwiperControl(
@@ -211,5 +218,4 @@ class _EntityPage extends State<EntityPage> {
     width: MediaQuery.of(context).size.width,
     color: const Color(0xFF2F2F2F),
   );
-
 }

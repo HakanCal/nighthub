@@ -16,11 +16,9 @@ class EditEntityPage extends StatefulWidget {
   const EditEntityPage({
     Key? key,
     required this.userData,
-    required this.profilePicture
   }) : super(key: key);
 
   final Map<String, dynamic> userData;
-  final File? profilePicture;
 
   @override
   State<StatefulWidget> createState() => _EditEntityProfile();
@@ -86,7 +84,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
     });
   }
 
-  /// Show loading spinner when communicating with Firebase
+  /// Show loading spinner while communicating with Firebase
   void toggleLoader() async {
     setState(() {
       isLoading = !isLoading;
