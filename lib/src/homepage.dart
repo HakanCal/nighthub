@@ -29,8 +29,14 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic>? _accountData = <String, dynamic>{};
   Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
-
-  late List <Widget> menuSelects = <Widget>[];
+  List <Widget> menuSelects = <Widget>[
+    //Swiper
+    //Near me
+    //Setting
+    const Discover(), //TODO: What we want in the screens
+    Radar(),
+    const AppSettings(userData: {}, profilePicture: null)
+  ];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
   @override
@@ -78,7 +84,7 @@ class _HomePage extends State<HomePage> {
             _tempImageFile = tempFile;
             menuSelects = <Widget>[
               Discover(userData: accountData!),
-              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
+              accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : Radar(), //TODO: FAVORITES
               AppSettings(userData: accountData!, profilePicture: _tempImageFile)
             ];
           });
@@ -91,7 +97,7 @@ class _HomePage extends State<HomePage> {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
             Discover(userData: accountData!),
-            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : const Radar(), //TODO: FAVORITES
+            accountData!['business'] == true ? EditEntityPage(userData: accountData!, profilePicture: _tempImageFile) : Radar(), //TODO: FAVORITES
             AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
