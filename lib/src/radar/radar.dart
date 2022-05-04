@@ -7,7 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nighthub/src/radar/radaritem.dart';
 import 'package:nighthub/src/radar/radarlist.dart';
 import "package:firebase_storage/firebase_storage.dart";
-import 'package:multiselect/multiselect.dart';
+import '../auth/formFields/customDropdownField.dart';
 
 
 class Radar extends StatefulWidget {
@@ -37,7 +37,7 @@ class Radar extends StatefulWidget {
   ];
 
   Radar({Key? key}) : super(key: key);
-  static const double MAX_DISTANCE = 100;
+  static const double MAX_DISTANCE = 200;
 
   @override
   State<StatefulWidget> createState() => _Radar();
@@ -57,7 +57,7 @@ class _Radar extends State<Radar> {
   List<RadarItem> _shownList = [];
   List<String> _interests = [];
   double _ratingFilterValue = 0;
-  double _userRadius = 100.0;
+  double _userRadius = Radar.MAX_DISTANCE;
 
   //Toggling variables
   //String _sortMethod = 'distance';
@@ -91,11 +91,16 @@ class _Radar extends State<Radar> {
 
   //Database Image fetch
   Future<Image> _getProfilepicture(String filename) async {
-    Uint8List? imageBytes = await widget.storage
-        .ref('profile_pictures/$filename')
-        .getData(10000000);
     Image image =
         Image.asset('assets/nighthub.png'); // Default Logo of RadarItem
+    Uint8List? imageBytes;
+    try{
+      imageBytes = await widget.storage
+          .ref('profile_pictures/$filename')
+          .getData(10000000);
+    }catch(e){
+      print("Error file does not lead to picture");
+    }
     if (imageBytes != null) {
       image = Image.memory(imageBytes);
     }
@@ -212,82 +217,159 @@ class _Radar extends State<Radar> {
         .where((item) => item.rating > _ratingFilterValue)
         .toList();
   }
+  _showCategoryList(BuildContext context){
 
+  }
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return Column(
+        children: [
       // Top bar menu for sorting method and order of RadarItems
-      Container(
-          margin: const EdgeInsets.symmetric(horizontal: 2),
-          child: Row(children: [
-            Column(
-              children: [
-                Row(
-                  children: [
-                    IconButton(icon: _sortIcon, onPressed: (){
-                      setState((){
-                        _sortOrder = !_sortOrder;
-                        _sortIcon = _sortOrder ? const Icon(Icons.north) : const Icon(Icons.south);
-                        if (_sortOrder) {
-                          _shownList.sort((a, b) => a.distance.compareTo(b.distance));
-                        } else {
-                          _shownList.sort((a, b) => b.distance.compareTo(a.distance));
-                        }
-                        print("List is sorted  ${_sortOrder ? "ascending" : "descending"}");
-                      });
-                    }),
-                    const Text('Distance'),
-                  ],
-                ),
-                /*Row(
-                  children: [
-                    IconButton(icon: Icon(Icons.filter_alt_rounded), onPressed: (){
-                      setState((){
-
-                      });
-                    }),
-                    DropDownMultiSelect(
-                      onChanged: (List<String> x) {
-                        setState(() {
-                          // DO SOMETHING HERE
-                        });
-                      },
-                      options: widget.options,
-                      selectedValues: _interests,
-                      whenEmpty: 'Select Interests',
-                    )
-                  ]
-                )*/
-              ],
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+        IconButton(icon: _sortIcon, onPressed: (){
+          setState((){
+            _sortOrder = !_sortOrder;
+            _sortIcon = _sortOrder ? const Icon(Icons.north) : const Icon(Icons.south);
+            if (_sortOrder) {
+              _shownList.sort((a, b) => a.distance.compareTo(b.distance));
+            } else {
+              _shownList.sort((a, b) => b.distance.compareTo(a.distance));
+            }
+            print("List is sorted  ${_sortOrder ? "ascending" : "descending"}");
+          });
+        }),
+        //const Text('Distance'),
+        Column(
+          children: [
+            Slider(
+              activeColor: Colors.orange,
+              value: _userRadius,
+              max: Radar.MAX_DISTANCE,
+              divisions: 10,
+              label: _userRadius.round().toString(),
+              onChanged: (double value) {
+                setState(() {
+                  _userRadius = value;
+                  _shownList = applyFilter(_completeList);
+                });
+              },
             ),
-            Column(
-              children: [
-                Slider(
-                  activeColor: Colors.orange,
-                  value: _userRadius,
-                  max: 100.0,
-                  divisions: 10,
-                  label: _userRadius.round().toString(),
-                  onChanged: (double value) {
-                    setState(() {
-                      _userRadius = value;
-                      _shownList = applyFilter(_completeList);
-                    });
-                  },
-                ),
-                Text("Search radius: ${_userRadius.round().toString()}km")
-              ],
-            ),
-            Column(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.star_border),
-                  onPressed: (){},
-                ),
-                const Text("Favorites")
-              ],
-            )
-          ])),
+            Text("Search radius: ${_userRadius.round().toString()}km"),
+          ],
+        ),
+        IconButton(
+          icon: const Icon(Icons.filter_alt_rounded),
+          onPressed: ()async{
+            _shownList = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => StatefulBuilder(
+                    builder: (context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                        elevation: 16,
+                        backgroundColor: Colors.orange.withOpacity(0.9),
+                        child: Container(
+                          height: 500,
+                          child:
+                          ListView.builder(
+                              itemCount: widget.options.length + 1,
+                              itemBuilder: (context,int index){
+                                if(index == 0){
+                                  //Header of List
+                                  return ListTile(
+                                      title: Center(child: Text("Categories")),
+                                      trailing: TextButton(
+                                        child: Text("apply", style: TextStyle(color: Colors.white),),
+                                        onPressed: (){
+                                          Navigator.pop(context, _shownList);
+                                        },
+                                      )
+                                  );
+                                }
+                                index -= 1;
+                                String option = widget.options[index];
+                                return CheckboxListTile(
+                                  title: Text(option),
+                                  checkColor: Colors.black,
+                                  activeColor: Colors.white,
+                                  onChanged: (bool? _selected){
+                                    setState(() {
+                                      if(!_interests.contains(option)){
+                                        _interests.add(option);
+                                      }else{
+                                        _interests.remove(option);
+                                      }
+                                      _shownList = applyFilter(_completeList);
+                                    });
+                                    print(_interests);
+                                  },
+                                  value: _interests.contains(option),
+                                ); // CheckboxListTile(value: value, onChanged:(){});
+                              }),
+                        ),
+                      );
+                    }
+                ))
+            );
+            setState(() {});
+            return;
+            showDialog(
+                context: context,
+                builder: (context){
+                  return StatefulBuilder(
+                    builder: (context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                        elevation: 16,
+                        backgroundColor: Colors.orange.withOpacity(0.9),
+                        child: Container(
+                          height: 500,
+                          child:
+                          ListView.builder(
+                              itemCount: widget.options.length + 1,
+                              itemBuilder: (context,int index){
+                            if(index == 0){
+                              //Header of List
+                              return ListTile(
+                                  title: Center(child: Text("Categories")),
+                                  trailing: TextButton(
+                                    child: Text("apply", style: TextStyle(color: Colors.white),),
+                                    onPressed: (){
+                                      Navigator.pop(context, _shownList);
+                                      },
+                                  )
+                              );
+                            }
+                            index -= 1;
+                            String option = widget.options[index];
+                            return CheckboxListTile(
+                                title: Text(option),
+                              checkColor: Colors.black,
+                              activeColor: Colors.white,
+                              onChanged: (bool? _selected){
+                                  setState(() {
+                                    if(!_interests.contains(option)){
+                                      _interests.add(option);
+                                    }else{
+                                      _interests.remove(option);
+                                    }
+                                    _shownList = applyFilter(_completeList);
+                                  });
+                                  print(_interests);
+                              },
+                              value: _interests.contains(option),
+                            ); // CheckboxListTile(value: value, onChanged:(){});
+                          }),
+                        ),
+                      );
+                    }
+                  );
+                });
+          },
+        ),
+      ]),
       const SizedBox(height: 10),
       // List with Shops
       FutureBuilder<void>(
@@ -310,6 +392,8 @@ class _Radar extends State<Radar> {
                 String error = "";
                 if (_completeList.isEmpty) {
                   error = "Nothing nearby";
+                }else if(_shownList.isEmpty){
+                  error = "Try changing your search settings";
                 }
                 if (!_serviceEnabled) {
                   error = "Location service is disabled";

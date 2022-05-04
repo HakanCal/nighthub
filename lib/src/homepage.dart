@@ -34,7 +34,7 @@ class _HomePage extends State<HomePage> {
     //Swiper
     //Near me
     //Setting
-    const Discover(), //TODO: What we want in the screens
+    //const Discover(), //TODO: What we want in the screens
     Radar(),
     const AppSettings(userData: {}, profilePicture: null)
   ];
