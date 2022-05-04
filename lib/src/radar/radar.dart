@@ -147,6 +147,7 @@ class _Radar extends State<Radar> {
           business.child("profile_picture").value as String);
       //Image _logo = Image.asset("assets/nighthub.png");
       radarItems.add(RadarItem(
+        userID: business.child("userId").value as String,
           name: business.child("username").value as String,
           logo: _logo,
           address: business.child("address").value as String,

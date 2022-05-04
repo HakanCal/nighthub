@@ -1,9 +1,15 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import '../discover/entity.dart';
+import '../discover/entityPage.dart';
 
 // Layout of one list item
 class RadarItem extends StatelessWidget {
-  const RadarItem(
-      {required this.name,
+  RadarItem(
+      {required this.userID,
+        required this.name,
       required this.logo,
       required this.address,
       required this.distance, // distance in km
@@ -12,6 +18,7 @@ class RadarItem extends StatelessWidget {
       Key? key})
       : super(key: key);
 
+  final String userID;
   final String name;
   final Image logo;
   final String address;
@@ -19,42 +26,78 @@ class RadarItem extends StatelessWidget {
   final List<dynamic> categories;
   final double rating;
 
+  DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
+  String primaryImageUrl = '';
   //final int shopID
   //TODO route widget to shop page
-  void goToBusiness(int shopID) {}
+  List<String> getUserInterests(List<dynamic> userData) {
+    List<String> list = [];
+    for (var elem in userData) {
+      list.add(elem);
+    }
+    return list;
+  }
+
+  Future<Entity> getBusinessData() async{
+    DatabaseEvent event = await realtimeDatabase.child('user_accounts/$userID/').once();
+    final value = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+    final businessPictures = await firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('business_pictures/${value['userId']}').listAll();
+    if (businessPictures.items.isNotEmpty) {
+      await businessPictures.items.last.getDownloadURL().then((value) {
+          primaryImageUrl = value.toString();
+      });
+    }
+    return Entity(
+      userId: value['userId'],
+      isBusiness: value['business'],
+      username: value['username'],
+      address: value['address'],
+      distance: 1.6,
+      tags: getUserInterests(value['interests']),
+      about: value['about'],
+      primaryImage: NetworkImage(primaryImageUrl),
+      /*images: [
+        NetworkImage(images![images!.length - 2]),
+      ],*/
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () => {
-          //Navigator.push(context, MaterialPageRoute(builder: (context) => EntityPage(entity: ent)));
-          print("NAVIGATE TO ENTITY PAGE")
-        }, //go to shop page
-        child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            height: 120,
-            decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border.all(color: Colors.orange, width: 5),
-                borderRadius: BorderRadius.circular(20)),
-            child: Center(
-              child: Row(children: [
-                Expanded(
-                    child: FittedBox(fit: BoxFit.contain,
-                        child: ClipOval(
-                          child: SizedBox.fromSize(
-                            child: logo,
-                            size: Size.fromRadius(4)
-                          )
-                    )), flex: 1),
-                Expanded(
-                    child: _RadarItemBody(name: name, categories: categories),
-                    flex: 2),
-                Expanded(
-                    child: _RadarItemTrailer(rating: rating, distance: distance),
-                    flex: 1)
-              ], crossAxisAlignment: CrossAxisAlignment.stretch),
-            )));
+          onTap: () async => {
+            getBusinessData().then((ent) =>
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EntityPage(entity: ent)))
+            )
+          }, //go to shop page
+          child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              height: 120,
+              decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: Colors.orange, width: 5),
+                  borderRadius: BorderRadius.circular(20)),
+              child: Center(
+                child: Row(children: [
+                  Expanded(
+                      child: FittedBox(fit: BoxFit.contain,
+                          child: ClipOval(
+                            child: SizedBox.fromSize(
+                              child: logo,
+                              size: Size.fromRadius(4)
+                            )
+                      )), flex: 1),
+                  Expanded(
+                      child: _RadarItemBody(name: name, categories: categories),
+                      flex: 2),
+                  Expanded(
+                      child: _RadarItemTrailer(rating: rating, distance: distance),
+                      flex: 1)
+                ], crossAxisAlignment: CrossAxisAlignment.stretch),
+              ))
+    );
   }
 }
 
