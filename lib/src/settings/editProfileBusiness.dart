@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
+import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocode/geocode.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -136,6 +138,27 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
     });
   }
 
+  /// Creates geohash, longitude and latitude from address
+  Future<Object> createGeoPoint(String address) async {
+    var point = {};
+    GeoCode geoCode = GeoCode();
+
+    try {
+      Coordinates coordinates = await geoCode.forwardGeocoding(address: address);
+      GeoHash geoHash = GeoHash.fromDecimalDegrees(coordinates.longitude!, coordinates.latitude!);
+      point = {
+        'geohash': geoHash.geohash,
+        'geopoint': {
+          'latitude': coordinates.latitude!,
+          'longitude': coordinates.longitude!
+        }
+      };
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return point;
+  }
+
   /// Updates the user data if desired
   Future<void> updateBusinessAccount(
       BuildContext context,
@@ -200,10 +223,14 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
       String userId = FirebaseAuth.instance.currentUser!.uid;
       DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$userId/');
 
+      String address = '$street , $postcode, $country';
+      var point = await createGeoPoint(address);
+
       realtimeDatabase.update({
         'username': entityName,
         'email': email,
-        'address': '$street, $postcode, $country',
+        'address': address,
+        'point': point,
         'profile_picture': imageName,
         'interests': interests
       });

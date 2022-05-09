@@ -39,12 +39,12 @@ class _About extends State<About> {
         ),
       ),
       body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20.00, vertical: 20.00),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: SingleChildScrollView(
           child: Column(
             children: [
               Center(
-                child: Image.asset('assets/nighthub.png', width: 150.00, height: 150.00,),
+                child: Image.asset('assets/nighthub.png', width: 150, height: 150),
               ),
               Text(data ?? '<error> please contact an admin', style: const TextStyle(color: Colors.white, fontSize: 20.00),)
             ],
