@@ -8,9 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:nighthub/src/discover/discover.dart';
-import 'package:nighthub/src/discover/entityPage.dart';
-import 'package:provider/provider.dart';
 
 import '../auth/formFields/index.dart';
 import '../dialogs/customFadingPopup.dart';
@@ -19,11 +16,9 @@ class EditEntityPage extends StatefulWidget {
   const EditEntityPage({
     Key? key,
     required this.userData,
-    required this.profilePicture
   }) : super(key: key);
 
   final Map<String, dynamic> userData;
-  final File? profilePicture;
 
   @override
   State<StatefulWidget> createState() => _EditEntityProfile();
@@ -89,7 +84,7 @@ class _EditEntityProfile extends State<EditEntityPage> {
     });
   }
 
-  /// Show loading spinner when communicating with Firebase
+  /// Show loading spinner while communicating with Firebase
   void toggleLoader() async {
     setState(() {
       isLoading = !isLoading;

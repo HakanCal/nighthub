@@ -40,7 +40,7 @@ class _AppSettings extends State<AppSettings> {
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.only(top: 15, bottom: marginCards+5),
+                margin: EdgeInsets.only(top: 15, bottom: marginCards + 5),
                 padding: EdgeInsets.symmetric(vertical: marginCards + 5),
                 decoration: const BoxDecoration(
                   color: Color(0x8c8c8c8c),

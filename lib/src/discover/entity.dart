@@ -7,8 +7,7 @@ class Entity {
   final String address;
   final double distance;
   final List<String> tags;
-  final String about;
-
+  final String? about;
   final NetworkImage primaryImage;
 
   Entity({
@@ -18,8 +17,7 @@ class Entity {
     required this.address,
     required this.distance,
     required this.tags,
-    required this.about,
+    this.about,
     required this.primaryImage
   });
-
 }
