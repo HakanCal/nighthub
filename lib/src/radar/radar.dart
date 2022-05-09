@@ -142,10 +142,11 @@ class _Radar extends State<Radar> {
       // Here we skip this business from the list
       if (distance > Radar.MAX_DISTANCE) continue;
       print("Business ${business.child("username").value} is ${distance}km away");
-      print(business.child("interests").value as List<dynamic>);
-      Image _logo = await _getProfilepicture(
-          business.child("profile_picture").value as String);
-      //Image _logo = Image.asset("assets/nighthub.png");
+      //print(business.child("interests").value as List<dynamic>);
+      //Database is so useless you can not even load in images wtf
+      //Image _logo = await _getProfilepicture(business.child("profile_picture").value as String);
+      // Placeholder image
+      Image _logo = Image.asset("assets/nighthub.png");
       radarItems.add(RadarItem(
         userID: business.child("userId").value as String,
           name: business.child("username").value as String,
@@ -156,6 +157,7 @@ class _Radar extends State<Radar> {
           rating: 1));
     }
     print("Loaded Radar Items");
+    print(radarItems);
     return radarItems;
   }
 
@@ -180,14 +182,15 @@ class _Radar extends State<Radar> {
     });
   }
   List<RadarItem> applyFilter(List<RadarItem> completeList){
-    print("Complete List");
+    print("Complete List:");
     print(completeList);
     print(_completeList);
-    print("Filtering by distance");
+    print("Filtering by distance:");
     List<RadarItem> filteredList = distanceFilter(completeList);
     print(filteredList);
-    print("Filtering by category / interest");
+    print("Filtering by categorys:");
     filteredList = interestFilter(filteredList);
+    print(_interests);
     print(filteredList);
     return filteredList;
   }
