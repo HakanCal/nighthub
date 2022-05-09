@@ -72,6 +72,8 @@ class _Discover extends State<Discover> {
           setState(() {
             primaryImageUrl = value.toString();
           });
+        }).catchError((e) {
+          debugPrint(e.toString());
         });
       } else {
         setState(() {

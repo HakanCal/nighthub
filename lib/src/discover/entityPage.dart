@@ -67,7 +67,7 @@ class _EntityPage extends State<EntityPage> {
           ],
         )) : Scaffold(
       backgroundColor: const Color(0xFF262626),
-      appBar: widget.entity.isBusiness ? AppBar(
+      appBar: !widget.entity.isBusiness ? AppBar(
         backgroundColor: Colors.black,
         title: const Text(''),
         automaticallyImplyLeading: true,
@@ -127,7 +127,7 @@ class _EntityPage extends State<EntityPage> {
                         fontSize: 20,
                     ),
                   ),
-                  const Padding(padding: EdgeInsets.only(bottom: 50)),
+                  const Padding(padding: EdgeInsets.only(bottom: 120)),
                 ],
               ),
             ),

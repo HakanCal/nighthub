@@ -62,7 +62,7 @@ class _HomePage extends State<HomePage> {
 
   /// Preloads the profile picture from Firebase Storage
   Future<dynamic> getImageFile() async {
-    if (accountData!.isNotEmpty) {
+    if (accountData!.isNotEmpty == true) {
       String? imageName = accountData!['profile_picture'];
 
       if (imageName != null) {
@@ -70,27 +70,30 @@ class _HomePage extends State<HomePage> {
         final File tempFile = File('${tempDir.path}/$imageName');
 
         /// If file doesn't exist, it will try downloading
-        if (!tempFile.existsSync()) {
+        if (tempFile.existsSync() == false) {
           try {
             tempFile.create(recursive: true);
             await firebase_storage.FirebaseStorage.instance.ref(
                 '/profile_pictures/$imageName').writeToFile(tempFile);
-            setState(() {
-              _tempImageFile = tempFile;
-              menuSelects = <Widget>[
-                Discover(isBusiness: accountData!['business']),
-                accountData!['business'] == true ? EditEntityPage(
-                    userData: accountData!) : Radar(),
-                const Favorites(),
-                AppSettings(
-                    userData: accountData!, profilePicture: _tempImageFile)
-              ];
-            });
           } catch (e) {
             /// If there is an error the created file will be deleted
+            debugPrint(e.toString());
             await tempFile.delete(recursive: true);
           }
         }
+
+        setState(() {
+          _tempImageFile = tempFile;
+          menuSelects = <Widget>[
+            Discover(isBusiness: accountData!['business']),
+            accountData!['business'] == true ? EditEntityPage(
+                userData: accountData!) : Radar(),
+            const Favorites(),
+            AppSettings(
+                userData: accountData!, profilePicture: tempFile)
+          ];
+        });
+
       } else {
         setState(() {
           menuSelects = <Widget>[
