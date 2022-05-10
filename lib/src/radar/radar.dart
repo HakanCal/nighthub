@@ -1,17 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nighthub/src/radar/radaritem.dart';
+import 'package:nighthub/src/radar/radarItem.dart';
 import 'package:nighthub/src/radar/radarlist.dart';
-import "package:firebase_storage/firebase_storage.dart";
-import '../auth/formFields/customDropdownField.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class Radar extends StatefulWidget {
-  final FirebaseStorage storage = FirebaseStorage.instance;
   final options = [
     'Nightclub',
     'Dance',
@@ -37,7 +32,7 @@ class Radar extends StatefulWidget {
   ];
 
   Radar({Key? key}) : super(key: key);
-  static const double MAX_DISTANCE = 200;
+  static const double maxDistance = 200;
 
   @override
   State<StatefulWidget> createState() => _Radar();
@@ -55,18 +50,15 @@ class _Radar extends State<Radar> {
 
   // Filter variables
   List<RadarItem> _shownList = [];
-  List<String> _interests = [];
-  double _ratingFilterValue = 0;
-  double _userRadius = Radar.MAX_DISTANCE;
+  final List<String> _interests = [];
+  final double _ratingFilterValue = 0;
+  double _userRadius = Radar.maxDistance;
 
   //Toggling variables
-  //String _sortMethod = 'distance';
   bool _sortOrder = true;
   Icon _sortIcon = const Icon(Icons.north);
 
   Future<Position> _getUserPosition() async {
-    print("Getting user location...");
-
     _serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!_serviceEnabled) {
       await Geolocator.requestPermission();
@@ -85,39 +77,15 @@ class _Radar extends State<Radar> {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-    print("Got user location!");
     return Geolocator.getCurrentPosition();
-  }
-
-  //Database Image fetch
-  Future<Image> _getProfilepicture(String filename) async {
-    Image image =
-        Image.asset('assets/nighthub.png'); // Default Logo of RadarItem
-    Uint8List? imageBytes;
-    try{
-      imageBytes = await widget.storage
-          .ref('profile_pictures/$filename')
-          .getData(10000000);
-    }catch(e){
-      print("Error file does not lead to picture");
-    }
-    if (imageBytes != null) {
-      image = Image.memory(imageBytes);
-    }
-    return image;
   }
 
   //Database fetch
   Future<Iterable<DataSnapshot>> _getBusinesses() async {
-    print('Accessing Database...');
-    FirebaseDatabase database = FirebaseDatabase.instance;
-    database.databaseURL =
-        "https://nighthub-77c81-default-rtdb.europe-west1.firebasedatabase.app";
-    print('Querying Database for Businesses...');
+    DatabaseReference database = FirebaseDatabase.instance.ref();
     Query query =
-        database.ref('user_accounts').orderByChild('business').equalTo(true);
+        database.child('user_accounts').orderByChild('business').equalTo(true);
     DataSnapshot event = await query.get();
-    print("Businesses loaded!");
     return event.children;
   }
 
@@ -125,44 +93,48 @@ class _Radar extends State<Radar> {
   Future<List<RadarItem>> _getCompleteList(
       Position userPos, Iterable<DataSnapshot> businesses) async {
     List<RadarItem> radarItems = <RadarItem>[];
-    print("Getting radar items...");
+    String primaryImageUrl = '';
+
     for (DataSnapshot business in businesses) {
       // If this business has no geopoint data
-      if (!business.hasChild("point/geopoint")) {
+      if (!business.hasChild('point/geopoint')) {
         continue;
       }
       double distance = Geolocator.distanceBetween(
           userPos.latitude,
           userPos.longitude,
-          business.child("point/geopoint/latitude").value as double,
-          business.child("point/geopoint/longitude").value as double);
+          business.child('point/geopoint/latitude').value as double,
+          business.child('point/geopoint/longitude').value as double);
       distance /= 1000; // meters to kilometer
 
       // Filter out all Businesses that are not within Max radius
       // Here we skip this business from the list
-      if (distance > Radar.MAX_DISTANCE) continue;
-      print("Business ${business.child("username").value} is ${distance}km away");
-      //print(business.child("interests").value as List<dynamic>);
-      //Database is so useless you can not even load in images wtf
-      //Image _logo = await _getProfilepicture(business.child("profile_picture").value as String);
-      // Placeholder image
-      Image _logo = Image.asset("assets/nighthub.png");
-      radarItems.add(RadarItem(
-        userID: business.child("userId").value as String,
-          name: business.child("username").value as String,
-          logo: _logo,
-          address: business.child("address").value as String,
-          distance: distance,
-          categories: business.child("interests").value as List<dynamic>,
-          rating: 1));
+      if (distance > Radar.maxDistance) continue;
+      final businessPictures = await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child(
+              'business_pictures/${business.child('userId').value as String}')
+          .listAll();
+
+      if (businessPictures.items.isNotEmpty) {
+        await businessPictures.items.last.getDownloadURL().then((value) {
+          primaryImageUrl = value.toString();
+        });
+
+        radarItems.add(RadarItem(
+            userID: business.child('userId').value as String,
+            name: business.child('username').value as String,
+            address: business.child('address').value as String,
+            logo: primaryImageUrl,
+            distance: distance,
+            categories: business.child('interests').value as List<dynamic>,
+            rating: 1));
+      }
     }
-    print("Loaded Radar Items");
-    print(radarItems);
     return radarItems;
   }
 
   Future<void> _initFuture() async {
-    //print("Doing some Future work");
     _userPos = await _getUserPosition();
     _businesses = await _getBusinesses();
     _completeList = await _getCompleteList(_userPos, _businesses);
@@ -171,9 +143,8 @@ class _Radar extends State<Radar> {
 
   @override
   void initState() {
-    print("Initialising Radar widget...");
-    _future = _initFuture();
     super.initState();
+    _future = _initFuture();
   }
 
   Future<void> _refreshList() async {
@@ -181,31 +152,23 @@ class _Radar extends State<Radar> {
       _future = _initFuture();
     });
   }
-  List<RadarItem> applyFilter(List<RadarItem> completeList){
-    print("Complete List:");
-    print(completeList);
-    print(_completeList);
-    print("Filtering by distance:");
+
+  List<RadarItem> applyFilter(List<RadarItem> completeList) {
     List<RadarItem> filteredList = distanceFilter(completeList);
-    print(filteredList);
-    print("Filtering by categorys:");
-    filteredList = interestFilter(filteredList);
-    print(_interests);
-    print(filteredList);
-    return filteredList;
+    return interestFilter(filteredList);
   }
 
-  List<RadarItem> interestFilter( List<RadarItem> shownList) {
+  List<RadarItem> interestFilter(List<RadarItem> shownList) {
     List<RadarItem> filteredList = shownList;
     if (_interests.isNotEmpty) {
       filteredList = <RadarItem>[];
-      for(RadarItem item in shownList){
-          for(dynamic interest in item.categories){
-            String interestString = interest as String;
-            if(_interests.contains(interestString)) {
-              filteredList.add(item);
-              break;
-            }
+      for (RadarItem item in shownList) {
+        for (dynamic interest in item.categories) {
+          String interestString = interest as String;
+          if (_interests.contains(interestString)) {
+            filteredList.add(item);
+            break;
+          }
         }
       }
     }
@@ -217,40 +180,35 @@ class _Radar extends State<Radar> {
   }
 
   List<RadarItem> ratingFilter(List<RadarItem> items) {
-     return items
-        .where((item) => item.rating > _ratingFilterValue)
-        .toList();
+    return items.where((item) => item.rating > _ratingFilterValue).toList();
   }
-  _showCategoryList(BuildContext context){
 
-  }
   @override
   Widget build(BuildContext context) {
-    return Column(
-        children: [
+    return Column(children: [
       // Top bar menu for sorting method and order of RadarItems
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-        IconButton(icon: _sortIcon, onPressed: (){
-          setState((){
-            _sortOrder = !_sortOrder;
-            _sortIcon = _sortOrder ? const Icon(Icons.north) : const Icon(Icons.south);
-            if (_sortOrder) {
-              _shownList.sort((a, b) => a.distance.compareTo(b.distance));
-            } else {
-              _shownList.sort((a, b) => b.distance.compareTo(a.distance));
-            }
-            print("List is sorted  ${_sortOrder ? "ascending" : "descending"}");
-          });
-        }),
-        //const Text('Distance'),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        IconButton(
+            icon: _sortIcon,
+            onPressed: () {
+              setState(() {
+                _sortOrder = !_sortOrder;
+                _sortIcon = _sortOrder
+                    ? const Icon(Icons.north)
+                    : const Icon(Icons.south);
+                if (_sortOrder) {
+                  _shownList.sort((a, b) => a.distance.compareTo(b.distance));
+                } else {
+                  _shownList.sort((a, b) => b.distance.compareTo(a.distance));
+                }
+              });
+            }),
         Column(
           children: [
             Slider(
               activeColor: Colors.orange,
               value: _userRadius,
-              max: Radar.MAX_DISTANCE,
+              max: Radar.maxDistance,
               divisions: 10,
               label: _userRadius.round().toString(),
               onChanged: (double value) {
@@ -260,117 +218,69 @@ class _Radar extends State<Radar> {
                 });
               },
             ),
-            Text("Search radius: ${_userRadius.round().toString()}km"),
+            Text('Search radius: ${_userRadius.round().toString()} km'),
           ],
         ),
         IconButton(
           icon: const Icon(Icons.filter_alt_rounded),
-          onPressed: ()async{
+          onPressed: () async {
             _shownList = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => StatefulBuilder(
-                    builder: (context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                        elevation: 16,
-                        backgroundColor: Colors.orange.withOpacity(0.9),
-                        child: Container(
-                          height: 500,
-                          child:
-                          ListView.builder(
-                              itemCount: widget.options.length + 1,
-                              itemBuilder: (context,int index){
-                                if(index == 0){
-                                  //Header of List
-                                  return ListTile(
-                                      title: Center(child: Text("Categories")),
-                                      trailing: TextButton(
-                                        child: Text("apply", style: TextStyle(color: Colors.white),),
-                                        onPressed: (){
-                                          Navigator.pop(context, _shownList);
-                                        },
-                                      )
-                                  );
-                                }
-                                index -= 1;
-                                String option = widget.options[index];
-                                return CheckboxListTile(
-                                  title: Text(option),
-                                  checkColor: Colors.black,
-                                  activeColor: Colors.white,
-                                  onChanged: (bool? _selected){
-                                    setState(() {
-                                      if(!_interests.contains(option)){
-                                        _interests.add(option);
-                                      }else{
-                                        _interests.remove(option);
-                                      }
-                                      _shownList = applyFilter(_completeList);
-                                    });
-                                    print(_interests);
-                                  },
-                                  value: _interests.contains(option),
-                                ); // CheckboxListTile(value: value, onChanged:(){});
-                              }),
-                        ),
-                      );
-                    }
-                ))
-            );
+                MaterialPageRoute(
+                    builder: (context) =>
+                        StatefulBuilder(builder: (context, setState) {
+                          return Dialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40)),
+                            elevation: 16,
+                            child: SizedBox(
+                              height: 500,
+                              child: ListView.builder(
+                                  itemCount: widget.options.length + 1,
+                                  itemBuilder: (context, int index) {
+                                    if (index == 0) {
+                                      //Header of List
+                                      return ListTile(
+                                          title: const Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text('Categories')),
+                                          trailing: TextButton(
+                                            child: const Text(
+                                              'apply',
+                                              style: TextStyle(
+                                                  color: Colors.orange),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pop(
+                                                  context, _shownList);
+                                            },
+                                          ));
+                                    }
+                                    index -= 1;
+                                    String option = widget.options[index];
+                                    return CheckboxListTile(
+                                      title: Text(option),
+                                      checkColor: Colors.black,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool? _selected) {
+                                        setState(() {
+                                          if (!_interests.contains(option)) {
+                                            _interests.add(option);
+                                          } else {
+                                            _interests.remove(option);
+                                          }
+                                          _shownList =
+                                              applyFilter(_completeList);
+                                        });
+                                      },
+                                      value: _interests.contains(option),
+                                    );
+                                  }),
+                            ),
+                          );
+                        })));
             setState(() {});
             return;
-            showDialog(
-                context: context,
-                builder: (context){
-                  return StatefulBuilder(
-                    builder: (context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                        elevation: 16,
-                        backgroundColor: Colors.orange.withOpacity(0.9),
-                        child: Container(
-                          height: 500,
-                          child:
-                          ListView.builder(
-                              itemCount: widget.options.length + 1,
-                              itemBuilder: (context,int index){
-                            if(index == 0){
-                              //Header of List
-                              return ListTile(
-                                  title: Center(child: Text("Categories")),
-                                  trailing: TextButton(
-                                    child: Text("apply", style: TextStyle(color: Colors.white),),
-                                    onPressed: (){
-                                      Navigator.pop(context, _shownList);
-                                      },
-                                  )
-                              );
-                            }
-                            index -= 1;
-                            String option = widget.options[index];
-                            return CheckboxListTile(
-                                title: Text(option),
-                              checkColor: Colors.black,
-                              activeColor: Colors.white,
-                              onChanged: (bool? _selected){
-                                  setState(() {
-                                    if(!_interests.contains(option)){
-                                      _interests.add(option);
-                                    }else{
-                                      _interests.remove(option);
-                                    }
-                                    _shownList = applyFilter(_completeList);
-                                  });
-                                  print(_interests);
-                              },
-                              value: _interests.contains(option),
-                            ); // CheckboxListTile(value: value, onChanged:(){});
-                          }),
-                        ),
-                      );
-                    }
-                  );
-                });
           },
         ),
       ]),
@@ -393,17 +303,17 @@ class _Radar extends State<Radar> {
                   );
                 }
               case ConnectionState.done:
-                String error = "";
+                String error = '';
                 if (_completeList.isEmpty) {
-                  error = "Nothing nearby";
-                }else if(_shownList.isEmpty){
-                  error = "Try changing your search settings";
+                  error = 'Nothing nearby';
+                } else if (_shownList.isEmpty) {
+                  error = 'Try changing your search settings';
                 }
                 if (!_serviceEnabled) {
-                  error = "Location service is disabled";
+                  error = 'Location service is disabled';
                 } else if (_permission == LocationPermission.denied ||
                     _permission == LocationPermission.deniedForever) {
-                  error = "Location service has no permission";
+                  error = 'Location service has no permission';
                 }
                 if (error.isNotEmpty) {
                   return Expanded(
@@ -411,15 +321,15 @@ class _Radar extends State<Radar> {
                           child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      const Icon(Icons.error_outline_rounded),
+                      const Icon(Icons.error_outline_rounded, size: 18),
                       Text(error),
                     ],
                   )));
                 }
 
-                // Here we can work with future data
-
-                _shownList = _shownList.where((element) => element.distance < _userRadius).toList();
+                _shownList = _shownList
+                    .where((element) => element.distance < _userRadius)
+                    .toList();
 
                 return Expanded(
                   flex: 1,
@@ -433,9 +343,7 @@ class _Radar extends State<Radar> {
                       scrollbarOrientation: ScrollbarOrientation.left,
                       child: RefreshIndicator(
                           child: RadarList(radarItems: _shownList),
-                          onRefresh:
-                              _refreshList // refreshes list content on swiping down
-                          )),
+                          onRefresh: _refreshList)),
                 );
             }
           })
