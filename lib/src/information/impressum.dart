@@ -40,7 +40,7 @@ class _Impressum extends State<Impressum> {
         ),
       ),
       body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20.00, vertical: 20.00),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -52,14 +52,16 @@ class _Impressum extends State<Impressum> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.fromLTRB(5.00, 25.00, 5.00, 0.00),
-                  child: Text(data ?? '<error> please contact an admin', style: const TextStyle(color: Colors.white, fontSize: 20.00),))
+                  margin: const EdgeInsets.fromLTRB(5, 25, 5, 0),
+                  child: Text(
+                    data ?? '<error> please contact an admin',
+                    style:
+                        const TextStyle(color: Colors.white, fontSize: 20),
+                  ))
             ],
           ),
         ),
       ),
     );
   }
-
-
 }

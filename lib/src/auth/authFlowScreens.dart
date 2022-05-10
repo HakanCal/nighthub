@@ -16,11 +16,13 @@ class AuthFlowScreens extends StatelessWidget {
         body: ListView(
           controller: ScrollController(),
           addAutomaticKeepAlives: true,
-          padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
+          padding:
+              const EdgeInsets.only(bottom: kFloatingActionButtonMargin + 48),
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 24),
-              child: Image.asset('assets/nighthub.png', width: 50, height: 200, fit: BoxFit.contain),
+              child: Image.asset('assets/nighthub.png',
+                  width: 50, height: 200, fit: BoxFit.contain),
             ),
             Consumer<AuthState>(
               builder: (context, appState, _) => AuthMiddleware(
@@ -28,7 +30,8 @@ class AuthFlowScreens extends StatelessWidget {
                 authState: appState.authState,
                 forgotPassword: appState.forgotPassword,
                 setAuthStateToRegisterUser: appState.setAuthStateToRegisterUser,
-                setAuthStateToRegisterBusiness: appState.setAuthStateToRegisterBusiness,
+                setAuthStateToRegisterBusiness:
+                    appState.setAuthStateToRegisterBusiness,
                 sendNewPassword: appState.sendNewPassword,
                 setAuthStateToLoggedOut: appState.setAuthStateToLoggedOut,
                 signIn: appState.signIn,
@@ -38,21 +41,6 @@ class AuthFlowScreens extends StatelessWidget {
                 logOut: appState.logOut,
               ),
             ),
-            /*
-            Consumer<AuthState>(
-              builder: (context, appState, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (appState.authState == AuthenticationState.loggedIn) ...[
-                    const Header('Review'),
-                    Review(
-                      addMessage: (message) =>
-                          appState.submitReview(message),
-                    ),
-                  ],
-                ],
-              ),
-            ),*/
           ],
         ),
       ),

@@ -32,7 +32,9 @@ class _Discover extends State<Discover> {
   double _angle = 0;
 
   bool get isDragging => _isDragging;
+
   Offset get position => _position;
+
   double get angle => _angle;
 
   @override
@@ -43,13 +45,18 @@ class _Discover extends State<Discover> {
         getBusinessData();
       } else {
         initLazyLoader();
-      }
-      Future.delayed(const Duration(milliseconds: 700), () {
-        setState(() {
-          loading = false;
+        Future.delayed(const Duration(milliseconds: 500), () {
+          setState(() {
+            loading = false;
+          });
         });
-      });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   /// Load user-data related to Business-Accounts
@@ -60,12 +67,12 @@ class _Discover extends State<Discover> {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
     realtimeDatabase.child('user_accounts/$userId/').once().then((event) async {
-
       final value = event.snapshot.value as dynamic;
 
       final businessPictures = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('business_pictures/${value['userId']}').listAll();
+          .child('business_pictures/${value['userId']}')
+          .listAll();
 
       if (businessPictures.items.isNotEmpty) {
         await businessPictures.items.last.getDownloadURL().then((value) {
@@ -77,13 +84,13 @@ class _Discover extends State<Discover> {
         });
       } else {
         setState(() {
-          primaryImageUrl = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shutterstock.com%2Fimage-vector%2Fuser-account-circle-profile-line-art-272552858&psig=AOvVaw09vPkiqW8eJkZuadboUcDS&ust=1651683080312000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCLi14JHlw_cCFQAAAAAdAAAAABAZ';
+          primaryImageUrl =
+              'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shutterstock.com%2Fimage-vector%2Fuser-account-circle-profile-line-art-272552858&psig=AOvVaw09vPkiqW8eJkZuadboUcDS&ust=1651683080312000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCLi14JHlw_cCFQAAAAAdAAAAABAZ';
         });
       }
 
       setState(() {
-        entities.add(
-          Entity(
+        entities.add(Entity(
             userId: value['userId'],
             isBusiness: true,
             username: value['username'],
@@ -91,9 +98,7 @@ class _Discover extends State<Discover> {
             distance: 1.6,
             tags: getUserInterests(value['interests']),
             about: value['about'],
-            primaryImage: NetworkImage(primaryImageUrl)
-          )
-        );
+            primaryImage: NetworkImage(primaryImageUrl)));
       });
     });
   }
@@ -105,15 +110,22 @@ class _Discover extends State<Discover> {
 
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
 
-    realtimeDatabase.child('user_accounts/').orderByKey().limitToFirst(30).get().then((snapshot) {
+    realtimeDatabase
+        .child('user_accounts/')
+        .orderByKey()
+        .limitToFirst(30)
+        .get()
+        .then((snapshot) {
       Map<dynamic, dynamic> users = snapshot.value as Map;
       users.forEach((key, value) async {
         bool dislike = false;
 
-        if(value['business'] == true) {
-          final businessPictures = await firebase_storage.FirebaseStorage.instance
+        if (value['business'] == true) {
+          final businessPictures = await firebase_storage
+              .FirebaseStorage.instance
               .ref()
-              .child('business_pictures/${value['userId']}').listAll();
+              .child('business_pictures/${value['userId']}')
+              .listAll();
 
           if (businessPictures.items.isNotEmpty) {
             await businessPictures.items.last.getDownloadURL().then((value) {
@@ -131,18 +143,15 @@ class _Discover extends State<Discover> {
               }
               if (dislike == false) {
                 setState(() {
-                  entities.add(
-                      Entity(
-                        userId: value['userId'],
-                        isBusiness: true,
-                        username: value['username'],
-                        address: value['address'],
-                        distance: 1.6,
-                        tags: getUserInterests(value['interests']),
-                        about: value['about'],
-                        primaryImage: NetworkImage(primaryImageUrl)
-                      )
-                  );
+                  entities.add(Entity(
+                      userId: value['userId'],
+                      isBusiness: true,
+                      username: value['username'],
+                      address: value['address'],
+                      distance: 1.6,
+                      tags: getUserInterests(value['interests']),
+                      about: value['about'],
+                      primaryImage: NetworkImage(primaryImageUrl)));
                 });
               }
             });
@@ -183,9 +192,8 @@ class _Discover extends State<Discover> {
     if (x >= delta) {
       final Entity ent = entities.last;
       like();
-      Navigator.push(context, MaterialPageRoute(
-          builder: (context) => EntityPage(entity: ent))
-      );
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => EntityPage(entity: ent)));
     } else if (x <= -delta) {
       dislike();
     } else if (y <= -delta / 2) {
@@ -208,7 +216,8 @@ class _Discover extends State<Discover> {
   void dislike() {
     String businessUserID = entities.last.userId;
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
-    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$businessUserID/dislikes');
+    DatabaseReference realtimeDatabase =
+        FirebaseDatabase.instance.ref('user_accounts/$businessUserID/dislikes');
 
     realtimeDatabase.push().set(currentUserID);
     setState(() {
@@ -222,7 +231,8 @@ class _Discover extends State<Discover> {
   void like() {
     String businessUserID = entities.last.userId;
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
-    DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref('user_accounts/$businessUserID/likes');
+    DatabaseReference realtimeDatabase =
+        FirebaseDatabase.instance.ref('user_accounts/$businessUserID/likes');
 
     realtimeDatabase.push().set(currentUserID);
     setState(() {
@@ -262,81 +272,98 @@ class _Discover extends State<Discover> {
   Widget build(BuildContext context) {
     const double iconSize = 50;
 
-    return loading == true ? Container(
-      color: Colors.black,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
-          const SpinKitFadingCircle(
-            color: Colors.orange,
-            size: 60,
-          ) ,
-        ],
-      )) : !widget.isBusiness ? Container(
-      color: const Color(0xFF262626),
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          Flexible(
-            flex: 85,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: entities.map((entity) =>
-                SwipeCard(
-                  entity: entity,
-                  isFront: entities.last == entity,
-                  setScreenSize: setScreenSize,
-                  position: position,
-                  isDragging: isDragging,
-                  angle: angle,
-                  startPosition: startPosition,
-                  updatePosition: updatePosition,
-                  endPosition: endPosition,
-                )).toList(),
-            ),
-          ),
-          Flexible(
-              flex: 13,
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
+    return loading == true
+        ? Container(
+            color: Colors.black,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset('assets/nighthub.png',
+                    width: 200, height: 200, fit: BoxFit.contain),
+                const SpinKitFadingCircle(
+                  color: Colors.orange,
+                  size: 60,
                 ),
-                alignment: Alignment.center,
-                child: Row(
+              ],
+            ))
+        : !widget.isBusiness
+            ? Container(
+                color: const Color(0xFF262626),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        iconSize: iconSize,
-                        color: Colors.red,
-                        onPressed: () {
-                          dislike();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(Icons.check_rounded),
-                        iconSize: iconSize,
-                        color: Colors.green,
-                        onPressed: () {
-                          final Entity ent = entities.last;
-                          like();
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => EntityPage(entity: ent))
-                          );
-                        },
-                      ),
-                    )
+                    Flexible(
+                        flex: 85,
+                        child: entities.isNotEmpty
+                            ? Stack(
+                                clipBehavior: Clip.none,
+                                children: entities
+                                    .map((entity) => SwipeCard(
+                                          entity: entity,
+                                          isFront: entities.last == entity,
+                                          setScreenSize: setScreenSize,
+                                          position: position,
+                                          isDragging: isDragging,
+                                          angle: angle,
+                                          startPosition: startPosition,
+                                          updatePosition: updatePosition,
+                                          endPosition: endPosition,
+                                        ))
+                                    .toList(),
+                              )
+                            : Container(
+                                color: const Color(0xFF262626),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const <Widget>[
+                                    Text('More options coming soon...',
+                                        style: TextStyle(fontSize: 25))
+                                  ],
+                                ))),
+                    entities.isNotEmpty
+                        ? Flexible(
+                            flex: 13,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                              ),
+                              alignment: Alignment.center,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close_rounded),
+                                      iconSize: iconSize,
+                                      color: Colors.red,
+                                      onPressed: () {
+                                        dislike();
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: IconButton(
+                                      icon: const Icon(Icons.check_rounded),
+                                      iconSize: iconSize,
+                                      color: Colors.green,
+                                      onPressed: () {
+                                        final Entity ent = entities.last;
+                                        like();
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EntityPage(entity: ent)));
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ))
+                        : Container()
                   ],
                 ),
               )
-          )
-        ],
-      ),
-    ) : EntityPage(
-      entity: entities[0]
-    );
+            : EntityPage(entity: entities[0]);
   }
 }

@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nighthub/src/auth/authFlowScreens.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nighthub/src/settings/settings.dart';
 import 'package:nighthub/src/auth/authState.dart';
 import 'package:nighthub/src/homepage.dart';
 
@@ -22,20 +20,20 @@ class NightHub extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Welcome Screen',
-        theme: ThemeData(
-            scaffoldBackgroundColor: Colors.black12,
-            iconTheme: const IconThemeData(color: Colors.amber),
-            textTheme: const TextTheme(bodyText1: TextStyle(), bodyText2: TextStyle()).apply(bodyColor: Colors.white, displayColor: Colors.white),
-            fontFamily: 'anybody',
-        ),
-        initialRoute: '/',
-        routes: <String, WidgetBuilder>{
-          //! CHANGED: BEFORE -> const AuthFlowScreens()
-          '/': (BuildContext context) => const AuthFlowScreens(),
-          '/home': (BuildContext context) => const HomePage(),
-        },
+      title: 'Welcome Screen',
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.black12,
+        iconTheme: const IconThemeData(color: Colors.amber),
+        textTheme:
+            const TextTheme(bodyText1: TextStyle(), bodyText2: TextStyle())
+                .apply(bodyColor: Colors.white, displayColor: Colors.white),
+        fontFamily: 'anybody',
+      ),
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/': (BuildContext context) => const AuthFlowScreens(),
+        '/home': (BuildContext context) => const HomePage(),
+      },
     );
   }
 }
-
