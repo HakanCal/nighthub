@@ -318,6 +318,7 @@ class _Discover extends State<Discover> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: const <Widget>[
                                     Text('More options coming soon...',
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(fontSize: 25))
                                   ],
                                 ))),
