@@ -28,56 +28,64 @@ class _CustomDropdownField extends State<CustomDropdownField> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         DropdownButtonFormField(
-          isExpanded: true,
-          isDense: true,
-          //borderRadius: BorderRadius.circular(30),
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-                width: 2,
+            isExpanded: true,
+            isDense: true,
+            //borderRadius: BorderRadius.circular(30),
+            decoration: InputDecoration(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: const BorderSide(
+                  color: Colors.grey,
+                  width: 2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: const BorderSide(
+                  color: Colors.grey,
+                  width: 2,
+                ),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: const BorderSide(
+                  color: Colors.grey,
+                  width: 2,
+                ),
               ),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-                width: 2,
+            icon: const Icon(Icons.arrow_drop_down, color: Colors.blueGrey),
+            hint: Text(
+              widget.hintText,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.blueGrey,
               ),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-                width: 2,
-              ),
-            ),
-          ),
-          icon: const Icon(Icons.arrow_drop_down, color: Colors.blueGrey),
-          hint: Text(
-            widget.hintText,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey,),
-          ),
-          validator: widget.validator,
-          onChanged: (value) {},
-          items: widget.options.map((String option) => DropdownMenuItem(
-            value: option,
-            child: CustomCheckboxListTile(
-              title: option,
-              onChanged: (_) {
-                widget.onChanged(option);
-              },
-              selected: widget.values.contains(option),
-            )
-          )).toList(),
-          selectedItemBuilder: (BuildContext context) {
-            return widget.options.map<Widget>((String option) {
-              return const Text('');
-            }).toList();
-          }),
-        widget.values.isEmpty ? const SizedBox(height: 0) : const SizedBox(height: 8),
+            validator: widget.validator,
+            onChanged: (value) {},
+            items: widget.options
+                .map((String option) => DropdownMenuItem(
+                    value: option,
+                    child: CustomCheckboxListTile(
+                      title: option,
+                      onChanged: (_) {
+                        widget.onChanged(option);
+                      },
+                      selected: widget.values.contains(option),
+                    )))
+                .toList(),
+            selectedItemBuilder: (BuildContext context) {
+              return widget.options.map<Widget>((String option) {
+                return const Text('');
+              }).toList();
+            }),
+        widget.values.isEmpty
+            ? const SizedBox(height: 0)
+            : const SizedBox(height: 8),
         Row(
           children: [
             Expanded(

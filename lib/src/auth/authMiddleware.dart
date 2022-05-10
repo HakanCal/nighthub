@@ -36,40 +36,40 @@ class AuthMiddleware extends StatefulWidget {
   final void Function() setAuthStateToRegisterUser;
   final void Function() setAuthStateToRegisterBusiness;
   final void Function(
-      String email,
-      void Function() toggleLoader,
-      void Function(Exception e) error,
-      ) sendNewPassword;
+    String email,
+    void Function() toggleLoader,
+    void Function(Exception e) error,
+  ) sendNewPassword;
   final void Function() setAuthStateToLoggedOut;
   final void Function(
-      String email,
-      String password,
-      void Function() navigator,
-      void Function() toggleLoader,
-      void Function(Exception e) error,
-      ) signIn;
+    String email,
+    String password,
+    void Function() navigator,
+    void Function() toggleLoader,
+    void Function(Exception e) error,
+  ) signIn;
   final void Function() cancelRegistration;
   final void Function(
-      String username,
-      String email,
-      String password,
-      File? profilePicture,
-      List<String> interests,
-      void Function() toggleLoader,
-      void Function(Exception e) error,
-      ) registerUserAccount;
+    String username,
+    String email,
+    String password,
+    File? profilePicture,
+    List<String> interests,
+    void Function() toggleLoader,
+    void Function(Exception e) error,
+  ) registerUserAccount;
   final void Function(
-      String entityName,
-      String email,
-      String password,
-      String street,
-      String postcode,
-      String country,
-      File? profilePicture,
-      List<String> interests,
-      void Function() toggleLoader,
-      void Function(Exception e) error,
-      ) registerBusinessAccount;
+    String entityName,
+    String email,
+    String password,
+    String street,
+    String postcode,
+    String country,
+    File? profilePicture,
+    List<String> interests,
+    void Function() toggleLoader,
+    void Function(Exception e) error,
+  ) registerBusinessAccount;
   final void Function() logOut;
 
   @override
@@ -89,61 +89,61 @@ class _AuthMiddleware extends State<AuthMiddleware> {
   @override
   Widget build(BuildContext context) {
     switch (widget.authState) {
-     case AuthenticationState.forgotPassword:
+      case AuthenticationState.forgotPassword:
         return ForgotPasswordForm(
-          email: widget.email,
-          sendNewPassword: (email, toggleLoader) => widget.sendNewPassword(
-            email,
-            () => toggleLoader(),
-            (e) => _showErrorDialog(context, 'Email could not be sent', e)
-          ),
-          setAuthStateToLoggedOut: () => widget.setAuthStateToLoggedOut(),
-          isLoading: isLoading,
-          toggleLoader: () => toggleLoader()
-        );
+            email: widget.email,
+            sendNewPassword: (email, toggleLoader) => widget.sendNewPassword(
+                email,
+                () => toggleLoader(),
+                (e) => _showErrorDialog(context, 'Email could not be sent', e)),
+            setAuthStateToLoggedOut: () => widget.setAuthStateToLoggedOut(),
+            isLoading: isLoading,
+            toggleLoader: () => toggleLoader());
       case AuthenticationState.loggedOut:
         return LoginForm(
-          email: widget.email,
-          login: (email, password, navigator, toggleLoader) {
-            widget.signIn(
-              email,
-              password,
-              () => navigator(),
-              () => toggleLoader(),
-              (e) => _showErrorDialog(context, 'Failed to sign in', e));
-          },
-          forgotPassword: () => widget.forgotPassword(),
-          setAuthStateToRegisterUser: () => widget.setAuthStateToRegisterUser(),
-          setAuthStateToRegisterBusiness: () => widget.setAuthStateToRegisterBusiness(),
-          isLoading: isLoading,
-          toggleLoader: () => toggleLoader()
-        );
+            email: widget.email,
+            login: (email, password, navigator, toggleLoader) {
+              widget.signIn(
+                  email,
+                  password,
+                  () => navigator(),
+                  () => toggleLoader(),
+                  (e) => _showErrorDialog(context, 'Failed to sign in', e));
+            },
+            forgotPassword: () => widget.forgotPassword(),
+            setAuthStateToRegisterUser: () =>
+                widget.setAuthStateToRegisterUser(),
+            setAuthStateToRegisterBusiness: () =>
+                widget.setAuthStateToRegisterBusiness(),
+            isLoading: isLoading,
+            toggleLoader: () => toggleLoader());
       case AuthenticationState.registerUser:
         return UserRegisterForm(
-          email: widget.email,
-          cancel: () {
-            widget.cancelRegistration();
-          },
-          registerUserAccount: (username, email, password, profilePicture, interests, toggleLoader) {
-            widget.registerUserAccount(
-              username,
-              email,
-              password,
-              profilePicture,
-              interests,
-              () => toggleLoader(),
-              (e) => _showErrorDialog(context, 'Failed to create account', e));
-          },
+            email: widget.email,
+            cancel: () {
+              widget.cancelRegistration();
+            },
+            registerUserAccount: (username, email, password, profilePicture,
+                interests, toggleLoader) {
+              widget.registerUserAccount(
+                  username,
+                  email,
+                  password,
+                  profilePicture,
+                  interests,
+                  () => toggleLoader(),
+                  (e) =>
+                      _showErrorDialog(context, 'Failed to create account', e));
+            },
             isLoading: isLoading,
-            toggleLoader: () => toggleLoader()
-        );
+            toggleLoader: () => toggleLoader());
       case AuthenticationState.registerBusiness:
         return BusinessRegisterForm(
-          email: widget.email,
-          cancel: () {
-            widget.cancelRegistration();
-          },
-          registerBusinessAccount: (
+            email: widget.email,
+            cancel: () {
+              widget.cancelRegistration();
+            },
+            registerBusinessAccount: (
               entityName,
               email,
               password,
@@ -153,22 +153,22 @@ class _AuthMiddleware extends State<AuthMiddleware> {
               profilePicture,
               interests,
               toggleLoader,
-              ) {
-            widget.registerBusinessAccount(
-              entityName,
-              email,
-              password,
-              street,
-              postcode,
-              country,
-              profilePicture,
-              interests,
-              () => toggleLoader(),
-              (e) => _showErrorDialog(context, 'Failed to create account', e));
-          },
+            ) {
+              widget.registerBusinessAccount(
+                  entityName,
+                  email,
+                  password,
+                  street,
+                  postcode,
+                  country,
+                  profilePicture,
+                  interests,
+                  () => toggleLoader(),
+                  (e) =>
+                      _showErrorDialog(context, 'Failed to create account', e));
+            },
             isLoading: isLoading,
-            toggleLoader: () => toggleLoader()
-        );
+            toggleLoader: () => toggleLoader());
       case AuthenticationState.loggedIn:
         return const HomePage();
       default:
@@ -183,51 +183,50 @@ class _AuthMiddleware extends State<AuthMiddleware> {
   /// Show error modal with the default validation messages from Firebase
   void _showErrorDialog(BuildContext context, String title, Exception e) {
     showGeneralDialog(
-      transitionBuilder: (context, a1, a2, errorDialogWidget) {
-        return Transform.scale(
-          scale: a1.value,
-          child: Opacity(
-            opacity: a1.value,
-            child: AlertDialog(
-              actionsPadding: const EdgeInsets.only(top: 0, right: 10),
-              shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(20)
-              ),
-              title: Text(
-                title,
-                style: const TextStyle(fontSize: 24),
-              ),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text(
-                      '${(e as dynamic).message}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
+        transitionBuilder: (context, a1, a2, errorDialogWidget) {
+          return Transform.scale(
+            scale: a1.value,
+            child: Opacity(
+              opacity: a1.value,
+              child: AlertDialog(
+                actionsPadding: const EdgeInsets.only(top: 0, right: 10),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                title: Text(
+                  title,
+                  style: const TextStyle(fontSize: 24),
                 ),
-              ),
-              actions: <Widget>[
-                StyledButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(color: Colors.black),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[
+                      Text(
+                        '${(e as dynamic).message}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+                actions: <Widget>[
+                  StyledButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'OK',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 200),
-      barrierDismissible: true,
-      barrierLabel: '',
-      context: context,
-      pageBuilder: (context, animation1, animation2) {throw Exception;}
-    );
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 200),
+        barrierDismissible: true,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {
+          throw Exception;
+        });
   }
 }

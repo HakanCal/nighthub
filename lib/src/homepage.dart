@@ -17,7 +17,7 @@ import 'radar/radar.dart';
 import 'settings/settings.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({ Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePage createState() => _HomePage();
@@ -27,9 +27,10 @@ class _HomePage extends State<HomePage> {
   late Future<dynamic> _future;
 
   Map<String, dynamic>? _accountData = <String, dynamic>{};
+
   Map<String, dynamic>? get accountData => _accountData;
   File? _tempImageFile;
-  List <Widget> menuSelects = <Widget>[];
+  List<Widget> menuSelects = <Widget>[];
   late StreamSubscription<DatabaseEvent> _counterSubscription;
 
   @override
@@ -51,12 +52,17 @@ class _HomePage extends State<HomePage> {
     DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    _counterSubscription = realtimeDatabase.child('user_accounts/$userId/').onValue.listen((event) async {
-      final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
-      setState(() {
-        _accountData = data;
-      });
-      await getImageFile();
+    _counterSubscription = realtimeDatabase
+        .child('user_accounts/$userId/')
+        .onValue
+        .listen((event) async {
+          if (event.snapshot.value != null) {
+            Map<String, dynamic>? data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+            setState(() {
+              _accountData = data;
+            });
+            await getImageFile();
+          }
     });
   }
 
@@ -73,8 +79,9 @@ class _HomePage extends State<HomePage> {
         if (tempFile.existsSync() == false) {
           try {
             tempFile.create(recursive: true);
-            await firebase_storage.FirebaseStorage.instance.ref(
-                '/profile_pictures/$imageName').writeToFile(tempFile);
+            await firebase_storage.FirebaseStorage.instance
+                .ref('/profile_pictures/$imageName')
+                .writeToFile(tempFile);
           } catch (e) {
             /// If there is an error the created file will be deleted
             debugPrint(e.toString());
@@ -86,23 +93,22 @@ class _HomePage extends State<HomePage> {
           _tempImageFile = tempFile;
           menuSelects = <Widget>[
             Discover(isBusiness: accountData!['business']),
-            accountData!['business'] == true ? EditEntityPage(
-                userData: accountData!) : Radar(),
+            accountData!['business'] == true
+                ? EditEntityPage(userData: accountData!)
+                : Radar(),
             const Favorites(),
-            AppSettings(
-                userData: accountData!, profilePicture: tempFile)
+            AppSettings(userData: accountData!, profilePicture: _tempImageFile)
           ];
         });
-
       } else {
         setState(() {
           menuSelects = <Widget>[
             Discover(isBusiness: accountData!['business']),
-            accountData!['business'] == true ? EditEntityPage(
-                userData: accountData!) : Radar(), //TODO: FAVORITES
+            accountData!['business'] == true
+                ? EditEntityPage(userData: accountData!)
+                : Radar(), //TODO: FAVORITES
             const Favorites(),
-            AppSettings(
-                userData: accountData!, profilePicture: null)
+            AppSettings(userData: accountData!, profilePicture: null)
           ];
         });
       }
@@ -111,7 +117,7 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    void _onItemTap(int index){
+    void _onItemTap(int index) {
       setState(() => {_selectedIndex = index});
     }
 
@@ -135,15 +141,12 @@ class _HomePage extends State<HomePage> {
                 body: Center(
                     child: menuSelects.isNotEmpty
                         ? menuSelects[_selectedIndex]
-                        : null
-                ),
+                        : null),
                 bottomNavigationBar: NavBar(
                     selectedIndex: _selectedIndex,
                     onItemTap: _onItemTap,
-                    isBusinessAccount: accountData!['business'] == true
-                        ? true
-                        : false
-                ),
+                    isBusinessAccount:
+                        accountData!['business'] == true ? true : false),
               ),
             );
           } else {
@@ -152,16 +155,15 @@ class _HomePage extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset('assets/nighthub.png', width: 200, height: 200, fit: BoxFit.contain),
+                    Image.asset('assets/nighthub.png',
+                        width: 200, height: 200, fit: BoxFit.contain),
                     const SpinKitFadingCircle(
                       color: Colors.orange,
                       size: 60,
-                    ) ,
+                    ),
                   ],
-                )
-            );
+                ));
           }
-        }
-    );
+        });
   }
 }

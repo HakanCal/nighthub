@@ -21,31 +21,33 @@ class CustomFormButton extends StatelessWidget {
     return TextButton(
       style: ButtonStyle(
         minimumSize: MaterialStateProperty.all(const Size.fromHeight(50)),
-        backgroundColor: onPressed != null ? MaterialStateProperty.all(fillColor) : MaterialStateProperty.all(fillColor.withOpacity(0.3)),
+        backgroundColor: onPressed != null
+            ? MaterialStateProperty.all(fillColor)
+            : MaterialStateProperty.all(fillColor.withOpacity(0.3)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
               side: const BorderSide(
                 width: 2,
                 color: Colors.orange,
-              )
-          ),
+              )),
         ),
       ),
       onPressed: onPressed,
-      child: isLoading ?
-        const SpinKitFadingCircle(
-          color: Colors.black,
-          size: 30,
-        ) :
-        Text(
-          text,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: onPressed != null ? textColor : textColor.withOpacity(0.3),
-            fontSize: 16
-          ),
-        ),
+      child: isLoading
+          ? const SpinKitFadingCircle(
+              color: Colors.black,
+              size: 30,
+            )
+          : Text(
+              text,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: onPressed != null
+                      ? textColor
+                      : textColor.withOpacity(0.3),
+                  fontSize: 16),
+            ),
     );
   }
 }

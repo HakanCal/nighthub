@@ -10,14 +10,13 @@ class Entity {
   final String? about;
   final NetworkImage primaryImage;
 
-  Entity({
-    required this.userId,
-    required this.isBusiness,
-    required this.username,
-    required this.address,
-    required this.distance,
-    required this.tags,
-    this.about,
-    required this.primaryImage
-  });
+  Entity(
+      {required this.userId,
+      required this.isBusiness,
+      required this.username,
+      required this.address,
+      required this.distance,
+      required this.tags,
+      this.about,
+      required this.primaryImage});
 }

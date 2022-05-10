@@ -10,6 +10,7 @@ import 'package:geocode/geocode.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 
 import './authMiddleware.dart';
+
 class AuthState extends ChangeNotifier {
   AuthState() {
     init();
@@ -17,6 +18,7 @@ class AuthState extends ChangeNotifier {
 
   /// Assuming the user is logged-out the first time
   AuthenticationState _authState = AuthenticationState.loggedOut;
+
   AuthenticationState get authState => _authState;
 
   /// init() function to check whether user is logged-in or -out
@@ -35,6 +37,7 @@ class AuthState extends ChangeNotifier {
   }
 
   String? _email;
+
   String? get email => _email;
 
   /// Auth state changes and navigates to ForgotPassword page
@@ -45,13 +48,14 @@ class AuthState extends ChangeNotifier {
 
   /// Sends email withe instructions to change password
   Future<void> sendNewPassword(
-      String email,
-      void Function() toggleLoader,
-      void Function(FirebaseAuthException e) errorCallback,
-      ) async {
+    String email,
+    void Function() toggleLoader,
+    void Function(FirebaseAuthException e) errorCallback,
+  ) async {
     toggleLoader();
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail( email: email)
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email)
           .then((value) => toggleLoader());
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -68,25 +72,27 @@ class AuthState extends ChangeNotifier {
 
   /// Sign in by entering email and password
   Future<void> signIn(
-      String email,
-      String password,
-      void Function() navigator,
-      void Function() toggleLoader,
-      void Function(FirebaseAuthException e) errorCallback,
-    ) async {
+    String email,
+    String password,
+    void Function() navigator,
+    void Function() toggleLoader,
+    void Function(FirebaseAuthException e) errorCallback,
+  ) async {
+    toggleLoader();
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      )
+          .then((value) {
+        navigator();
+      });
+    } on FirebaseAuthException catch (e) {
+      errorCallback(e);
       toggleLoader();
-      try {
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: email,
-            password: password,
-          ).then((value) {
-            navigator();
-          });
-      } on FirebaseAuthException catch (e) {
-        errorCallback(e);
-        toggleLoader();
-      }
     }
+  }
 
   /// Navigates back to login page
   void setAuthStateToRegisterUser() {
@@ -114,46 +120,46 @@ class AuthState extends ChangeNotifier {
       File? profilePicture,
       List<String> interests,
       void Function() toggleLoader,
-      void Function(FirebaseAuthException e) errorCallback
-    ) async {
-      toggleLoader();
-      try {
-        DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
+      void Function(FirebaseAuthException e) errorCallback) async {
+    toggleLoader();
+    try {
+      DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
 
-        String? imageName = profilePicture?.path.split('/').last;
-        if (imageName != null) {
-          uploadProfilePicture(profilePicture!, imageName);
-        }
+      String? imageName = profilePicture?.path.split('/').last;
+      if (imageName != null) {
+        uploadProfilePicture(profilePicture!, imageName);
+      }
 
-        var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email,
-            password: password);
+      var credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-        final newUserData = <String, dynamic> {
-          'userId': FirebaseAuth.instance.currentUser!.uid,
-          'business': false,
-          'username': username,
-          'email': email,
-          'profile_picture': imageName,
-          'interests': interests,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-        };
+      final newUserData = <String, dynamic>{
+        'userId': FirebaseAuth.instance.currentUser!.uid,
+        'business': false,
+        'username': username,
+        'email': email,
+        'profile_picture': imageName,
+        'interests': interests,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
 
-        await credential.user!.updateDisplayName(username)
-          .then((value) async => await realtimeDatabase.child('user_accounts/${FirebaseAuth.instance.currentUser!.uid}/')
-            .set(newUserData)
-            .then((value) => debugPrint('Did work the realtimeData'))
-            .catchError((onError) => debugPrint('Didn\'t work the realtimeData'))
-        );
+      await credential.user!.updateDisplayName(username).then((value) async =>
+          await realtimeDatabase
+              .child('user_accounts/${FirebaseAuth.instance.currentUser!.uid}/')
+              .set(newUserData)
+              .then((value) => debugPrint('Did work the realtimeData'))
+              .catchError(
+                  (onError) => debugPrint('Didn\'t work the realtimeData')));
 
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
       toggleLoader();
-      } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) {
       errorCallback(e);
       toggleLoader();
     }
   }
+
   /// Registration is finished and business account created
   Future<void> registerBusinessAccount(
       String entityName,
@@ -165,8 +171,7 @@ class AuthState extends ChangeNotifier {
       File? profilePicture,
       List<String> interests,
       void Function() toggleLoader,
-      void Function(FirebaseAuthException e) errorCallback
-    ) async {
+      void Function(FirebaseAuthException e) errorCallback) async {
     toggleLoader();
     try {
       DatabaseReference realtimeDatabase = FirebaseDatabase.instance.ref();
@@ -176,9 +181,8 @@ class AuthState extends ChangeNotifier {
         uploadProfilePicture(profilePicture!, imageName);
       }
 
-      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password);
+      var credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       String address = '$street , $postcode, $country';
       var point = await createGeoPoint(address);
@@ -197,18 +201,19 @@ class AuthState extends ChangeNotifier {
         'dislikes': []
       };
 
-      await credential.user!.updateDisplayName(entityName)
-        .then((value) async => await realtimeDatabase.child('user_accounts/${FirebaseAuth.instance.currentUser!.uid}/')
-          .set(newUserData)
-          .then((value) => debugPrint('Did work the realtimeData'))
-          .catchError((onError) => debugPrint('Didn\'t work the realtimeData: $onError'))
-      );
+      await credential.user!.updateDisplayName(entityName).then((value) async =>
+          await realtimeDatabase
+              .child('user_accounts/${FirebaseAuth.instance.currentUser!.uid}/')
+              .set(newUserData)
+              .then((value) => debugPrint('Did work the realtimeData'))
+              .catchError((onError) =>
+                  debugPrint('Didn\'t work the realtimeData: $onError')));
       toggleLoader();
       _authState = AuthenticationState.loggedOut;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
-        errorCallback(e);
-        toggleLoader();
+      errorCallback(e);
+      toggleLoader();
     }
   }
 
@@ -228,7 +233,8 @@ class AuthState extends ChangeNotifier {
         contentType: 'image/jpeg',
         customMetadata: {'picked-file-path': profilePicture.path});
 
-    firebase_storage.UploadTask uploadTask = ref.putFile(File(profilePicture.path), metadata);
+    firebase_storage.UploadTask uploadTask =
+        ref.putFile(File(profilePicture.path), metadata);
     uploadTask.whenComplete(() {
       debugPrint('Photo was uploaded to storage');
     });
@@ -240,8 +246,10 @@ class AuthState extends ChangeNotifier {
     GeoCode geoCode = GeoCode();
 
     try {
-      Coordinates coordinates = await geoCode.forwardGeocoding(address: address);
-      GeoHash geoHash = GeoHash.fromDecimalDegrees(coordinates.longitude!, coordinates.latitude!);
+      Coordinates coordinates =
+          await geoCode.forwardGeocoding(address: address);
+      GeoHash geoHash = GeoHash.fromDecimalDegrees(
+          coordinates.longitude!, coordinates.latitude!);
       point = {
         'geohash': geoHash.geohash,
         'geopoint': {

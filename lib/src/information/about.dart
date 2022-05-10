@@ -44,14 +44,17 @@ class _About extends State<About> {
           child: Column(
             children: [
               Center(
-                child: Image.asset('assets/nighthub.png', width: 150, height: 150),
+                child:
+                    Image.asset('assets/nighthub.png', width: 150, height: 150),
               ),
-              Text(data ?? '<error> please contact an admin', style: const TextStyle(color: Colors.white, fontSize: 20.00),)
+              Text(
+                data ?? '<error> please contact an admin',
+                style: const TextStyle(color: Colors.white, fontSize: 20),
+              )
             ],
           ),
         ),
       ),
     );
   }
-
 }

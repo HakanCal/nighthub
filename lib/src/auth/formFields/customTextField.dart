@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({
-    required this.controller,
-    required this.hint,
-    this.isHidden = false,
-    this.readOnly = false,
-    required this.validator,
-    required this.onSaved,
-    required this.iconWidget,
-    this.onTap,
-    required this.textInputAction,
-    required this.onFieldSubmitted
-  });
+  const CustomTextField(
+      {required this.controller,
+      required this.hint,
+      this.isHidden = false,
+      this.readOnly = false,
+      required this.validator,
+      required this.onSaved,
+      required this.iconWidget,
+      this.onTap,
+      required this.textInputAction,
+      required this.onFieldSubmitted});
 
   final FormFieldSetter<String> onSaved;
   final TextEditingController controller;
@@ -41,7 +40,8 @@ class CustomTextField extends StatelessWidget {
         color: Colors.grey,
       ),
       decoration: InputDecoration(
-        hintStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
+        hintStyle: const TextStyle(
+            fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
         hintText: hint,
         contentPadding: const EdgeInsets.all(20),
         enabledBorder: OutlineInputBorder(
@@ -65,10 +65,11 @@ class CustomTextField extends StatelessWidget {
             width: 2,
           ),
         ),
-        suffixIcon: iconWidget != null ? Padding(
-          padding: const EdgeInsets.only(left: 0, right: 10),
-          child: iconWidget
-        ) : null,
+        suffixIcon: iconWidget != null
+            ? Padding(
+                padding: const EdgeInsets.only(left: 0, right: 10),
+                child: iconWidget)
+            : null,
       ),
     );
   }

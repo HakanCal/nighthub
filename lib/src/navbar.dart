@@ -19,44 +19,40 @@ class _NavBar extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-
-        widget.isBusinessAccount == true ?
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.remove_red_eye, color: Colors.orangeAccent),
-            label: 'Preview',
-            tooltip: 'Preview of your Bar'
-        ) : const BottomNavigationBarItem(
-            icon: Icon(Icons.bolt_outlined, color: Colors.orangeAccent),
-            label: 'Discover',
-            tooltip: 'Discover local Bars!'),
-
-        widget.isBusinessAccount == true ?
+        items: <BottomNavigationBarItem>[
+          widget.isBusinessAccount == true
+              ? const BottomNavigationBarItem(
+                  icon: Icon(Icons.remove_red_eye, color: Colors.orangeAccent),
+                  label: 'Preview',
+                  tooltip: 'Preview of your Bar')
+              : const BottomNavigationBarItem(
+                  icon: Icon(Icons.bolt_outlined, color: Colors.orangeAccent),
+                  label: 'Discover',
+                  tooltip: 'Discover local Bars!'),
+          widget.isBusinessAccount == true
+              ? const BottomNavigationBarItem(
+                  icon:
+                      Icon(Icons.pentagon_outlined, color: Colors.orangeAccent),
+                  label: 'Page settings',
+                  tooltip: 'Page settings')
+              : const BottomNavigationBarItem(
+                  icon: Icon(Icons.location_on, color: Colors.orangeAccent),
+                  label: 'Near me',
+                  tooltip: 'Local Bars near me'),
           const BottomNavigationBarItem(
-              icon: Icon(Icons.pentagon_outlined, color: Colors.orangeAccent),
-              label: 'Page settings',
-              tooltip: 'Page settings') :
+              icon: Icon(Icons.turned_in_outlined, color: Colors.orangeAccent),
+              label: 'Favorites',
+              tooltip: 'favorites'),
           const BottomNavigationBarItem(
-              icon: Icon(Icons.location_on, color: Colors.orangeAccent),
-              label: 'Near me',
-              tooltip: 'Local Bars near me'),
-
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.turned_in_outlined, color: Colors.orangeAccent),
-            label: 'Favorites',
-            tooltip: 'favorites'),
-
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.orangeAccent),
-            label: 'Settings',
-            tooltip: 'Settings')
-      ],
-      backgroundColor: Colors.black,
-      iconSize: 24,
-      currentIndex: widget.selectedIndex,
-      onTap: widget.onItemTap,
-      showSelectedLabels: false,
-      type: BottomNavigationBarType.fixed
-    );
+              icon: Icon(Icons.settings, color: Colors.orangeAccent),
+              label: 'Settings',
+              tooltip: 'Settings')
+        ],
+        backgroundColor: Colors.black,
+        iconSize: 24,
+        currentIndex: widget.selectedIndex,
+        onTap: widget.onItemTap,
+        showSelectedLabels: false,
+        type: BottomNavigationBarType.fixed);
   }
 }
