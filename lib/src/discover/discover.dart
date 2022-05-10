@@ -45,12 +45,13 @@ class _Discover extends State<Discover> {
         getBusinessData();
       } else {
         initLazyLoader();
-        Future.delayed(const Duration(milliseconds: 500), () {
-          setState(() {
-            loading = false;
-          });
-        });
       }
+    });
+    Future.delayed(const Duration(milliseconds: 500), ()
+    {
+      setState(() {
+        loading = false;
+      });
     });
   }
 
@@ -364,6 +365,6 @@ class _Discover extends State<Discover> {
                   ],
                 ),
               )
-            : EntityPage(entity: entities[0]);
+            : EntityPage(entity: entities.first);
   }
 }
