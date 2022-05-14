@@ -69,9 +69,9 @@ class _HomePage extends State<HomePage> {
   /// Preloads the profile picture from Firebase Storage
   Future<dynamic> getImageFile() async {
     if (accountData!.isNotEmpty == true) {
-      String? imageName = accountData!['profile_picture'];
+      String imageName = accountData!['profile_picture'];
 
-      if (imageName != null) {
+      if (imageName != 'null') {
         final tempDir = await getTemporaryDirectory();
         final File tempFile = File('${tempDir.path}/$imageName');
 

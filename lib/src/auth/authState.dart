@@ -138,7 +138,7 @@ class AuthState extends ChangeNotifier {
         'business': false,
         'username': username,
         'email': email,
-        'profile_picture': imageName,
+        'profile_picture': imageName ?? 'null',
         'interests': interests,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
       };
@@ -192,7 +192,7 @@ class AuthState extends ChangeNotifier {
         'business': true,
         'username': entityName,
         'email': email,
-        'profile_picture': imageName,
+        'profile_picture': imageName ?? 'null',
         'interests': interests,
         'address': address,
         'point': point,

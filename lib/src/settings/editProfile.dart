@@ -159,7 +159,7 @@ class _EditProfile extends State<EditProfile> {
     } else {
       String? imageName = profilePicture?.path.split('/').last;
 
-      if (imageName != widget.userData['profile_picture']) {
+      if (imageName != widget.userData['profile_picture'] && widget.userData['profile_picture'] != 'null') {
         firebase_storage.Reference ref = firebase_storage
             .FirebaseStorage.instance
             .ref()
@@ -178,7 +178,7 @@ class _EditProfile extends State<EditProfile> {
       realtimeDatabase.update({
         'username': username,
         'email': email,
-        'profile_picture': imageName,
+        'profile_picture': imageName ?? 'null',
         'interests': interests
       });
 

@@ -236,7 +236,7 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
     } else {
       String? imageName = profilePicture?.path.split('/').last;
 
-      if (imageName != widget.userData['profile_picture']) {
+      if (imageName != widget.userData['profile_picture'] && widget.userData['profile_picture'] != 'null') {
         firebase_storage.Reference ref = firebase_storage
             .FirebaseStorage.instance
             .ref()
@@ -260,7 +260,7 @@ class _EditBusinessProfile extends State<EditBusinessProfile> {
         'email': email,
         'address': address,
         'point': point,
-        'profile_picture': imageName,
+        'profile_picture': imageName ?? 'null',
         'interests': interests
       });
 
