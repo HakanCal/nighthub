@@ -72,7 +72,7 @@ class RadarItem extends StatelessWidget {
             }, //go to shop page
         child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
-            height: 130,
+            height: 150,
             decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(color: Colors.orange, width: 2),
@@ -132,7 +132,7 @@ class _RadarItemBody extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 30,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold)),
               )),
           flex: 2,
@@ -142,7 +142,10 @@ class _RadarItemBody extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 10),
               child: Center(
                 child: Text(threeCategories(),
-                    style: const TextStyle(color: Colors.white, fontSize: 15)),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 14)),
               )),
           flex: 1,
         )
