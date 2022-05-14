@@ -61,11 +61,15 @@ class _AppSettings extends State<AppSettings> {
                           .image,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(widget.userData['username'],
-                      style:
-                          const TextStyle(fontSize: 30, color: Colors.white)),
-                ),
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Center(
+                      child: Text(widget.userData['username'],
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 30, color: Colors.white)),
+                    )),
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(widget.userData['email'],
