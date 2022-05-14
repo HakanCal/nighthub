@@ -41,9 +41,7 @@ class _CustomImagePicker extends State<CustomImagePicker> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 30, color: Colors.blueGrey))
-                )
+                    style: TextStyle(fontSize: 30, color: Colors.blueGrey))
               ],
             ),
           ),
