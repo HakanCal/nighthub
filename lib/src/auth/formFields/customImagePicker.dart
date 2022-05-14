@@ -37,11 +37,11 @@ class _CustomImagePicker extends State<CustomImagePicker> {
                           .image,
                 ),
                 const SizedBox(height: 10),
-                const Text('Please select your profile photo',
+                const Text('Choose profile photo',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 30, color: Colors.blueGrey))
+                    style: TextStyle(fontSize: 25, color: Colors.blueGrey))
               ],
             ),
           ),

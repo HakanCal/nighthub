@@ -23,7 +23,7 @@ class CustomChipList extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Wrap(
-        spacing: 20,
+        spacing: 25,
         children: <Widget>[..._buildChipList()],
       ),
     );

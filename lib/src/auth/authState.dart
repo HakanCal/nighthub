@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_database/firebase_database.dart';
-import 'package:geocode/geocode.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 
 import './authMiddleware.dart';
@@ -243,18 +243,16 @@ class AuthState extends ChangeNotifier {
   /// Creates geohash, longitude and latitude from address
   Future<Object> createGeoPoint(String address) async {
     var point = {};
-    GeoCode geoCode = GeoCode();
+    List<Location> locations = await locationFromAddress(address);
 
     try {
-      Coordinates coordinates =
-          await geoCode.forwardGeocoding(address: address);
       GeoHash geoHash = GeoHash.fromDecimalDegrees(
-          coordinates.longitude!, coordinates.latitude!);
+          locations[0].longitude, locations[0].latitude);
       point = {
         'geohash': geoHash.geohash,
         'geopoint': {
-          'latitude': coordinates.latitude!,
-          'longitude': coordinates.longitude!
+          'latitude': locations[0].latitude,
+          'longitude': locations[0].longitude
         }
       };
     } catch (e) {
